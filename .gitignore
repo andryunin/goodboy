@@ -1,0 +1,14 @@
+# Byte-compiled and built packages
+*.py[cod]
+dist/
+
+# Unit test / coverage reports
+.coverage
+
+# Sphinx documentation
+docs/_build/
+
+# Editors and notes
+.vscode/*
+.idea/*
+.notes
