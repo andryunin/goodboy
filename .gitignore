@@ -8,6 +8,9 @@ dist/
 # Sphinx documentation
 docs/_build/
 
+# I18n
+src/goodboy/locale/**/goodboy.mo
+
 # Editors and notes
 .vscode/*
 .idea/*
