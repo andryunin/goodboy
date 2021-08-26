@@ -3,6 +3,9 @@ name = "goodboy"
 version = "0.1.0"
 description = ""
 authors = ["Maxim Andryunin <maxim.andryunin@gmail.com>"]
+include = [
+    "src/goodboy/locale/**/*.mo"
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"
