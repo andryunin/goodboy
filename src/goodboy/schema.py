@@ -30,7 +30,7 @@ class Schema(ABC):
 
     def __call__(self, value, *, typecast=False):
         if value is None and not self.allow_none:
-            return InvalidValueError([Error("cannot_be_none")])
+            raise InvalidValueError([Error("cannot_be_none")])
 
         if typecast:
             value = self.typecast(value)

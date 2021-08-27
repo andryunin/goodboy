@@ -3,6 +3,14 @@ from datetime import datetime
 from goodboy.schema import Schema, Error, InvalidValueError
 
 
+class AnyType(Schema):
+    def validate(self, value):
+        return []
+
+    def typecast(self, value):
+        return value
+
+
 class DateTime(Schema):
     def __init__(
         self,
