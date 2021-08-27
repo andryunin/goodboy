@@ -18,18 +18,14 @@ class Validator:
         self.schema = schema
 
     def validate(self, value, typecast: bool = False) -> Result:
-        result = Result()
-
         try:
-            result_value = self.schema(value, result, typecast=typecast)
+            result_value = self.schema(value, typecast=typecast)
         except InvalidValueError as e:
-            result.set_errors(e.errors)
-        else:
-            result.set_value(result_value)
+            return Result(None, e.errors)
 
-        return result
+        return Result(result_value, [])
 
 
 def validate(schema: Schema, value, typecast: bool = False):
     validator = Validator(schema)
-    validator.validate(value, typecast=typecast)
+    return validator.validate(value, typecast=typecast)
