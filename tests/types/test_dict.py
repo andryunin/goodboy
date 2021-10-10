@@ -23,9 +23,7 @@ def test_key_required():
         Error(
             "dict.keys_error",
             args={
-                "keys": {
-                    "key_0": [Error("dict.required_key")],
-                }
+                "key_0": [Error("dict.required_key")],
             },
         )
     ]
@@ -54,9 +52,7 @@ def test_value_validation():
         Error(
             "dict.keys_error",
             args={
-                "keys": {
-                    "timestamp": [Error("cannot_be_none")],
-                }
+                "timestamp": [Error("cannot_be_none")],
             },
         )
     ]
@@ -87,10 +83,8 @@ def test_value_typecasting():
         Error(
             "dict.keys_error",
             args={
-                "keys": {
-                    "timestamp": [Error("datetime.invalid_format")],
-                    "value": [Error("int.invalid_format")],
-                }
+                "timestamp": [Error("datetime.invalid_format")],
+                "value": [Error("int.invalid_format")],
             },
         )
     ]

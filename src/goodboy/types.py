@@ -144,7 +144,7 @@ class Dict(Schema):
                 key_errors[key] = [Error("dict.unknown_key")]
 
         if key_errors:
-            return None, [Error("dict.keys_error", {"keys": key_errors})]
+            return None, [Error("dict.keys_error", key_errors)]
 
         return key_values, []
 
