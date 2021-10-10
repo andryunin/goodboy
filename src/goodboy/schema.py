@@ -1,3 +1,5 @@
+from typing import Any
+
 from abc import ABC, abstractmethod
 
 
@@ -19,7 +21,7 @@ class Error:
         return super().__eq__(other)
 
 
-class InvalidValueError(Exception):
+class SchemaError(Exception):
     def __init__(self, errors: list[Error]):
         self.errors = errors
 
@@ -31,24 +33,27 @@ class Schema(ABC):
     def __call__(self, value, *, typecast=False):
         if value is None:
             if not self.allow_none:
-                raise InvalidValueError([Error("cannot_be_none")])
+                raise SchemaError([Error("cannot_be_none")])
 
             return None
 
         if typecast:
-            value = self.typecast(value)
+            value, errors = self.typecast(value)
 
-        errors = self.validate(value)
+            if errors:
+                raise SchemaError(errors)
+
+        errors = self.validate(value, typecast)
 
         if errors:
-            raise InvalidValueError(errors)
+            raise SchemaError(errors)
 
         return value
 
     @abstractmethod
-    def validate(self, value) -> list[Error]:
+    def validate(self, value: Any, typecast: bool) -> list[Error]:
         ...
 
     @abstractmethod
-    def typecast(self, value):
+    def typecast(self, value: Any) -> tuple[Any, list[Error]]:
         ...

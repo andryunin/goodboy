@@ -2,12 +2,12 @@ from contextlib import contextmanager
 
 import pytest
 
-from goodboy.schema import Error, InvalidValueError
+from goodboy.schema import Error, SchemaError
 
 
 @contextmanager
 def assert_errors(errors: list[Error]):
-    with pytest.raises(InvalidValueError) as e:
+    with pytest.raises(SchemaError) as e:
         yield
 
     assert e.value.errors == errors

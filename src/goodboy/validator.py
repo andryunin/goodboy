@@ -1,6 +1,6 @@
 from typing import Any
 
-from goodboy.schema import Schema, Error, InvalidValueError
+from goodboy.schema import Schema, SchemaError, Error
 
 
 class Result:
@@ -20,7 +20,7 @@ class Validator:
     def validate(self, value, typecast: bool = False) -> Result:
         try:
             result_value = self.schema(value, typecast=typecast)
-        except InvalidValueError as e:
+        except SchemaError as e:
             return Result(None, e.errors)
 
         return Result(result_value, [])

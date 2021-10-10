@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from goodboy.schema import Schema, Error, InvalidValueError
+from goodboy.schema import Schema, Error
 
 
 class AnyType(Schema):
-    def validate(self, value):
+    def validate(self, value, typecast):
         return []
 
     def typecast(self, value):
@@ -25,7 +25,7 @@ class DateTime(Schema):
         self.max = max
         self.format = format
 
-    def validate(self, value):
+    def validate(self, value, typecast):
         if not isinstance(value, datetime):
             return [Error("invalid_type", {"expected_type": "datetime"})]
 
@@ -41,16 +41,16 @@ class DateTime(Schema):
 
     def typecast(self, value):
         if isinstance(value, datetime):
-            return value
+            return value, []
 
         if not isinstance(value, str):
-            raise InvalidValueError([Error("datetime.invalid_type_to_cast")])
+            return None, [Error("datetime.invalid_type_to_cast")]
 
         try:
             if self.format:
-                return datetime.strptime(value, self.format)
+                return datetime.strptime(value, self.format), []
             else:
-                return datetime.fromisoformat(value)
+                return datetime.fromisoformat(value), []
 
         except ValueError:
-            raise InvalidValueError([Error("datetime.invalid_format")])
+            return None, [Error("datetime.invalid_format")]
