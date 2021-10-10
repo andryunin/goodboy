@@ -14,3 +14,10 @@ def test_none():
 def test_value():
     assert AnyType()("ok") == "ok"
     assert AnyType()(42) == 42
+
+
+def test_allow_none():
+    assert AnyType(allow_none=True)(None) is None
+
+    with assert_errors([Error("cannot_be_none")]):
+        AnyType()(None)

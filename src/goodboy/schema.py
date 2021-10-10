@@ -29,8 +29,11 @@ class Schema(ABC):
         self.allow_none = allow_none
 
     def __call__(self, value, *, typecast=False):
-        if value is None and not self.allow_none:
-            raise InvalidValueError([Error("cannot_be_none")])
+        if value is None:
+            if not self.allow_none:
+                raise InvalidValueError([Error("cannot_be_none")])
+
+            return None
 
         if typecast:
             value = self.typecast(value)

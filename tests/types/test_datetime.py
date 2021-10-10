@@ -64,3 +64,10 @@ def test_format_typecast():
 
     with assert_errors([Error("datetime.invalid_format")]):
         schema(bad_string, typecast=True)
+
+
+def test_allow_none():
+    assert DateTime(allow_none=True)(None) is None
+
+    with assert_errors([Error("cannot_be_none")]):
+        DateTime()(None)
