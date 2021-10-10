@@ -43,7 +43,7 @@ class Schema(ABC):
             if errors:
                 raise SchemaError(errors)
 
-        errors = self.validate(value, typecast)
+        value, errors = self.validate(value, typecast)
 
         if errors:
             raise SchemaError(errors)

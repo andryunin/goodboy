@@ -5,10 +5,10 @@ from goodboy.schema import Schema, Error
 
 class AnyType(Schema):
     def validate(self, value, typecast):
-        return []
+        return value, []
 
     def typecast(self, value):
-        return value
+        return value, []
 
 
 class DateTime(Schema):
@@ -27,7 +27,7 @@ class DateTime(Schema):
 
     def validate(self, value, typecast):
         if not isinstance(value, datetime):
-            return [Error("invalid_type", {"expected_type": "datetime"})]
+            return None, [Error("invalid_type", {"expected_type": "datetime"})]
 
         errors = []
 
@@ -37,7 +37,7 @@ class DateTime(Schema):
         if self.max and value >= self.max:
             errors.append(Error("datetime.more_or_equal_then", {"max": self.max}))
 
-        return errors
+        return value, errors
 
     def typecast(self, value):
         if isinstance(value, datetime):
@@ -70,7 +70,7 @@ class Int(Schema):
 
     def validate(self, value, typecast):
         if not isinstance(value, int):
-            return [Error("invalid_type", {"expected_type": "int"})]
+            return None, [Error("invalid_type", {"expected_type": "int"})]
 
         errors = []
 
@@ -80,7 +80,7 @@ class Int(Schema):
         if self.max is not None and value >= self.max:
             errors.append(Error("int.more_or_equal_then", {"max": self.max}))
 
-        return errors
+        return value, errors
 
     def typecast(self, value):
         if isinstance(value, int):
