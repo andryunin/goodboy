@@ -1,6 +1,7 @@
 from typing import Optional
-
 from abc import ABC, abstractmethod
+
+from goodboy.i18n import Translations, I18nLazyStub, lazy_gettext as _
 
 
 class Message:
@@ -24,11 +25,21 @@ class Message:
     def __init__(self, default_message, **other_messages):
         self.messages = {"default": default_message, **other_messages}
 
-    def get(self, format: Optional[str] = None):
+    def get(
+        self, format: Optional[str] = None, translations: Optional[Translations] = None
+    ):
         if format not in self.messages:
             format = "default"
 
-        return self.messages[format]
+        message = self.messages[format]
+
+        if isinstance(message, I18nLazyStub):
+            if translations:
+                message = message.eval(translations)
+            else:
+                message = message.get_original_message()
+
+        return message
 
 
 class MessageCollection:
@@ -50,8 +61,8 @@ class MessageCollection:
 
 DEFAULT_MESSAGES = MessageCollection(
     {
-        "cannot_be_none": Message("Cannot be none", json="Cannot be null"),
-        "unexpected_type": Message("Should be {type}"),
+        "cannot_be_none": Message(_("Cannot be None"), json=_("Cannot be null")),
+        "unexpected_type": Message(_("Should be '{type}' type")),
     }
 )
 
@@ -76,18 +87,29 @@ class Error:
 
         return super().__eq__(other)
 
-    def get_message(self, format: Optional[str] = None):
-        return self.messages.get_message(self.code).get(format)
+    def get_message(
+        self, format: Optional[str] = None, translations: Optional[Translations] = None
+    ):
+        return self.messages.get_message(self.code).get(format, translations)
 
 
 class ErrorFormatter(ABC):
     @abstractmethod
-    def format(self, errors: list[Error], languages: list[str] = []):
+    def format(self, errors: list[Error]):
         ...
 
 
-class JSONErrorFormatter(ErrorFormatter):
-    def format(self, errors: list[Error], languages: list[str] = []):
+class I18nErrorFormatter(ErrorFormatter):
+    @abstractmethod
+    def __init__(self, translations: Optional[Translations] = None):
+        self.translations = translations
+
+
+class JSONErrorFormatter(I18nErrorFormatter):
+    def __init__(self, translations: Optional[Translations] = None):
+        super().__init__(translations)
+
+    def format(self, errors: list[Error]):
         result = []
 
         for error in errors:
@@ -114,7 +136,7 @@ class JSONErrorFormatter(ErrorFormatter):
 
         result = {
             "code": error.code,
-            "message": error.get_message("json"),
+            "message": error.get_message("json", self.translations),
         }
 
         if args:
@@ -123,10 +145,10 @@ class JSONErrorFormatter(ErrorFormatter):
         return result
 
 
-FORMATTERS = {"json": JSONErrorFormatter()}
+FORMATTERS: dict[str, I18nErrorFormatter] = {"json": JSONErrorFormatter}
 
 
-def get_formatter(code: str) -> ErrorFormatter:
+def get_formatter_class(code: str) -> type[I18nErrorFormatter]:
     if code not in FORMATTERS:
         raise ValueError(f"unknown error formatter code: '{code}'")
 

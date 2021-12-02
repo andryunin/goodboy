@@ -1,5 +1,11 @@
 import gettext
 from pathlib import Path
+from typing import Protocol
+
+
+class Translations(Protocol):
+    def gettext(self, message):
+        ...
 
 
 def default_messages_path() -> Path:
@@ -9,7 +15,7 @@ def default_messages_path() -> Path:
     return Path(__file__).joinpath("..", "locale").resolve()
 
 
-def get_default_translations(languages: list[str] = None):
+def load_default_messages(languages: list[str] = None) -> Translations:
     """
     Get translations object (instance of ``gettext.GNUTranslations``) with included
     messages.
@@ -18,3 +24,32 @@ def get_default_translations(languages: list[str] = None):
         Languages list in order to try. If None, system language will be used.
     """
     return gettext.translation("goodboy", default_messages_path(), languages)
+
+
+class I18nLoader:
+    def __init__(self):
+        self._cache: dict[str, Translations] = {}
+
+    def get_translations(self, languages: list[str] = None) -> Translations:
+        # Make hashable tuple from unhashable list
+        languages = tuple(languages)
+
+        if languages not in self._cache:
+            self._cache[languages] = load_default_messages(languages)
+
+        return self._cache[languages]
+
+
+class I18nLazyStub:
+    def __init__(self, message):
+        self.message = message
+
+    def eval(self, translations):
+        return translations.gettext(self.message)
+
+    def get_original_message(self):
+        return self.message
+
+
+def lazy_gettext(message):
+    return I18nLazyStub(message)

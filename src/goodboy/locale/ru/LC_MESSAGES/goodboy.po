@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-08-26 13:54+0700\n"
+"POT-Creation-Date: 2021-12-02 20:26+0700\n"
 "PO-Revision-Date: 2021-08-26 11:51+0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,7 +19,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: src/goodboy/__init__.py:8
-msgid "hello world"
-msgstr "привет мир"
+#: src/goodboy/errors.py:64
+msgid "Cannot be None"
+msgstr "Не может быть None"
 
+#: src/goodboy/errors.py:64
+msgid "Cannot be null"
+msgstr "Не может быть null"
+
+#: src/goodboy/errors.py:65
+msgid "Should be '{type}' type"
+msgstr "Требуется тип '{type}'"
