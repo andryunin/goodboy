@@ -1,4 +1,4 @@
-from typing import Any, Callable, Union
+from typing import Any, Callable, ClassVar, Optional, Union
 
 from goodboy.errors import Error, ErrorFormatter, get_formatter_class
 from goodboy.schema import Schema, SchemaError
@@ -25,6 +25,8 @@ class Result:
         formatter: Union[ErrorFormatter, str],
         languages: list = [],
     ):
+        translations: Optional[Translations]
+
         if languages:
             if not self.translations_getter:
                 raise ValueError("tranlations_getter is not set")
@@ -41,6 +43,8 @@ class Result:
 
 
 class Validator:
+    _i18n_loader: ClassVar[I18nLoader]
+
     def __init__(self, schema: Schema):
         self.schema = schema
 

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 from abc import ABC, abstractmethod
 
 from goodboy.i18n import Translations, I18nLazyStub, lazy_gettext as _
@@ -118,7 +118,7 @@ class JSONErrorFormatter(I18nErrorFormatter):
         return result
 
     def format_error(self, error: Error):
-        args = {}
+        args: dict[Any, Any] = {}
 
         for key, value in error.args.items():
             if isinstance(value, str):
@@ -145,7 +145,7 @@ class JSONErrorFormatter(I18nErrorFormatter):
         return result
 
 
-FORMATTERS: dict[str, I18nErrorFormatter] = {"json": JSONErrorFormatter}
+FORMATTERS: dict[str, type[I18nErrorFormatter]] = {"json": JSONErrorFormatter}
 
 
 def get_formatter_class(code: str) -> type[I18nErrorFormatter]:

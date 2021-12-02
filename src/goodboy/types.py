@@ -1,6 +1,7 @@
 import re
 from typing import Optional, Pattern, Union
 from datetime import datetime
+from goodboy.errors import MessageCollection
 
 from goodboy.schema import Schema, Error, SchemaError
 
@@ -18,8 +19,8 @@ class DateTime(Schema):
         self,
         *,
         allow_none: bool = False,
-        min: datetime = None,
-        max: datetime = None,
+        min: Optional[datetime] = None,
+        max: Optional[datetime] = None,
         format: str = None,
     ):
         super().__init__(allow_none=allow_none)
@@ -63,8 +64,8 @@ class Int(Schema):
         self,
         *,
         allow_none: bool = False,
-        min: int = None,
-        max: int = None,
+        min: Optional[int] = None,
+        max: Optional[int] = None,
     ):
         super().__init__(allow_none=allow_none)
         self.min = min
@@ -102,9 +103,9 @@ class Str(Schema):
         self,
         *,
         allow_none: bool = False,
-        min_length: int = None,
-        max_length: int = None,
-        length: int = None,
+        min_length: Optional[int] = None,
+        max_length: Optional[int] = None,
+        length: Optional[int] = None,
         pattern: Union[str, Pattern[str], None] = None,
     ):
         super().__init__(allow_none=allow_none)
@@ -150,7 +151,7 @@ class Str(Schema):
 
 
 class Key:
-    def __init__(self, name, schema: Schema = None, required: bool = True):
+    def __init__(self, name, schema: Optional[Schema] = None, required: bool = True):
         self.name = name
         self.schema = schema
         self.required = required
@@ -166,7 +167,7 @@ class Dict(Schema):
         self,
         *,
         allow_none: bool = False,
-        keys: list[Key] = None,
+        keys: Optional[list[Key]] = None,
     ):
         super().__init__(allow_none=allow_none)
         self.keys = keys

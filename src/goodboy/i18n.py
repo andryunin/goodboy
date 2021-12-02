@@ -1,6 +1,6 @@
 import gettext
 from pathlib import Path
-from typing import Protocol
+from typing import Protocol, Iterable
 
 
 class Translations(Protocol):
@@ -15,7 +15,7 @@ def default_messages_path() -> Path:
     return Path(__file__).joinpath("..", "locale").resolve()
 
 
-def load_default_messages(languages: list[str] = None) -> Translations:
+def load_default_messages(languages: Iterable[str] = None) -> Translations:
     """
     Get translations object (instance of ``gettext.GNUTranslations``) with included
     messages.
@@ -28,9 +28,9 @@ def load_default_messages(languages: list[str] = None) -> Translations:
 
 class I18nLoader:
     def __init__(self):
-        self._cache: dict[str, Translations] = {}
+        self._cache: dict[tuple[str, ...], Translations] = {}
 
-    def get_translations(self, languages: list[str] = None) -> Translations:
+    def get_translations(self, languages: Iterable[str]) -> Translations:
         # Make hashable tuple from unhashable list
         languages = tuple(languages)
 
