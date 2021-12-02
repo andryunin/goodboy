@@ -1,10 +1,68 @@
+from typing import Optional
+
 from abc import ABC, abstractmethod
 
 
+class Message:
+    """
+    Error message class, allows using different messages for different input formats.
+
+    For example, when returning an error from the JSON API, it allows you to get "is
+    not an object" instead of "is not a dict".
+
+    Default format is "python", which means that primary error messages should use
+    python names for data types ("str" instead of "string", "dict" instead of "object"
+    and so on).
+
+        >>> e = ErrorMessage("Cannot be None", json="Cannot be null")
+        >>> e.get()
+        "Cannot be None"
+        >>> e.get("json")
+        "Cannot be null"
+    """
+
+    def __init__(self, default_message, **other_messages):
+        self.messages = {"default": default_message, **other_messages}
+
+    def get(self, format: Optional[str] = None):
+        if format not in self.messages:
+            format = "default"
+
+        return self.messages[format]
+
+
+class MessageCollection:
+    def __init__(
+        self, messages: dict[str, Message], parent: Optional["MessageCollection"] = None
+    ):
+        self.messages = messages
+        self.parent = parent
+
+    def get_message(self, code: str) -> Message:
+        if code in self.messages:
+            return self.messages[code]
+
+        if self.parent:
+            return self.parent.get_message(code)
+
+        return Message(code)
+
+
+DEFAULT_MESSAGES = MessageCollection(
+    {
+        "cannot_be_none": Message("Cannot be none", json="Cannot be null"),
+        "unexpected_type": Message("Should be {type}"),
+    }
+)
+
+
 class Error:
-    def __init__(self, code: str, args: dict = {}):
+    def __init__(
+        self, code: str, args: dict = {}, messages: MessageCollection = DEFAULT_MESSAGES
+    ):
         self.code = code
         self.args = args
+        self.messages = messages
 
     def __str__(self):
         return self.code
@@ -17,6 +75,9 @@ class Error:
             return self.code == other.code and self.args == other.args
 
         return super().__eq__(other)
+
+    def get_message(self, format: Optional[str] = None):
+        return self.messages.get_message(self.code).get(format)
 
 
 class ErrorFormatter(ABC):
