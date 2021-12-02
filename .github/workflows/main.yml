@@ -40,6 +40,10 @@ jobs:
         python -m poetry install
         python -m poetry run pip install flake8 pytest
     
+    - name: Compile locale files
+      run: |
+        python -m poetry run pybabel compile -d src/goodboy/locale -D goodboy
+
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
