@@ -1,5 +1,4 @@
-from gettext import translation
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Union
 
 from goodboy.errors import Error, ErrorFormatter, get_formatter_class
 from goodboy.schema import Schema, SchemaError
