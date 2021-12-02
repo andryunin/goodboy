@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from goodboy.schema import Error
+from goodboy.errors import Error
 from goodboy.types import Str
 
 from tests.types.conftest import assert_errors
