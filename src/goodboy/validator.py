@@ -1,8 +1,8 @@
 from typing import Any, Callable, ClassVar, Optional, Union
 
 from goodboy.errors import Error, ErrorFormatter, get_formatter_class
-from goodboy.schema import Schema, SchemaError
 from goodboy.i18n import I18nLoader, Translations
+from goodboy.schema import Schema, SchemaError
 
 
 class Result:

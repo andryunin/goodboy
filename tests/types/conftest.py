@@ -2,8 +2,8 @@ from contextlib import contextmanager
 
 import pytest
 
-from goodboy.schema import SchemaError
 from goodboy.errors import Error
+from goodboy.schema import SchemaError
 
 
 @contextmanager

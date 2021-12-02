@@ -1,6 +1,6 @@
 import gettext
 from pathlib import Path
-from typing import Protocol, Iterable
+from typing import Iterable, Protocol
 
 
 class Translations(Protocol):

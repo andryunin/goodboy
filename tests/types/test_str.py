@@ -4,7 +4,6 @@ import pytest
 
 from goodboy.errors import Error
 from goodboy.types import Str
-
 from tests.types.conftest import assert_errors
 
 

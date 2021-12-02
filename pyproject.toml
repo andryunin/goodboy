@@ -23,6 +23,9 @@ mypy = "^0.910"
 module = "pytest.*"
 ignore_missing_imports = true
 
+[tool.isort]
+profile = "black"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

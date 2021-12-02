@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 
 from goodboy.errors import Error
 from goodboy.types import DateTime
-
 from tests.types.conftest import assert_errors
 
 

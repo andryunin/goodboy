@@ -1,8 +1,7 @@
 from datetime import datetime
 
 from goodboy.errors import Error
-from goodboy.types import Dict, Key, AnyType, Int, DateTime
-
+from goodboy.types import AnyType, DateTime, Dict, Int, Key
 from tests.types.conftest import assert_errors
 
 

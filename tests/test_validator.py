@@ -1,8 +1,7 @@
 import pytest
 
-from goodboy.validator import Validator
 from goodboy.types import Int
-
+from goodboy.validator import Validator
 
 schema = Int()
 

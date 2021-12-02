@@ -1,9 +1,8 @@
 import re
-from typing import Optional, Pattern, Union
 from datetime import datetime
-from goodboy.errors import MessageCollection
+from typing import Optional, Pattern, Union
 
-from goodboy.schema import Schema, Error, SchemaError
+from goodboy.schema import Error, Schema, SchemaError
 
 
 class AnyType(Schema):

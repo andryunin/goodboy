@@ -1,7 +1,8 @@
-from typing import Optional, Any
 from abc import ABC, abstractmethod
+from typing import Any, Optional
 
-from goodboy.i18n import Translations, I18nLazyStub, lazy_gettext as _
+from goodboy.i18n import I18nLazyStub, Translations
+from goodboy.i18n import lazy_gettext as _
 
 
 class Message:
