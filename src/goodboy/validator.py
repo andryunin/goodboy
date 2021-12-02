@@ -1,6 +1,7 @@
-from typing import Any
+from typing import Any, Union
 
-from goodboy.schema import Schema, SchemaError, Error
+from goodboy.errors import Error, ErrorFormatter, get_formatter
+from goodboy.schema import Schema, SchemaError
 
 
 class Result:
@@ -11,6 +12,16 @@ class Result:
     @property
     def is_valid(self) -> bool:
         return not self.errors
+
+    def format_errors(
+        self,
+        formatter: Union[ErrorFormatter, str],
+        languages: list = [],
+    ):
+        if isinstance(formatter, str):
+            formatter = get_formatter(formatter)
+
+        return formatter.format(self.errors, languages=languages)
 
 
 class Validator:

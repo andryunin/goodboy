@@ -112,10 +112,15 @@ class JSONErrorFormatter(ErrorFormatter):
                     f"unexpected type of error argument '{key}': '{type(value)}'"
                 )
 
+        result = {
+            "code": error.code,
+            "message": error.get_message("json"),
+        }
+
         if args:
-            return {"code": error.code, "args": args}
-        else:
-            return {"code": error.code}
+            result["args"] = args
+
+        return result
 
 
 FORMATTERS = {"json": JSONErrorFormatter()}

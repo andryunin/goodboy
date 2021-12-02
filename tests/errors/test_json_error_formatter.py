@@ -14,17 +14,23 @@ def test_simple_error_formatting():
     ]
 
     assert formatter.format(errors) == [
-        {"code": "err_1"},
+        {
+            "code": "err_1",
+            "message": "err_1",
+        },
         {
             "code": "err_2",
+            "message": "err_2",
             "args": {"str_arg": "ok"},
         },
         {
             "code": "err_3",
+            "message": "err_3",
             "args": {"int_arg": 42},
         },
         {
             "code": "err_4",
+            "message": "err_4",
             "args": {"float_arg": 42.0},
         },
     ]
@@ -35,24 +41,21 @@ def test_complex_error_formatting():
 
     errors = [
         Error(
-            "values_error",
+            "err_1",
             {
-                "value_1": Error("cannot_be_none"),
-                "value_2": Error("cannot_be_none"),
+                "value_1": Error("value_1_err"),
+                "value_2": Error("value_2_err"),
             },
         ),
     ]
 
     assert formatter.format(errors) == [
         {
-            "code": "values_error",
+            "code": "err_1",
+            "message": "err_1",
             "args": {
-                "value_1": {
-                    "code": "cannot_be_none",
-                },
-                "value_2": {
-                    "code": "cannot_be_none",
-                },
+                "value_1": {"code": "value_1_err", "message": "value_1_err"},
+                "value_2": {"code": "value_2_err", "message": "value_2_err"},
             },
         },
     ]
