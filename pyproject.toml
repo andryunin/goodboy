@@ -1,8 +1,10 @@
 [tool.poetry]
 name = "goodboy"
 version = "0.1.0"
-description = ""
+description = "Data validation tool"
+license = "MIT"
 authors = ["Maxim Andryunin <maxim.andryunin@gmail.com>"]
+readme = "README.md"
 include = [
     "src/goodboy/locale/**/*.mo"
 ]
