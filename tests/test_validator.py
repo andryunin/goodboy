@@ -19,8 +19,8 @@ def test_validate_with_typecast():
 @pytest.mark.parametrize(
     "languages,message",
     [
-        (["ru"], "Не может быть null"),
-        (["en"], "Cannot be null"),
+        (["ru"], "не может быть null"),
+        (["en"], "cannot be null"),
     ],
 )
 def test_messages_translation(languages, message):
