@@ -2,7 +2,8 @@ import re
 from datetime import datetime
 from typing import Optional, Pattern, Union
 
-from goodboy.schema import Error, Schema, SchemaError
+from goodboy.errors import DEFAULT_MESSAGES, Error, MessageCollection
+from goodboy.schema import Schema, SchemaError
 
 
 class AnyType(Schema):
@@ -18,11 +19,12 @@ class DateTime(Schema):
         self,
         *,
         allow_none: bool = False,
+        messages: MessageCollection = DEFAULT_MESSAGES,
         min: Optional[datetime] = None,
         max: Optional[datetime] = None,
         format: str = None,
     ):
-        super().__init__(allow_none=allow_none)
+        super().__init__(allow_none=allow_none, messages=messages)
         self.min = min
         self.max = max
         self.format = format
@@ -63,10 +65,11 @@ class Int(Schema):
         self,
         *,
         allow_none: bool = False,
+        messages: MessageCollection = DEFAULT_MESSAGES,
         min: Optional[int] = None,
         max: Optional[int] = None,
     ):
-        super().__init__(allow_none=allow_none)
+        super().__init__(allow_none=allow_none, messages=messages)
         self.min = min
         self.max = max
 
@@ -102,12 +105,13 @@ class Str(Schema):
         self,
         *,
         allow_none: bool = False,
+        messages: MessageCollection = DEFAULT_MESSAGES,
         min_length: Optional[int] = None,
         max_length: Optional[int] = None,
         length: Optional[int] = None,
         pattern: Union[str, Pattern[str], None] = None,
     ):
-        super().__init__(allow_none=allow_none)
+        super().__init__(allow_none=allow_none, messages=messages)
         self.min_length = min_length
         self.max_length = max_length
         self.length = length
@@ -166,9 +170,10 @@ class Dict(Schema):
         self,
         *,
         allow_none: bool = False,
+        messages: MessageCollection = DEFAULT_MESSAGES,
         keys: Optional[list[Key]] = None,
     ):
-        super().__init__(allow_none=allow_none)
+        super().__init__(allow_none=allow_none, messages=messages)
         self.keys = keys
 
     def validate(self, value, typecast):
