@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 from typing import Optional, Pattern, Union
 
-from goodboy.errors import DEFAULT_MESSAGES, Error, MessageCollection
+from goodboy.errors import DEFAULT_MESSAGES, MessageCollection
 from goodboy.schema import Schema, SchemaError
 
 
@@ -199,7 +199,7 @@ class Dict(Schema):
 
     def validate(self, value, typecast):
         if not isinstance(value, dict):
-            return None, [Error("invalid_type", {"expected_type": "dict"})]
+            return None, [self.error("invalid_type", {"expected_type": "dict"})]
 
         key_errors = {}
         key_values = {}
@@ -218,13 +218,13 @@ class Dict(Schema):
                     else:
                         key_values[key.name] = key_value
                 elif key.required:
-                    key_errors[key.name] = [Error("dict.required_key")]
+                    key_errors[key.name] = [self.error("dict.required_key")]
 
             for key in value_keys:
-                key_errors[key] = [Error("dict.unknown_key")]
+                key_errors[key] = [self.error("dict.unknown_key")]
 
         if key_errors:
-            return None, [Error("dict.keys_error", key_errors)]
+            return None, [self.error("dict.keys_error", key_errors)]
 
         return key_values, []
 
