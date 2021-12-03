@@ -1,10 +1,11 @@
 import gettext
+import sys
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Tuple
 
-try:
+if sys.version_info >= (3, 8):
     from typing import Protocol
-except ImportError:
+else:
     from typing_extensions import Protocol
 
 
@@ -33,7 +34,7 @@ def load_default_messages(languages: Iterable[str] = None) -> Translations:
 
 class I18nLoader:
     def __init__(self):
-        self._cache: dict[tuple[str, ...], Translations] = {}
+        self._cache: dict[Tuple[str, ...], Translations] = {}
 
     def get_translations(self, languages: Iterable[str]) -> Translations:
         # Make hashable tuple from unhashable list
