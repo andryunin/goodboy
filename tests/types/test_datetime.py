@@ -50,3 +50,18 @@ def test_type_casting_rejects_bad_input_with_custom_format():
 
     with assert_errors([Error("invalid_datetime_format")]):
         schema(bad_input, typecast=True)
+
+
+def test_type_casting_accepts_date_values():
+    schema = DateTime()
+    good_input = datetime(2000, 1, 1, 0, 0, 0)
+
+    assert schema(good_input, typecast=True) == good_input
+
+
+def test_type_casting_rejects_non_string_values():
+    schema = DateTime()
+    bad_input = 42
+
+    with assert_errors([Error("unexpected_type", {"expected_type": "datetime"})]):
+        schema(bad_input, typecast=True)

@@ -68,7 +68,7 @@ class Date(DateBase[date]):
             return input, []
 
         if not isinstance(input, str):
-            return None[self.error("unexpected_type", {"expected_type": "date"})]
+            return None, [self.error("unexpected_type", {"expected_type": "date"})]
 
         try:
             if self.format:
