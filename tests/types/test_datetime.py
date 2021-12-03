@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 
 from goodboy.errors import Error
-from goodboy.types import DateTime
+from goodboy.types.dates import DateTime
 from tests.types.conftest import assert_errors
 
 

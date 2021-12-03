@@ -3,7 +3,7 @@ import re
 import pytest
 
 from goodboy.errors import Error
-from goodboy.types import Str
+from goodboy.types.simple import Str
 from tests.types.conftest import assert_errors
 
 

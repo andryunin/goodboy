@@ -1,7 +1,7 @@
 import pytest
 
 from goodboy.errors import Error
-from goodboy.types import Float, Int
+from goodboy.types.numeric import Float, Int
 from tests.types.conftest import assert_errors
 
 
