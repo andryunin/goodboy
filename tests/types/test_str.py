@@ -19,6 +19,21 @@ def test_rejects_none_when_none_denied():
         schema(None)
 
 
+def test_type_casting_accepts_good_input():
+    schema = Str()
+    good_input = "42"
+
+    assert schema(good_input, typecast=True) == good_input
+
+
+def test_type_casting_rejects_bad_input():
+    schema = Str()
+    bad_input = 42
+
+    with assert_errors([Error("unexpected_type", {"expected_type": "string"})]):
+        schema(bad_input, typecast=True)
+
+
 def test_accepts_str_type():
     schema = Str()
     good_value = "42"

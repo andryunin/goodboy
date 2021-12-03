@@ -165,14 +165,13 @@ class Str(Schema):
 
         return value, errors
 
-    def typecast(self, value):
-        if isinstance(value, str):
-            return value, []
-
-        try:
-            return str(value), []
-        except ValueError:
-            return None, [Error("str.cast_error")]
+    def typecast(self, input):
+        # Any python object usually can be casted to string, so casting any value to
+        # string is too dangerous
+        if isinstance(input, str):
+            return input, []
+        else:
+            return None, [self.error("unexpected_type", {"expected_type": "string"})]
 
 
 class Key:
