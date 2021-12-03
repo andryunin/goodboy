@@ -1,14 +1,13 @@
-# Translations template for PROJECT.
-# Copyright (C) 2021 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# Translations template for goodboy.
+# Copyright (C) 2021 Maxim Andryunin
+# This file is distributed under the same license as the goodboy project.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-12-02 20:26+0700\n"
+"POT-Creation-Date: 2021-12-03 19:24+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,15 +16,95 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: src/goodboy/errors.py:64
-msgid "Cannot be None"
+#: src/goodboy/errors.py:68
+msgid "cannot be None"
 msgstr ""
 
-#: src/goodboy/errors.py:64
-msgid "Cannot be null"
+#: src/goodboy/errors.py:68
+msgid "cannot be null"
 msgstr ""
 
-#: src/goodboy/errors.py:65
-msgid "Should be '{type}' type"
+#: src/goodboy/errors.py:69
+msgid "cannot be blank"
+msgstr ""
+
+#: src/goodboy/errors.py:70
+msgid "expected type is \"{type}\""
+msgstr ""
+
+#: src/goodboy/errors.py:72
+msgid "must be later than {value}"
+msgstr ""
+
+#: src/goodboy/errors.py:73
+msgid "must be later or equal to {value}"
+msgstr ""
+
+#: src/goodboy/errors.py:74
+msgid "must be earlier than {value}"
+msgstr ""
+
+#: src/goodboy/errors.py:75
+msgid "must be earlier or equal to {value}"
+msgstr ""
+
+#: src/goodboy/errors.py:76
+msgid "invalid date format"
+msgstr ""
+
+#: src/goodboy/errors.py:77
+msgid "invalid date and time format"
+msgstr ""
+
+#: src/goodboy/errors.py:79
+msgid "must be less than {value}"
+msgstr ""
+
+#: src/goodboy/errors.py:80
+msgid "must be less or equal to {value}"
+msgstr ""
+
+#: src/goodboy/errors.py:81
+msgid "must be greater than {value}"
+msgstr ""
+
+#: src/goodboy/errors.py:82
+msgid "must be greater or equal to {value}"
+msgstr ""
+
+#: src/goodboy/errors.py:83
+msgid "invalid integer format"
+msgstr ""
+
+#: src/goodboy/errors.py:84
+msgid "invalid numeric format"
+msgstr ""
+
+#: src/goodboy/errors.py:86
+msgid "invalid string format"
+msgstr ""
+
+#: src/goodboy/errors.py:87
+msgid "must be {value} characters long"
+msgstr ""
+
+#: src/goodboy/errors.py:88
+msgid "must be shorter than {value} characters"
+msgstr ""
+
+#: src/goodboy/errors.py:89
+msgid "must be longer than {value} characters"
+msgstr ""
+
+#: src/goodboy/errors.py:91
+msgid "key errors"
+msgstr ""
+
+#: src/goodboy/errors.py:92
+msgid "key is required"
+msgstr ""
+
+#: src/goodboy/errors.py:93
+msgid "unknown key"
 msgstr ""
 
