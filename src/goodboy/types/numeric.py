@@ -1,22 +1,24 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Optional
+from typing import Generic, Optional, TypeVar
 
 from goodboy.errors import DEFAULT_MESSAGES, Error, MessageCollection
 from goodboy.schema import Schema
 
+N = TypeVar("N")
 
-class NumericBase(Schema):
+
+class NumericBase(Generic[N], Schema):
     def __init__(
         self,
         *,
         allow_none: bool = False,
         messages: MessageCollection = DEFAULT_MESSAGES,
-        less_than: Optional[float] = None,
-        less_or_equal_to: Optional[float] = None,
-        greater_than: Optional[float] = None,
-        greater_or_equal_to: Optional[float] = None,
+        less_than: Optional[N] = None,
+        less_or_equal_to: Optional[N] = None,
+        greater_than: Optional[N] = None,
+        greater_or_equal_to: Optional[N] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages)
         self.less_than = less_than
@@ -25,7 +27,7 @@ class NumericBase(Schema):
         self.greater_or_equal_to = greater_or_equal_to
 
     def validate(self, value, typecast):
-        value, type_errors = self.validate_numeric_type(value)
+        value, type_errors = self.validate_exact_type(value)
 
         if type_errors:
             return None, type_errors
@@ -47,12 +49,12 @@ class NumericBase(Schema):
         return value, errors
 
     @abstractmethod
-    def validate_numeric_type(self, value) -> Optional[list[Error]]:
+    def validate_exact_type(self, value) -> Optional[list[Error]]:
         ...
 
 
-class Float(NumericBase):
-    def validate_numeric_type(self, value):
+class Float(NumericBase[float]):
+    def validate_exact_type(self, value):
         if isinstance(value, float):
             return value, []
         elif isinstance(value, int):
@@ -76,8 +78,8 @@ class Float(NumericBase):
             return None, [self.error("invalid_numeric_format")]
 
 
-class Int(NumericBase):
-    def validate_numeric_type(self, value):
+class Int(NumericBase[int]):
+    def validate_exact_type(self, value):
         if not isinstance(value, int):
             return None, [self.error("unexpected_type", {"expected_type": "integer"})]
         else:
