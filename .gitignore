@@ -2,6 +2,9 @@
 *.py[cod]
 dist/
 
+# Virtual environment 
+.venv
+
 # Unit test / coverage reports
 .coverage
 
