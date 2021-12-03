@@ -46,13 +46,13 @@ class I18nLoader:
 
 
 class I18nLazyStub:
-    def __init__(self, message):
+    def __init__(self, message: str):
         self.message = message
 
-    def eval(self, translations):
+    def eval(self, translations) -> str:
         return translations.gettext(self.message)
 
-    def get_original_message(self):
+    def get_original_message(self) -> str:
         return self.message
 
 

@@ -1,6 +1,7 @@
 import pytest
 
 from goodboy.errors import Error
+from goodboy.messages import type_name
 from goodboy.types.numeric import Int
 from tests.types.conftest import assert_errors
 
@@ -16,7 +17,7 @@ def test_accepts_int_type():
 def test_rejects_non_int_type(bad_value):
     schema = Int()
 
-    with assert_errors([Error("unexpected_type", {"expected_type": "integer"})]):
+    with assert_errors([Error("unexpected_type", {"expected_type": type_name("int")})]):
         schema(bad_value)
 
 

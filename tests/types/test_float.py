@@ -1,6 +1,7 @@
 import pytest
 
 from goodboy.errors import Error
+from goodboy.messages import type_name
 from goodboy.types.numeric import Float
 from tests.types.conftest import assert_errors
 
@@ -15,7 +16,9 @@ def test_rejects_non_float_and_non_int_type():
     bad_value = "42.0"
     schema = Float()
 
-    with assert_errors([Error("unexpected_type", {"expected_type": "numeric"})]):
+    with assert_errors(
+        [Error("unexpected_type", {"expected_type": type_name("float")})]
+    ):
         schema(bad_value)
 
 

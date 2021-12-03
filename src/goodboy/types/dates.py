@@ -4,7 +4,8 @@ from abc import abstractmethod
 from datetime import date, datetime
 from typing import Generic, Optional, TypeVar
 
-from goodboy.errors import DEFAULT_MESSAGES, Error, MessageCollection
+from goodboy.errors import Error
+from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, type_name
 from goodboy.schema import Schema
 
 D = TypeVar("D")
@@ -59,7 +60,7 @@ class DateBase(Generic[D], Schema):
 class Date(DateBase[date]):
     def validate_exact_type(self, value) -> list[Error]:
         if not isinstance(value, date):
-            return [self.error("unexpected_type", {"expected_type": "date"})]
+            return [self.error("unexpected_type", {"expected_type": type_name("date")})]
         else:
             return []
 
@@ -68,7 +69,9 @@ class Date(DateBase[date]):
             return input, []
 
         if not isinstance(input, str):
-            return None, [self.error("unexpected_type", {"expected_type": "date"})]
+            return None, [
+                self.error("unexpected_type", {"expected_type": type_name("date")})
+            ]
 
         try:
             if self.format:
@@ -83,7 +86,9 @@ class Date(DateBase[date]):
 class DateTime(DateBase[datetime]):
     def validate_exact_type(self, value) -> list[Error]:
         if not isinstance(value, datetime):
-            return [self.error("unexpected_type", {"expected_type": "datetime"})]
+            return [
+                self.error("unexpected_type", {"expected_type": type_name("datetime")})
+            ]
         else:
             return []
 
@@ -92,7 +97,9 @@ class DateTime(DateBase[datetime]):
             return input, []
 
         if not isinstance(input, str):
-            return None, [self.error("unexpected_type", {"expected_type": "datetime"})]
+            return None, [
+                self.error("unexpected_type", {"expected_type": type_name("datetime")})
+            ]
 
         try:
             if self.format:

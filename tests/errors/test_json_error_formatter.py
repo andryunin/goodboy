@@ -67,6 +67,6 @@ def test_unexpected_type_of_error_argument():
     with pytest.raises(ValueError):
         formatter.format(
             [
-                Error("err", {"arg": []}),
+                Error("err", {"arg": set()}),
             ]
         )

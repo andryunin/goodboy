@@ -3,6 +3,7 @@ import re
 import pytest
 
 from goodboy.errors import Error
+from goodboy.messages import type_name
 from goodboy.types.simple import Str
 from tests.types.conftest import assert_errors
 
@@ -30,7 +31,7 @@ def test_type_casting_rejects_bad_input():
     schema = Str()
     bad_input = 42
 
-    with assert_errors([Error("unexpected_type", {"expected_type": "string"})]):
+    with assert_errors([Error("unexpected_type", {"expected_type": type_name("str")})]):
         schema(bad_input, typecast=True)
 
 
@@ -45,7 +46,7 @@ def test_rejects_non_str_type():
     schema = Str()
     bad_value = 42
 
-    with assert_errors([Error("unexpected_type", {"expected_type": "string"})]):
+    with assert_errors([Error("unexpected_type", {"expected_type": type_name("str")})]):
         schema(bad_value)
 
 

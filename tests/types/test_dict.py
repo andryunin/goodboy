@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from goodboy.errors import Error
+from goodboy.messages import type_name
 from goodboy.types.dates import DateTime
 from goodboy.types.dicts import Dict, Key
 from goodboy.types.numeric import Int
@@ -96,12 +97,16 @@ def test_value_typecasting():
 
 
 def test_typecast():
-    with assert_errors([Error("unexpected_type", {"expected_type": "dict"})]):
+    with assert_errors(
+        [Error("unexpected_type", {"expected_type": type_name("dict")})]
+    ):
         Dict()("oops", typecast=True)
 
 
 def test_typecheck():
-    with assert_errors([Error("unexpected_type", {"expected_type": "dict"})]):
+    with assert_errors(
+        [Error("unexpected_type", {"expected_type": type_name("dict")})]
+    ):
         Dict()("oops")
 
 

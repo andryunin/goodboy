@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from typing import Optional, Pattern, Union
 
-from goodboy.errors import DEFAULT_MESSAGES, MessageCollection
+from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, type_name
 from goodboy.schema import Schema
 
 
@@ -60,7 +60,9 @@ class Str(Schema):
 
     def validate(self, value, typecast):
         if not isinstance(value, str):
-            return None, [self.error("unexpected_type", {"expected_type": "string"})]
+            return None, [
+                self.error("unexpected_type", {"expected_type": type_name("str")})
+            ]
 
         errors = []
 
@@ -90,4 +92,6 @@ class Str(Schema):
         if isinstance(input, str):
             return input, []
         else:
-            return None, [self.error("unexpected_type", {"expected_type": "string"})]
+            return None, [
+                self.error("unexpected_type", {"expected_type": type_name("str")})
+            ]

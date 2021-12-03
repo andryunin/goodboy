@@ -28,7 +28,11 @@ class Message:
         self.messages = {"default": default_message, **other_messages}
 
     def get(
-        self, format: Optional[str] = None, translations: Optional[Translations] = None
+        self,
+        format: Optional[str] = None,
+        translations: Optional[Translations] = None,
+        format_args: list = [],
+        format_kwargs: dict = {},
     ):
         if format not in self.messages:
             format = "default"
@@ -41,7 +45,13 @@ class Message:
             else:
                 message = message.get_original_message()
 
-        return message
+        return message.format(*format_args, **format_kwargs)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.messages == other.messages
+
+        return super().__eq__(other)
 
 
 class MessageCollection:
@@ -52,13 +62,19 @@ class MessageCollection:
         self.parent = parent
 
     def get_message(self, code: str) -> Message:
+        try:
+            return self[code]
+        except KeyError:
+            return Message(code)
+
+    def __getitem__(self, code):
         if code in self.messages:
             return self.messages[code]
 
         if self.parent:
             return self.parent.get_message(code)
 
-        return Message(code)
+        raise KeyError(code)
 
 
 DEFAULT_MESSAGES = MessageCollection(
@@ -92,3 +108,20 @@ DEFAULT_MESSAGES = MessageCollection(
         "unknown_key": Message(_("unknown key")),
     }
 )
+
+
+_TYPE_NAMES_LIST: list[Message] = [
+    Message("dict", json="Object"),
+    Message("list", json="Array"),
+    Message("str", json="String"),
+    Message("date", json="String"),
+    Message("datetime", json="String"),
+    Message("int", json="Number"),
+    Message("float", json="Number"),
+]
+
+_TYPE_NAMES = MessageCollection({m.get(): m for m in _TYPE_NAMES_LIST})
+
+
+def type_name(python_type_name: str):
+    return _TYPE_NAMES[python_type_name]

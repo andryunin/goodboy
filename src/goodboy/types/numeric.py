@@ -3,7 +3,8 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Generic, Optional, TypeVar
 
-from goodboy.errors import DEFAULT_MESSAGES, Error, MessageCollection
+from goodboy.errors import Error
+from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, type_name
 from goodboy.schema import Schema
 
 N = TypeVar("N")
@@ -60,7 +61,9 @@ class Float(NumericBase[float]):
         elif isinstance(value, int):
             return float(value), []
         else:
-            return None, [self.error("unexpected_type", {"expected_type": "numeric"})]
+            return None, [
+                self.error("unexpected_type", {"expected_type": type_name("float")})
+            ]
 
     def typecast(self, input):
         if isinstance(input, float):
@@ -70,7 +73,9 @@ class Float(NumericBase[float]):
             return float(input), []
 
         if not isinstance(input, str):
-            return None, [self.error("unexpected_type", {"expected_type": "numeric"})]
+            return None, [
+                self.error("unexpected_type", {"expected_type": type_name("float")})
+            ]
 
         try:
             return float(input), []
@@ -81,7 +86,9 @@ class Float(NumericBase[float]):
 class Int(NumericBase[int]):
     def validate_exact_type(self, value):
         if not isinstance(value, int):
-            return None, [self.error("unexpected_type", {"expected_type": "integer"})]
+            return None, [
+                self.error("unexpected_type", {"expected_type": type_name("int")})
+            ]
         else:
             return value, []
 
@@ -90,7 +97,9 @@ class Int(NumericBase[int]):
             return input, []
 
         if not isinstance(input, str):
-            return None, [self.error("unexpected_type", {"expected_type": "integer"})]
+            return None, [
+                self.error("unexpected_type", {"expected_type": type_name("int")})
+            ]
 
         try:
             return int(input), []

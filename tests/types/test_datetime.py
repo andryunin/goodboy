@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from goodboy.errors import Error
+from goodboy.messages import type_name
 from goodboy.types.dates import DateTime
 from tests.types.conftest import assert_errors
 
@@ -16,7 +17,9 @@ def test_rejects_non_datetime_type():
     schema = DateTime()
     bad_value = "2000-01-01T00:00:00"
 
-    with assert_errors([Error("unexpected_type", {"expected_type": "datetime"})]):
+    with assert_errors(
+        [Error("unexpected_type", {"expected_type": type_name("datetime")})]
+    ):
         schema(bad_value)
 
 
@@ -63,5 +66,7 @@ def test_type_casting_rejects_non_string_values():
     schema = DateTime()
     bad_input = 42
 
-    with assert_errors([Error("unexpected_type", {"expected_type": "datetime"})]):
+    with assert_errors(
+        [Error("unexpected_type", {"expected_type": type_name("datetime")})]
+    ):
         schema(bad_input, typecast=True)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from goodboy.errors import DEFAULT_MESSAGES, MessageCollection
+from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, type_name
 from goodboy.schema import Schema, SchemaError
 
 
@@ -31,7 +31,9 @@ class Dict(Schema):
 
     def validate(self, value, typecast):
         if not isinstance(value, dict):
-            return None, [self.error("unexpected_type", {"expected_type": "dict"})]
+            return None, [
+                self.error("unexpected_type", {"expected_type": type_name("dict")})
+            ]
 
         key_errors = {}
         key_values = {}

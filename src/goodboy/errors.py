@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional
 
 from goodboy.i18n import Translations
-from goodboy.messages import DEFAULT_MESSAGES, MessageCollection
+from goodboy.messages import DEFAULT_MESSAGES, Message, MessageCollection
 
 
 class Error:
@@ -30,7 +30,15 @@ class Error:
     def get_message(
         self, format: Optional[str] = None, translations: Optional[Translations] = None
     ):
-        return self.messages.get_message(self.code).get(format, translations)
+        format_kwargs = self.args
+
+        for key, value in format_kwargs.items():
+            if isinstance(value, Message):
+                format_kwargs[key] = value.get(format, translations)
+
+        return self.messages.get_message(self.code).get(
+            format, translations, format_kwargs=format_kwargs
+        )
 
 
 class ErrorFormatter(ABC):
@@ -61,18 +69,7 @@ class JSONErrorFormatter(I18nErrorFormatter):
         args: dict[Any, Any] = {}
 
         for key, value in error.args.items():
-            if isinstance(value, str):
-                args[key] = value
-            elif isinstance(value, int):
-                args[key] = value
-            elif isinstance(value, float):
-                args[key] = value
-            elif isinstance(value, Error):
-                args[key] = self.format_error(value)
-            else:
-                raise ValueError(
-                    f"unexpected type of error argument '{key}': '{type(value)}'"
-                )
+            args[key] = self.format_argument_value(value)
 
         result = {
             "code": error.code,
@@ -83,6 +80,22 @@ class JSONErrorFormatter(I18nErrorFormatter):
             result["args"] = args
 
         return result
+
+    def format_argument_value(self, value):
+        if isinstance(value, str):
+            return value
+        elif isinstance(value, int):
+            return value
+        elif isinstance(value, float):
+            return value
+        elif isinstance(value, Error):
+            return self.format_error(value)
+        elif isinstance(value, Message):
+            return value.get("json", self.translations)
+        elif isinstance(value, list):
+            return [self.format_argument_value(v) for v in value]
+        else:
+            raise ValueError(f"unexpected type of error argument: '{type(value)}'")
 
 
 FORMATTERS: dict[str, type[I18nErrorFormatter]] = {"json": JSONErrorFormatter}
