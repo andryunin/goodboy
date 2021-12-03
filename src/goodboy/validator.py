@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any, Callable, ClassVar, Optional, Union
 
 from goodboy.errors import Error, ErrorFormatter, get_formatter_class
