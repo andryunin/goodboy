@@ -1,0 +1,35 @@
+import pytest
+
+from goodboy.errors import Error
+from goodboy.types import Float
+from tests.types.conftest import assert_errors
+
+
+@pytest.mark.parametrize("good_value", [42.0, 42])
+def test_accepts_float_and_int_type(good_value):
+    schema = Float()
+    assert schema(good_value) == good_value
+
+
+def test_rejects_non_float_and_non_int_type():
+    bad_value = "42.0"
+    schema = Float()
+
+    with assert_errors([Error("unexpected_type", {"expected_type": "numeric"})]):
+        schema(bad_value)
+
+
+@pytest.mark.parametrize("good_input", ["42.0", "42"])
+def test_type_casting_accepts_good_input(good_input):
+    schema = Float()
+    value = 42.0
+
+    assert schema(good_input, typecast=True) == value
+
+
+def test_type_casting_rejects_bad_input():
+    schema = Float()
+    bad_input = "oops"
+
+    with assert_errors([Error("invalid_numeric_format")]):
+        schema(bad_input, typecast=True)
