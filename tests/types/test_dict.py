@@ -23,9 +23,9 @@ def test_key_required():
 
     bad_value_errors = [
         Error(
-            "dict.keys_error",
+            "keys_error",
             args={
-                "key_0": [Error("dict.required_key")],
+                "key_0": [Error("required_key")],
             },
         )
     ]
@@ -52,7 +52,7 @@ def test_value_validation():
 
     bad_value_errors = [
         Error(
-            "dict.keys_error",
+            "keys_error",
             args={
                 "timestamp": [Error("cannot_be_none")],
             },
@@ -83,10 +83,10 @@ def test_value_typecasting():
 
     bad_value_errors = [
         Error(
-            "dict.keys_error",
+            "keys_error",
             args={
-                "timestamp": [Error("datetime.invalid_format")],
-                "value": [Error("int.invalid_format")],
+                "timestamp": [Error("invalid_datetime_format")],
+                "value": [Error("invalid_integer_format")],
             },
         )
     ]
@@ -96,12 +96,12 @@ def test_value_typecasting():
 
 
 def test_typecast():
-    with assert_errors([Error("invalid_type", {"expected_type": "dict"})]):
+    with assert_errors([Error("unexpected_type", {"expected_type": "dict"})]):
         Dict()("oops", typecast=True)
 
 
 def test_typecheck():
-    with assert_errors([Error("invalid_type", {"expected_type": "dict"})]):
+    with assert_errors([Error("unexpected_type", {"expected_type": "dict"})]):
         Dict()("oops")
 
 
