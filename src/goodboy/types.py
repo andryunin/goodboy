@@ -147,21 +147,21 @@ class Str(Schema):
 
     def validate(self, value, typecast):
         if not isinstance(value, str):
-            return None, [Error("invalid_type", {"expected_type": "str"})]
+            return None, [self.error("unexpected_type", {"expected_type": "string"})]
 
         errors = []
 
         if self.min_length is not None and len(value) < self.min_length:
-            errors.append(Error("str.too_short", {"min_length": self.min_length}))
+            errors.append(self.error("string_too_short", {"value": self.min_length}))
 
         if self.max_length is not None and len(value) > self.max_length:
-            errors.append(Error("str.too_long", {"max_length": self.max_length}))
+            errors.append(self.error("string_too_long", {"value": self.max_length}))
 
         if self.length is not None and len(value) != self.length:
-            errors.append(Error("str.unexpected_length", {"length": self.length}))
+            errors.append(self.error("invalid_string_length", {"value": self.length}))
 
         if self.pattern and not self.pattern.match(value):
-            errors.append(Error("str.pattern"))
+            errors.append(self.error("invalid_string_format"))
 
         return value, errors
 
