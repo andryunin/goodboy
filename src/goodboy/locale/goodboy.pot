@@ -29,7 +29,7 @@ msgid "cannot be blank"
 msgstr ""
 
 #: src/goodboy/errors.py:70
-msgid "expected type is \"{type}\""
+msgid "expected type is \"{expected_type}\""
 msgstr ""
 
 #: src/goodboy/errors.py:72

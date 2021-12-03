@@ -31,8 +31,8 @@ msgid "cannot be blank"
 msgstr "cannot be blank"
 
 #: src/goodboy/errors.py:70
-msgid "expected type is \"{type}\""
-msgstr "expected type is \"{type}\""
+msgid "expected type is \"{expected_type}\""
+msgstr "expected type is \"{expected_type}\""
 
 #: src/goodboy/errors.py:72
 msgid "must be later than {value}"

@@ -66,7 +66,7 @@ DEFAULT_MESSAGES = MessageCollection(
         # Common messages
         "cannot_be_none": Message(_("cannot be None"), json=_("cannot be null")),
         "cannot_be_blank": Message(_("cannot be blank")),
-        "unexpected_type": Message(_('expected type is "{type}"')),
+        "unexpected_type": Message(_('expected type is "{expected_type}"')),
         # Date/DateTime messages
         "earlier_or_equal_to": Message(_("must be later than {value}")),
         "earlier_than": Message(_("must be later or equal to {value}")),
