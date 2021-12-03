@@ -21,12 +21,14 @@ class Str(Schema):
         *,
         allow_none: bool = False,
         messages: MessageCollection = DEFAULT_MESSAGES,
+        allow_blank: bool = False,
         min_length: Optional[int] = None,
         max_length: Optional[int] = None,
         length: Optional[int] = None,
         pattern: Union[str, Pattern[str], None] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages)
+        self.allow_blank = allow_blank
         self.min_length = min_length
         self.max_length = max_length
         self.length = length
@@ -43,6 +45,12 @@ class Str(Schema):
             return None, [self.error("unexpected_type", {"expected_type": "string"})]
 
         errors = []
+
+        if not value:
+            if self.allow_blank:
+                return value, errors
+            else:
+                return None, [self.error("cannot_be_blank")]
 
         if self.min_length is not None and len(value) < self.min_length:
             errors.append(self.error("string_too_short", {"value": self.min_length}))

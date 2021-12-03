@@ -49,6 +49,21 @@ def test_rejects_non_str_type():
         schema(bad_value)
 
 
+def test_accepts_blank_string_when_enabled():
+    schema = Str(allow_blank=True, min_length=10, pattern=r"^\d+$")
+    good_value = ""
+
+    assert schema(good_value) == good_value
+
+
+def test_accepts_blank_string_when_disabled():
+    schema = Str(min_length=10, pattern=r"^\d+$")
+    bad_value = ""
+
+    with assert_errors([Error("cannot_be_blank")]):
+        schema(bad_value)
+
+
 def test_min_length_option_accepts_good_value():
     schema = Str(min_length=5)
     good_value = "hello"
