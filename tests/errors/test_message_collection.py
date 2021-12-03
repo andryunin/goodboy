@@ -1,6 +1,6 @@
 import pytest
 
-from goodboy.errors import Message, MessageCollection
+from goodboy.messages import Message, MessageCollection
 
 
 @pytest.fixture

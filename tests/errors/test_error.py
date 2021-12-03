@@ -1,4 +1,5 @@
-from goodboy.errors import Error, Message, MessageCollection
+from goodboy.errors import Error
+from goodboy.messages import Message, MessageCollection
 
 
 def test_equality():

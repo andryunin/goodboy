@@ -1,6 +1,7 @@
 import pytest
 
-from goodboy.errors import Error, Message, MessageCollection
+from goodboy.errors import Error
+from goodboy.messages import Message, MessageCollection
 from goodboy.schema import SchemaError
 from goodboy.types.simple import AnyType
 from tests.types.conftest import assert_errors

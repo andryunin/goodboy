@@ -1,4 +1,4 @@
-from goodboy.errors import Message
+from goodboy.messages import Message
 
 
 def test_known_formats():
