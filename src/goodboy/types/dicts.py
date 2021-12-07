@@ -13,7 +13,10 @@ class Key:
         self.required = required
 
     def validate(self, value, typecast):
-        return self.schema(value, typecast=typecast)
+        if self.schema:
+            return self.schema(value, typecast=typecast)
+        else:
+            return value
 
 
 # TODO: key_schema and key_value params for dynamic keys
@@ -35,10 +38,11 @@ class Dict(Schema):
                 self.error("unexpected_type", {"expected_type": type_name("dict")})
             ]
 
+        result_value = {}
         key_errors = {}
-        key_values = {}
+        value_errors = {}
 
-        if self.keys:
+        if self.keys is not None:
             value_keys = list(value.keys())
 
             for key in self.keys:
@@ -48,19 +52,28 @@ class Dict(Schema):
                     try:
                         key_value = key.validate(value[key.name], typecast)
                     except SchemaError as e:
-                        key_errors[key.name] = e.errors
+                        value_errors[key.name] = e.errors
                     else:
-                        key_values[key.name] = key_value
+                        result_value[key.name] = key_value
+
                 elif key.required:
                     key_errors[key.name] = [self.error("required_key")]
 
             for key in value_keys:
                 key_errors[key] = [self.error("unknown_key")]
 
+        errors = []
+
         if key_errors:
-            return None, [self.error("keys_error", key_errors)]
+            errors.append(self.error("key_errors", key_errors))
 
-        return key_values, []
+        if value_errors:
+            errors.append(self.error("value_errors", value_errors))
 
-    def typecast(self, value):
-        return value, []
+        if errors:
+            return None, errors
+
+        return result_value, []
+
+    def typecast(self, input):
+        return input, []

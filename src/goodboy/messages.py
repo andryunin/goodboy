@@ -103,7 +103,8 @@ DEFAULT_MESSAGES = MessageCollection(
         "string_too_long": Message(_("must be shorter than {value} characters")),
         "string_too_short": Message(_("must be longer than {value} characters")),
         # Dict messages
-        "keys_error": Message(_("key errors")),
+        "key_errors": Message(_("key errors")),
+        "value_errors": Message(_("value errors")),
         "required_key": Message(_("key is required")),
         "unknown_key": Message(_("unknown key")),
     }

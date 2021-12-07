@@ -1,117 +1,109 @@
-from datetime import datetime
+from datetime import date
 
 from goodboy.errors import Error
 from goodboy.messages import type_name
-from goodboy.types.dates import DateTime
+from goodboy.types.dates import Date
 from goodboy.types.dicts import Dict, Key
-from goodboy.types.numeric import Int
 from goodboy.types.simple import AnyType
-from tests.types.conftest import assert_errors
+from tests.types.conftest import (
+    assert_dict_key_errors,
+    assert_dict_value_errors,
+    assert_errors,
+)
 
 
-def test_key_required():
-    schema = Dict(
-        keys=[
-            Key("key_0", AnyType()),
-            Key("key_1", AnyType(), required=False),
-        ]
-    )
-
-    good_value = {"key_0": 0, "key_1": 1}
-    assert schema({"key_0": 0, "key_1": 1}) == good_value
-
-    bad_value = good_value = {"key_1": 1}
-
-    bad_value_errors = [
-        Error(
-            "keys_error",
-            args={
-                "key_0": [Error("required_key")],
-            },
-        )
-    ]
-
-    with assert_errors(bad_value_errors):
-        schema(bad_value)
-
-
-def test_value_validation():
-    schema = Dict(
-        keys=[
-            Key("timestamp", DateTime()),
-            Key("value", Int(allow_none=True)),
-        ]
-    )
-
-    good_value = {"timestamp": datetime(2021, 10, 10, 21, 30, 00), "value": None}
-    assert schema(good_value) == good_value
-
-    bad_value = {
-        "timestamp": None,
-        "value": None,
-    }
-
-    bad_value_errors = [
-        Error(
-            "keys_error",
-            args={
-                "timestamp": [Error("cannot_be_none")],
-            },
-        )
-    ]
-
-    with assert_errors(bad_value_errors):
-        schema(bad_value)
-
-
-def test_value_typecasting():
-    schema = Dict(
-        keys=[
-            Key("timestamp", DateTime()),
-            Key("value", Int()),
-        ]
-    )
-
-    value = {"timestamp": datetime(2021, 10, 10, 21, 30, 00), "value": 42}
-
-    good_value = {"timestamp": "2021-10-10T21:30:00", "value": "42"}
-    assert schema(good_value, typecast=True) == value
-
-    bad_value = {
-        "timestamp": "oops",
-        "value": "oops",
-    }
-
-    bad_value_errors = [
-        Error(
-            "keys_error",
-            args={
-                "timestamp": [Error("invalid_datetime_format")],
-                "value": [Error("invalid_integer_format")],
-            },
-        )
-    ]
-
-    with assert_errors(bad_value_errors):
-        schema(bad_value, typecast=True)
-
-
-def test_typecast():
-    with assert_errors(
-        [Error("unexpected_type", {"expected_type": type_name("dict")})]
-    ):
-        Dict()("oops", typecast=True)
-
-
-def test_typecheck():
-    with assert_errors(
-        [Error("unexpected_type", {"expected_type": type_name("dict")})]
-    ):
-        Dict()("oops")
-
-
-def test_allow_none():
+def test_accepts_none_when_none_allowed():
     assert Dict(allow_none=True)(None) is None
 
+
+def test_rejects_none_when_none_denied():
     with assert_errors([Error("cannot_be_none")]):
         Dict()(None)
+
+
+def test_type_casting_accepts_good_input():
+    assert Dict()({}, typecast=True) == {}
+
+
+def test_type_casting_rejects_bad_input():
+    with assert_errors(
+        [Error("unexpected_type", {"expected_type": type_name("dict")})]
+    ):
+        Dict()(42, typecast=True)
+
+
+def test_accepts_dict_type():
+    assert Dict()({}) == {}
+
+
+def test_rejects_non_dict_type():
+    with assert_errors(
+        [Error("unexpected_type", {"expected_type": type_name("dict")})]
+    ):
+        Dict()(42)
+
+
+def test_accepts_with_optional_key():
+    schema = Dict(keys=[Key("minor_key", required=False)])
+    good_value = {"minor_key": None}
+
+    assert schema(good_value) == good_value
+
+
+def test_accepts_without_optional_key():
+    schema = Dict(keys=[Key("minor_key", required=False)])
+    assert schema({}) == {}
+
+
+def test_accepts_with_required_key():
+    schema = Dict(keys=[Key("major_key", required=True)])
+    good_value = {"major_key": None}
+
+    assert schema(good_value) == good_value
+
+
+def test_rejects_without_required_key():
+    schema = Dict(keys=[Key("major_key", required=True)])
+
+    with assert_dict_key_errors({"major_key": [Error("required_key")]}):
+        schema({})
+
+
+def test_rejects_unknown_key():
+    schema = Dict(keys=[])
+
+    with assert_dict_key_errors({"oops": [Error("unknown_key")]}):
+        schema({"oops": True})
+
+
+def test_accepts_valid_values():
+    schema = Dict(keys=[Key("minor", AnyType(allow_none=True))])
+    good_value = {"minor": None}
+
+    assert schema(good_value) == good_value
+
+
+def test_rejects_invalid_values():
+    schema = Dict(keys=[Key("major", AnyType())])
+    bad_value = {"major": None}
+
+    with assert_dict_value_errors({"major": [Error("cannot_be_none")]}):
+        schema(bad_value)
+
+
+def test_passes_typecast_flag_to_key_schemas():
+    schema = Dict(keys=[Key("d", Date())])
+
+    assert schema({"d": "1970-01-01"}, typecast=True) == {"d": date(1970, 1, 1)}
+
+    with assert_dict_value_errors(
+        {"d": [Error("unexpected_type", {"expected_type": type_name("date")})]}
+    ):
+        schema({"d": "1970-01-01"})
+
+
+def test_rejects_values_with_typecasting_errors():
+    schema = Dict(keys=[Key("d", Date())])
+
+    with assert_dict_value_errors({"d": [Error("invalid_date_format")]}):
+        schema({"d": "1970/01/01"}, typecast=True)
