@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Callable, ClassVar, Optional, Union
 
 from goodboy.errors import Error, ErrorFormatter, get_formatter_class
-from goodboy.i18n import I18nLoader, Translations
+from goodboy.i18n import I18nLoader, Translations, get_default_locale
 from goodboy.schema import Schema, SchemaError
 
 
@@ -25,9 +25,12 @@ class Result:
     def format_errors(
         self,
         formatter: Union[ErrorFormatter, str],
-        languages: list = [],
+        languages: Optional[list[str]] = None,
     ):
         translations: Optional[Translations]
+
+        if not languages:
+            languages = get_default_locale()
 
         if languages:
             if not self.translations_getter:

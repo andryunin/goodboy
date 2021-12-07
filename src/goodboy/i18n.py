@@ -1,7 +1,11 @@
+from __future__ import annotations
+
 import gettext
 import sys
+import threading
+from enum import Enum
 from pathlib import Path
-from typing import Iterable, Tuple
+from typing import Iterable, Optional, Union
 
 if sys.version_info >= (3, 8):
     from typing import Protocol
@@ -34,7 +38,7 @@ def load_default_messages(languages: Iterable[str] = None) -> Translations:
 
 class I18nLoader:
     def __init__(self):
-        self._cache: dict[Tuple[str, ...], Translations] = {}
+        self._cache: dict[tuple[str, ...], Translations] = {}
 
     def get_translations(self, languages: Iterable[str]) -> Translations:
         # Make hashable tuple from unhashable list
@@ -59,3 +63,34 @@ class I18nLazyStub:
 
 def lazy_gettext(message):
     return I18nLazyStub(message)
+
+
+global_locale: Optional[list[str]] = ["en"]
+thread_locale = threading.local()
+
+
+class DefaultLocaleScope(Enum):
+    GLOBAL = 0
+    THREAD = 1
+
+
+def set_default_locale(
+    languages: Optional[list[str]],
+    scope: DefaultLocaleScope = DefaultLocaleScope.GLOBAL,
+):
+    global global_locale
+
+    if scope == DefaultLocaleScope.GLOBAL:
+        global_locale = languages
+    elif scope == DefaultLocaleScope.THREAD:
+        thread_locale.locale = languages
+        thread_locale.locale_is_set = True
+    else:
+        raise ValueError(f"unexpected default locale scope: {repr(scope)}")
+
+
+def get_default_locale() -> Union[list[str], None]:
+    if getattr(thread_locale, "locale_is_set", False):
+        return thread_locale.locale
+    else:
+        return global_locale
