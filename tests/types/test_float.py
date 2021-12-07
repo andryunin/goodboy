@@ -36,3 +36,22 @@ def test_type_casting_rejects_bad_input():
 
     with assert_errors([Error("invalid_numeric_format")]):
         schema(bad_input, typecast=True)
+
+
+def test_accepts_allowed_value():
+    schema = Float(allowed=[42.0, 100.0])
+    assert schema(42.0) == 42.0
+    assert schema(100.0) == 100.0
+
+
+def test_none_check_precedes_allowed():
+    schema = Float(allowed=[42.0, 100.0], allow_none=True)
+    assert schema(None) is None
+
+
+def test_rejects_not_allowed_value():
+    allowed = [42.0, 100.0]
+    schema = Float(allowed=allowed)
+
+    with assert_errors([Error("not_allowed", {"allowed": allowed})]):
+        schema(150.0)

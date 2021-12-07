@@ -1,14 +1,27 @@
 from __future__ import annotations
 
 import re
-from typing import Optional, Pattern, Union
+from typing import Any, Optional, Pattern, Union
 
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, type_name
 from goodboy.schema import Schema
 
 
 class AnyType(Schema):
+    def __init__(
+        self,
+        *,
+        allow_none: bool = False,
+        messages: MessageCollection = DEFAULT_MESSAGES,
+        allowed: Optional[list[Any]] = None,
+    ):
+        super().__init__(allow_none=allow_none, messages=messages)
+        self.allowed = allowed
+
     def validate(self, value, typecast):
+        if self.allowed is not None and value not in self.allowed:
+            return None, [self.error("not_allowed")]
+
         return value, []
 
     def typecast(self, value):
@@ -44,6 +57,7 @@ class Str(Schema):
         max_length: Optional[int] = None,
         length: Optional[int] = None,
         pattern: Union[str, Pattern[str], None] = None,
+        allowed: Optional[list[str]] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages)
         self.allow_blank = allow_blank
@@ -58,19 +72,24 @@ class Str(Schema):
         else:
             self.pattern = pattern
 
+        self.allowed = allowed
+
     def validate(self, value, typecast):
         if not isinstance(value, str):
             return None, [
                 self.error("unexpected_type", {"expected_type": type_name("str")})
             ]
 
-        errors = []
-
         if not value:
             if self.allow_blank:
-                return value, errors
+                return value, []
             else:
                 return None, [self.error("cannot_be_blank")]
+
+        errors = []
+
+        if self.allowed is not None and value not in self.allowed:
+            errors.append(self.error("not_allowed", {"allowed": self.allowed}))
 
         if self.min_length is not None and len(value) < self.min_length:
             errors.append(self.error("string_too_short", {"value": self.min_length}))

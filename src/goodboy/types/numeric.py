@@ -20,12 +20,14 @@ class NumericBase(Generic[N], Schema):
         less_or_equal_to: Optional[N] = None,
         greater_than: Optional[N] = None,
         greater_or_equal_to: Optional[N] = None,
+        allowed: Optional[list[N]] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages)
         self.less_than = less_than
         self.less_or_equal_to = less_or_equal_to
         self.greater_than = greater_than
         self.greater_or_equal_to = greater_or_equal_to
+        self.allowed = allowed
 
     def validate(self, value, typecast):
         value, type_errors = self.validate_exact_type(value)
@@ -34,6 +36,9 @@ class NumericBase(Generic[N], Schema):
             return None, type_errors
 
         errors = []
+
+        if self.allowed is not None and value not in self.allowed:
+            errors.append(self.error("not_allowed", {"allowed": self.allowed}))
 
         if self.less_than is not None and value >= self.less_than:
             errors.append(self.error("greater_or_equal_to", {"value": self.less_than}))

@@ -22,6 +22,7 @@ class DateBase(Generic[D], Schema):
         later_than: Optional[D] = None,
         later_or_equal_to: Optional[D] = None,
         format: str = None,
+        allowed: Optional[list[D]] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages)
         self.earlier_than = earlier_than
@@ -29,6 +30,7 @@ class DateBase(Generic[D], Schema):
         self.later_than = later_than
         self.later_or_equal_to = later_or_equal_to
         self.format = format
+        self.allowed = allowed
 
     def validate(self, value, typecast):
         type_errors = self.validate_exact_type(value)
@@ -37,6 +39,9 @@ class DateBase(Generic[D], Schema):
             return value, type_errors
 
         errors = []
+
+        if self.allowed is not None and value not in self.allowed:
+            errors.append(self.error("not_allowed", {"allowed": self.allowed}))
 
         if self.earlier_than and value >= self.earlier_than:
             errors.append(self.error("later_or_equal_to", {"value": self.earlier_than}))

@@ -128,3 +128,27 @@ def test_pattern_option_rejects_bad_string(pattern):
 
     with assert_errors([Error("invalid_string_format")]):
         schema(bad_string)
+
+
+def test_accepts_allowed_value():
+    schema = Str(allowed=["foo", "bar"])
+    assert schema("foo") == "foo"
+    assert schema("bar") == "bar"
+
+
+def test_none_check_precedes_allowed():
+    schema = Str(allowed=["foo", "bar"], allow_none=True)
+    assert schema(None) is None
+
+
+def test_blank_check_precedes_allowed():
+    schema = Str(allowed=["foo", "bar"], allow_blank=True)
+    assert schema("") == ""
+
+
+def test_rejects_not_allowed_value():
+    allowed = ["foo", "bar"]
+    schema = Str(allowed=allowed)
+
+    with assert_errors([Error("not_allowed", {"allowed": allowed})]):
+        schema("baz")

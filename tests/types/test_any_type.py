@@ -26,6 +26,24 @@ def test_allow_none():
         AnyType()(None)
 
 
+def test_accepts_allowed_value():
+    schema = AnyType(allowed=["foo", 42])
+    assert schema("foo") == "foo"
+    assert schema(42) == 42
+
+
+def test_none_check_precedes_allowed():
+    schema = AnyType(allowed=["foo", 42], allow_none=True)
+    assert schema(None) is None
+
+
+def test_rejects_not_allowed_value():
+    schema = AnyType(allowed=["foo", 42])
+
+    with assert_errors([Error("not_allowed")]):
+        schema(100)
+
+
 def test_messages_override():
     messages = MessageCollection({"cannot_be_none": Message("no None here please")})
 

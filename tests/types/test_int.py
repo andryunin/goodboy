@@ -35,3 +35,22 @@ def test_type_casting_rejects_bad_input():
 
     with assert_errors([Error("invalid_integer_format")]):
         schema(bad_input, typecast=True)
+
+
+def test_accepts_allowed_value():
+    schema = Int(allowed=[42, 100])
+    assert schema(42) == 42
+    assert schema(100) == 100
+
+
+def test_none_check_precedes_allowed():
+    schema = Int(allowed=[42, 100], allow_none=True)
+    assert schema(None) is None
+
+
+def test_rejects_not_allowed_value():
+    allowed = [42, 100]
+    schema = Int(allowed=allowed)
+
+    with assert_errors([Error("not_allowed", {"allowed": allowed})]):
+        schema(150)
