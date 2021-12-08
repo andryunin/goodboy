@@ -25,9 +25,6 @@ class TestNumeric:
 
     @pytest.mark.parametrize("bad_value", [0, 1])
     def test_less_than_option_rejects_bad_values(self, type_class, bad_value):
-        print("=============================")
-        print(type_class, bad_value)
-        print("=============================")
         less_than_value = 0
         schema = type_class(less_than=less_than_value)
 

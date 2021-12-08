@@ -9,7 +9,7 @@ from tests.types.conftest import assert_errors
 
 def test_none():
     with assert_errors([Error("cannot_be_none", {})]):
-        print(AnyType()(None))
+        AnyType()(None)
 
     assert AnyType(allow_none=True)(None) is None
 
