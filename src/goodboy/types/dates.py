@@ -12,6 +12,11 @@ D = TypeVar("D")
 
 
 class DateBase(Generic[D], Schema):
+    """
+    Abstract base class for Date/DateTime schemas, should not be used directly. Use
+    :class:`Date` or :class:`DateTime` instead.
+    """
+
     def __init__(
         self,
         *,
@@ -63,6 +68,26 @@ class DateBase(Generic[D], Schema):
 
 
 class Date(DateBase[date]):
+    """
+    Accept ``datetime.date`` values.
+
+    When type casting enabled, strings are converted to ``datetime.date`` using
+    ``format`` option as strptime format.
+
+    :param allow_none: If true, value is allowed to be ``None``.
+    :param messages: Override error messages.
+    :param earlier_than: Accept only values earlier than option value.
+    :param earlier_or_equal_to: Accept only values earlier than or equal to option
+        value.
+    :param later_than: Accept only values later than option value.
+    :param later_or_equal_to: Accept only values later than or equal to option value.
+    :param format: date format for type casting. See
+        `strftime() and strptime() Behavior <https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior>`_
+        for details.
+
+    :param allowed: Allow only certain values.
+    """
+
     def validate_exact_type(self, value) -> list[Error]:
         if not isinstance(value, date):
             return [self.error("unexpected_type", {"expected_type": type_name("date")})]
@@ -89,6 +114,26 @@ class Date(DateBase[date]):
 
 
 class DateTime(DateBase[datetime]):
+    """
+    Accept ``datetime.datetime`` values.
+
+    When type casting enabled, strings are converted to ``datetime.datetime`` using
+    ``format`` option as strptime format.
+
+    :param allow_none: If true, value is allowed to be ``None``.
+    :param messages: Override error messages.
+    :param earlier_than: Accept only values earlier than option value.
+    :param earlier_or_equal_to: Accept only values earlier than or equal to option
+        value.
+    :param later_than: Accept only values later than option value.
+    :param later_or_equal_to: Accept only values later than or equal to option value.
+    :param format: datetime format for type casting. See
+        `strftime() and strptime() Behavior <https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior>`_
+        for details.
+
+    :param allowed: Allow only certain values.
+    """
+
     def validate_exact_type(self, value) -> list[Error]:
         if not isinstance(value, datetime):
             return [

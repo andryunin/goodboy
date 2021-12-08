@@ -7,7 +7,16 @@ from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, type_name
 from goodboy.schema import Schema
 
 
+# TODO: rename to AnyValue for consistency
 class AnyType(Schema):
+    """
+    Accept any values, taking into account ``allow_none`` and ``allowed`` options.
+
+    :param allow_none: If true, value is allowed to be ``None``.
+    :param messages: Override error messages.
+    :param allowed: Allow only certain values.
+    """
+
     def __init__(
         self,
         *,
@@ -29,6 +38,12 @@ class AnyType(Schema):
 
 
 class NoneValue(Schema):
+    """
+    Accept ``None`` values. Type casting is not performed.
+
+    :param messages: Override error messages.
+    """
+
     def __init__(
         self,
         *,
@@ -48,21 +63,22 @@ class NoneValue(Schema):
 
 class Str(Schema):
     """
-    String schema.
+    Accept ``str`` values.
 
     When blank string found, only ``allow_blank`` validation applied.
 
     Since any python object can be casted to string (even complex types like ``dict`` or
     ``list``), it's too dangerous to automatically cast input value.
-    Therefore, **strings are not typecasted**.
+    Therefore, **strings are not type casted**.
 
     :param allow_none: If true, value is allowed to be ``None``.
-    :param messages: Override standard error messages.
+    :param messages: Override error messages.
     :param allow_blank: If true, value is allowed to be empty string. Defaults to false.
     :param min_length: Minimal allowed string length.
     :param max_length: Maximum allowed string length.
     :param length: Exact allowed string length.
     :param pattern: Regexp to match string value.
+    :param allowed: Allow only certain values.
     """
 
     def __init__(

@@ -11,6 +11,11 @@ N = TypeVar("N")
 
 
 class NumericBase(Generic[N], Schema):
+    """
+    Abstract base class for Int/Float schemas, should not be used directly. Use
+    :class:`Int` or :class:`Float` instead.
+    """
+
     def __init__(
         self,
         *,
@@ -60,6 +65,23 @@ class NumericBase(Generic[N], Schema):
 
 
 class Float(NumericBase[float]):
+    """
+    Accept ``float`` values. Integer values are converted to floats.
+
+    When type casting enabled, strings and other values with magic method
+    `__float__ <https://docs.python.org/3/reference/datamodel.html#object.__float__>`_
+    are converted to floats.
+
+    :param allow_none: If true, value is allowed to be ``None``.
+    :param messages: Override error messages.
+    :param less_than: Accept only values less than option value.
+    :param less_or_equal_to: Accept only values less than or equal to option value.
+    :param greater_than: Accept only values greater than option value.
+    :param greater_or_equal_to: Accept only values greater than or equal to option
+        value.
+    :param allowed: Allow only certain values.
+    """
+
     def validate_exact_type(self, value):
         if isinstance(value, float):
             return value, []
@@ -89,6 +111,23 @@ class Float(NumericBase[float]):
 
 
 class Int(NumericBase[int]):
+    """
+    Accept ``int`` values.
+
+    When type casting enabled, strings and other values with magic method
+    `__int__ <https://docs.python.org/3/reference/datamodel.html#object.__int__>`_ are
+    converted to integers.
+
+    :param allow_none: If true, value is allowed to be ``None``.
+    :param messages: Override error messages.
+    :param less_than: Accept only values less than option value.
+    :param less_or_equal_to: Accept only values less than or equal to option value.
+    :param greater_than: Accept only values greater than option value.
+    :param greater_or_equal_to: Accept only values greater than or equal to option
+        value.
+    :param allowed: Allow only certain values.
+    """
+
     def validate_exact_type(self, value):
         if not isinstance(value, int):
             return None, [
