@@ -30,3 +30,11 @@ def assert_dict_value_errors(value_errors: dict[str, Error]):
         yield
 
     assert e.value.errors == [Error("value_errors", value_errors)]
+
+
+@contextmanager
+def assert_list_value_errors(value_errors: dict[int, Error]):
+    with pytest.raises(SchemaError) as e:
+        yield
+
+    assert e.value.errors == [Error("value_errors", value_errors)]
