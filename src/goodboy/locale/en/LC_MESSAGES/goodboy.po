@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-12-07 21:41+0700\n"
+"POT-Creation-Date: 2021-12-08 12:59+0700\n"
 "PO-Revision-Date: 2021-08-26 12:06+0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -117,4 +117,16 @@ msgstr "key is required"
 #: src/goodboy/messages.py:110
 msgid "unknown key"
 msgstr "unknown key"
+
+#: src/goodboy/messages.py:112
+msgid "must be {value} items long"
+msgstr "must be {value} items long"
+
+#: src/goodboy/messages.py:113
+msgid "must be shorter than {value} items"
+msgstr "must be shorter than {value} items"
+
+#: src/goodboy/messages.py:114
+msgid "must be longer than {value} items"
+msgstr "must be longer than {value} items"
 

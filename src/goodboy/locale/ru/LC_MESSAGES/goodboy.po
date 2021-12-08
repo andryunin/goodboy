@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-12-07 21:41+0700\n"
+"POT-Creation-Date: 2021-12-08 12:59+0700\n"
 "PO-Revision-Date: 2021-08-26 11:51+0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -118,4 +118,16 @@ msgstr "ключ обязателен"
 #: src/goodboy/messages.py:110
 msgid "unknown key"
 msgstr "неизвестный ключ"
+
+#: src/goodboy/messages.py:112
+msgid "must be {value} items long"
+msgstr "неверной длины (должно быть ровно {value} элементов)"
+
+#: src/goodboy/messages.py:113
+msgid "must be shorter than {value} items"
+msgstr "должно быть короче {value} элементов"
+
+#: src/goodboy/messages.py:114
+msgid "must be longer than {value} items"
+msgstr "должно быть длинее {value} элементов"
 

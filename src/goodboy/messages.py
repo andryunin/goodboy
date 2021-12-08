@@ -108,6 +108,10 @@ DEFAULT_MESSAGES = MessageCollection(
         "value_errors": Message(_("value errors")),
         "required_key": Message(_("key is required")),
         "unknown_key": Message(_("unknown key")),
+        # List messages
+        "invalid_length": Message(_("must be {value} items long")),
+        "too_long": Message(_("must be shorter than {value} items")),
+        "too_short": Message(_("must be longer than {value} items")),
     }
 )
 
