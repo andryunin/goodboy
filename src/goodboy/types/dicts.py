@@ -1,18 +1,31 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Callable, Optional
 
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, type_name
 from goodboy.schema import Schema, SchemaError
 
 
 class Key:
-    def __init__(self, name, schema: Optional[Schema] = None, required: bool = True):
+    def __init__(
+        self,
+        name,
+        schema: Optional[Schema] = None,
+        required: bool = True,
+        predicate: Optional[Callable[[dict], bool]] = None,
+    ):
         self.name = name
         self.schema = schema
         self.required = required
+        self.predicate = predicate
 
-    def validate(self, value, typecast):
+    def predicate_result(self, prev_values: dict):
+        if self.predicate:
+            return self.predicate(prev_values)
+        else:
+            return True
+
+    def validate(self, value, typecast: bool):
         if self.schema:
             return self.schema(value, typecast=typecast)
         else:
@@ -46,6 +59,9 @@ class Dict(Schema):
             value_keys = list(value.keys())
 
             for key in self.keys:
+                if not key.predicate_result(result_value):
+                    continue
+
                 if key.name in value_keys:
                     value_keys.remove(key.name)
 

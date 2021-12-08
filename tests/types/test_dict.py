@@ -1,10 +1,12 @@
 from datetime import date
 
+import pytest
+
 from goodboy.errors import Error
 from goodboy.messages import type_name
 from goodboy.types.dates import Date
 from goodboy.types.dicts import Dict, Key
-from goodboy.types.simple import AnyType
+from goodboy.types.simple import AnyType, Str
 from tests.types.conftest import (
     assert_dict_key_errors,
     assert_dict_value_errors,
@@ -107,3 +109,44 @@ def test_rejects_values_with_typecasting_errors():
 
     with assert_dict_value_errors({"d": [Error("invalid_date_format")]}):
         schema({"d": "1970/01/01"}, typecast=True)
+
+
+@pytest.mark.parametrize(
+    "good_value",
+    [
+        {"field": "name", "value": "Marty"},
+        {"field": "birthday", "value": date(1968, 6, 12)},
+    ],
+)
+def test_accepts_values_when_conditional_validation_succeed(good_value):
+    schema = Dict(
+        keys=[
+            Key("field", Str()),
+            Key("value", Str(), predicate=lambda d: d.get("field") == "name"),
+            Key("value", Date(), predicate=lambda d: d.get("field") == "birthday"),
+        ]
+    )
+
+    assert schema(good_value) == good_value
+
+
+@pytest.mark.parametrize(
+    "bad_value,type_name",
+    [
+        ({"field": "name", "value": date(1968, 6, 12)}, type_name("str")),
+        ({"field": "birthday", "value": "Marty"}, type_name("date")),
+    ],
+)
+def test_rejects_values_when_conditional_validation_failed(bad_value, type_name):
+    schema = Dict(
+        keys=[
+            Key("field", Str()),
+            Key("value", Str(), predicate=lambda d: d.get("field") == "name"),
+            Key("value", Date(), predicate=lambda d: d.get("field") == "birthday"),
+        ]
+    )
+
+    with assert_dict_value_errors(
+        {"value": [Error("unexpected_type", {"expected_type": type_name})]}
+    ):
+        schema(bad_value)
