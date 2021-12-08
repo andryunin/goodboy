@@ -28,6 +28,24 @@ class AnyType(Schema):
         return value, []
 
 
+class NoneValue(Schema):
+    def __init__(
+        self,
+        *,
+        messages: MessageCollection = DEFAULT_MESSAGES,
+    ):
+        super().__init__(allow_none=True, messages=messages)
+
+    def validate(self, value, typecast):
+        if value is not None:
+            return None, [self.error("must_be_none")]
+
+        return value, []
+
+    def typecast(self, value):
+        return value, []
+
+
 class Str(Schema):
     """
     String schema.
