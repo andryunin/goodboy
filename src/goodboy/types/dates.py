@@ -86,7 +86,7 @@ class Date(DateBase[date]):
         for details.
 
     :param allowed: Allow only certain values.
-    """
+    """  # noqa: E501
 
     def validate_exact_type(self, value) -> list[Error]:
         if not isinstance(value, date):
@@ -132,7 +132,7 @@ class DateTime(DateBase[datetime]):
         for details.
 
     :param allowed: Allow only certain values.
-    """
+    """  # noqa: E501
 
     def validate_exact_type(self, value) -> list[Error]:
         if not isinstance(value, datetime):
