@@ -7,7 +7,6 @@ from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
 from goodboy.schema import Schema
 
 
-# TODO: rename to AnyValue for consistency
 class AnyValue(Schema):
     """
     Accept any values, taking into account ``allow_none`` and ``allowed`` options.

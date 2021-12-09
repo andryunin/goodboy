@@ -32,8 +32,7 @@ class Key:
             return value
 
 
-# TODO: key_schema and key_value params for dynamic keys
-# TODO: conditional validation
+# TODO: key_schema and value_schema params for dynamic dicts
 class Dict(Schema):
     def __init__(
         self,
