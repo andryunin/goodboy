@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any, Optional, Pattern, Union
 
-from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, type_name
+from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
 from goodboy.schema import Schema
 
 
@@ -21,7 +21,7 @@ class AnyType(Schema):
         self,
         *,
         allow_none: bool = False,
-        messages: MessageCollection = DEFAULT_MESSAGES,
+        messages: MessageCollectionType = DEFAULT_MESSAGES,
         allowed: Optional[list[Any]] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages)
@@ -47,7 +47,7 @@ class NoneValue(Schema):
     def __init__(
         self,
         *,
-        messages: MessageCollection = DEFAULT_MESSAGES,
+        messages: MessageCollectionType = DEFAULT_MESSAGES,
     ):
         super().__init__(allow_none=True, messages=messages)
 
@@ -85,7 +85,7 @@ class Str(Schema):
         self,
         *,
         allow_none: bool = False,
-        messages: MessageCollection = DEFAULT_MESSAGES,
+        messages: MessageCollectionType = DEFAULT_MESSAGES,
         allow_blank: bool = False,
         min_length: Optional[int] = None,
         max_length: Optional[int] = None,

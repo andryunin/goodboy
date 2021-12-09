@@ -4,7 +4,7 @@ from abc import abstractmethod
 from typing import Generic, Optional, TypeVar
 
 from goodboy.errors import Error
-from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, type_name
+from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
 from goodboy.schema import Schema
 
 N = TypeVar("N")
@@ -20,7 +20,7 @@ class NumericBase(Generic[N], Schema):
         self,
         *,
         allow_none: bool = False,
-        messages: MessageCollection = DEFAULT_MESSAGES,
+        messages: MessageCollectionType = DEFAULT_MESSAGES,
         less_than: Optional[N] = None,
         less_or_equal_to: Optional[N] = None,
         greater_than: Optional[N] = None,

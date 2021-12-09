@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Dict, Optional, Union
 
 from goodboy.i18n import I18nLazyStub, Translations
 from goodboy.i18n import lazy_gettext as _
@@ -56,8 +56,14 @@ class Message:
 
 class MessageCollection:
     def __init__(
-        self, messages: dict[str, Message], parent: Optional["MessageCollection"] = None
+        self,
+        messages: dict[str, Union[Message, I18nLazyStub, str]],
+        parent: Optional["MessageCollection"] = None,
     ):
+        for code, message in messages.items():
+            if not isinstance(message, Message):
+                messages[code] = Message(message)
+
         self.messages = messages
         self.parent = parent
 
@@ -76,6 +82,10 @@ class MessageCollection:
 
         raise KeyError(code)
 
+
+MessageCollectionType = Union[
+    MessageCollection, Dict[str, Union[Message, I18nLazyStub, str]]
+]
 
 DEFAULT_MESSAGES = MessageCollection(
     {

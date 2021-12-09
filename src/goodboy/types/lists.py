@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, type_name
+from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
 from goodboy.schema import Schema, SchemaError
 
 
@@ -11,7 +11,7 @@ class List(Schema):
         self,
         *,
         allow_none: bool = False,
-        messages: MessageCollection = DEFAULT_MESSAGES,
+        messages: MessageCollectionType = DEFAULT_MESSAGES,
         item: Optional[Schema] = None,
         min_length: Optional[int] = None,
         max_length: Optional[int] = None,

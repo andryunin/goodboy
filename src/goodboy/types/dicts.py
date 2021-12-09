@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Callable, Optional
 
-from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, type_name
+from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
 from goodboy.schema import Schema, SchemaError
 
 
@@ -39,7 +39,7 @@ class Dict(Schema):
         self,
         *,
         allow_none: bool = False,
-        messages: MessageCollection = DEFAULT_MESSAGES,
+        messages: MessageCollectionType = DEFAULT_MESSAGES,
         keys: Optional[list[Key]] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages)

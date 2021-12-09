@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Union
 
-from goodboy.errors import DEFAULT_MESSAGES, Error, MessageCollection
+from goodboy.errors import DEFAULT_MESSAGES, Error
+from goodboy.messages import Message, MessageCollection, MessageCollectionType
 
 
 class SchemaError(Exception):
@@ -16,10 +17,14 @@ class Schema(ABC):
         self,
         *,
         allow_none: bool = False,
-        messages: MessageCollection = DEFAULT_MESSAGES,
+        messages: MessageCollectionType = DEFAULT_MESSAGES,
     ):
         self.allow_none = allow_none
-        self.messages = messages
+
+        if isinstance(messages, MessageCollection):
+            self.messages = messages
+        else:
+            self.messages = MessageCollection(messages, parent=DEFAULT_MESSAGES)
 
     def __call__(self, value, *, typecast=False):
         if value is None:

@@ -44,9 +44,15 @@ def test_rejects_not_allowed_value():
         schema(100)
 
 
-def test_messages_override():
-    messages = MessageCollection({"cannot_be_none": Message("no None here please")})
-
+@pytest.mark.parametrize(
+    "messages",
+    [
+        MessageCollection({"cannot_be_none": Message("no None here please")}),
+        {"cannot_be_none": Message("no None here please")},
+        {"cannot_be_none": "no None here please"},
+    ],
+)
+def test_messages_override(messages):
     try:
         AnyType(messages=messages)(None)
     except SchemaError as e:

@@ -5,7 +5,7 @@ from datetime import date, datetime
 from typing import Generic, Optional, TypeVar
 
 from goodboy.errors import Error
-from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, type_name
+from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
 from goodboy.schema import Schema
 
 D = TypeVar("D")
@@ -21,7 +21,7 @@ class DateBase(Generic[D], Schema):
         self,
         *,
         allow_none: bool = False,
-        messages: MessageCollection = DEFAULT_MESSAGES,
+        messages: MessageCollectionType = DEFAULT_MESSAGES,
         earlier_than: Optional[D] = None,
         earlier_or_equal_to: Optional[D] = None,
         later_than: Optional[D] = None,
