@@ -37,8 +37,17 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install poetry
         python -m poetry config virtualenvs.in-project true
+
+    - name: Set up dependencies cache
+      uses: actions/cache@v2
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('poetry.lock') }}
+
+    - name: Install dependencies
+      run: |
         python -m poetry install
-        python -m poetry run pip install flake8 pytest
+        python -m poetry run pip install flake8
     
     - name: Compile locale files
       run: |
