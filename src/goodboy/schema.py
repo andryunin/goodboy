@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Union
+from typing import Any
 
 from goodboy.errors import DEFAULT_MESSAGES, Error
-from goodboy.messages import Message, MessageCollection, MessageCollectionType
+from goodboy.messages import MessageCollection, MessageCollectionType
 
 
 class SchemaError(Exception):
