@@ -6,7 +6,7 @@ from goodboy.errors import Error
 from goodboy.messages import type_name
 from goodboy.types.dates import Date
 from goodboy.types.lists import List
-from goodboy.types.simple import AnyType
+from goodboy.types.simple import AnyValue
 from tests.types.conftest import assert_errors, assert_list_value_errors
 
 
@@ -88,14 +88,14 @@ def test_length_option_rejects_good_value(bad_value):
 
 
 def test_accepts_valid_values():
-    schema = List(item=AnyType(allow_none=True))
+    schema = List(item=AnyValue(allow_none=True))
     good_value = [None, None]
 
     assert schema(good_value) == good_value
 
 
 def test_rejects_invalid_values():
-    schema = List(item=AnyType())
+    schema = List(item=AnyValue())
     bad_value = [None, None]
 
     with assert_list_value_errors(

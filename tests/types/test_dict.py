@@ -6,7 +6,7 @@ from goodboy.errors import Error
 from goodboy.messages import type_name
 from goodboy.types.dates import Date
 from goodboy.types.dicts import Dict, Key
-from goodboy.types.simple import AnyType, Str
+from goodboy.types.simple import AnyValue, Str
 from tests.types.conftest import (
     assert_dict_key_errors,
     assert_dict_value_errors,
@@ -79,14 +79,14 @@ def test_rejects_unknown_key():
 
 
 def test_accepts_valid_values():
-    schema = Dict(keys=[Key("minor", AnyType(allow_none=True))])
+    schema = Dict(keys=[Key("minor", AnyValue(allow_none=True))])
     good_value = {"minor": None}
 
     assert schema(good_value) == good_value
 
 
 def test_rejects_invalid_values():
-    schema = Dict(keys=[Key("major", AnyType())])
+    schema = Dict(keys=[Key("major", AnyValue())])
     bad_value = {"major": None}
 
     with assert_dict_value_errors({"major": [Error("cannot_be_none")]}):

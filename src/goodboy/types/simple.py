@@ -8,7 +8,7 @@ from goodboy.schema import Schema
 
 
 # TODO: rename to AnyValue for consistency
-class AnyType(Schema):
+class AnyValue(Schema):
     """
     Accept any values, taking into account ``allow_none`` and ``allowed`` options.
 

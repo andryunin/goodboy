@@ -6,7 +6,7 @@ Reference
 Simple types
 ------------
 .. autoclass:: goodboy.Str
-.. autoclass:: goodboy.AnyType
+.. autoclass:: goodboy.AnyValue
 
 Numeric types
 -------------
