@@ -128,13 +128,13 @@ DEFAULT_MESSAGES = MessageCollection(
 
 
 _TYPE_NAMES_LIST: list[Message] = [
-    Message("dict", json="Object"),
-    Message("list", json="Array"),
-    Message("str", json="String"),
-    Message("date", json="String"),
-    Message("datetime", json="String"),
-    Message("int", json="Number"),
-    Message("float", json="Number"),
+    Message("dict", json="object"),
+    Message("list", json="array"),
+    Message("str", json="string"),
+    Message("date", json="string"),
+    Message("datetime", json="string"),
+    Message("int", json="integer"),
+    Message("float", json="number"),
 ]
 
 _TYPE_NAMES = MessageCollection({m.get(): m for m in _TYPE_NAMES_LIST})
