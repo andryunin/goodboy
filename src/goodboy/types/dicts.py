@@ -77,6 +77,8 @@ class Dict(Schema):
 
             for key in value_keys:
                 key_errors[key] = [self.error("unknown_key")]
+        else:
+            result_value = value
 
         errors = []
 
