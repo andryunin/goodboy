@@ -1,3 +1,4 @@
+from goodboy.declarative import DeclarativeBuilder, SimpleDeclarativeSchemaFabric
 from goodboy.types.dates import Date, DateTime
 from goodboy.types.dicts import Dict, Key
 from goodboy.types.numeric import Float, Int
@@ -10,11 +11,13 @@ __all__ = [
     "AnyValue",
     "Date",
     "DateTime",
+    "DeclarativeBuilder",
     "Dict",
     "Float",
     "Int",
     "Key",
     "Result",
+    "SimpleDeclarativeSchemaFabric",
     "Str",
     "validate",
     "Validator",

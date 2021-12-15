@@ -31,6 +31,9 @@ class Key:
         else:
             return value
 
+    def with_predicate(self, predicate: Callable[[dict], bool]) -> Key:
+        return Key(self.name, self.schema, self.required, predicate)
+
 
 # TODO: key_schema and value_schema params for dynamic dicts
 class Dict(Schema):

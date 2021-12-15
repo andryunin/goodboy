@@ -68,6 +68,7 @@ class NoneValue(Schema):
         return input, []
 
 
+# TODO: add option to check value is valid regex (for declarative schema validation)
 class Str(Schema):
     """
     Accept ``str`` values.
