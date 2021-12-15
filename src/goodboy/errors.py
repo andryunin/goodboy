@@ -76,6 +76,11 @@ class JSONErrorFormatter(I18nErrorFormatter):
         for key, value in error.args.items():
             args[key] = self.format_argument_value(value)
 
+        nested_errors: dict[Any, Any] = {}
+
+        for key, nested_error in error.nested_errors.items():
+            nested_errors[key] = self.format_error(nested_error)
+
         result = {
             "code": error.code,
             "message": error.get_message("json", self.translations),
@@ -83,6 +88,9 @@ class JSONErrorFormatter(I18nErrorFormatter):
 
         if args:
             result["args"] = args
+
+        if nested_errors:
+            result["nested_errors"] = nested_errors
 
         return result
 
@@ -93,8 +101,6 @@ class JSONErrorFormatter(I18nErrorFormatter):
             return value
         elif isinstance(value, float):
             return value
-        elif isinstance(value, Error):
-            return self.format_error(value)
         elif isinstance(value, Message):
             return value.get("json", self.translations)
         elif isinstance(value, list):
