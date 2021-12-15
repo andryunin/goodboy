@@ -11,7 +11,7 @@ class Key:
         self,
         name,
         schema: Optional[Schema] = None,
-        required: bool = True,
+        required: Optional[bool] = None,
         predicate: Optional[Callable[[dict], bool]] = None,
     ):
         self.name = name
@@ -41,9 +41,11 @@ class Dict(Schema):
         messages: MessageCollectionType = DEFAULT_MESSAGES,
         rules: list[Rule] = [],
         keys: Optional[list[Key]] = None,
+        keys_required_by_default: bool = True,
     ):
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
         self.keys = keys
+        self.keys_required_by_default = keys_required_by_default
 
     def validate(self, value, typecast: bool, context: dict = {}):
         if not isinstance(value, dict):
@@ -71,9 +73,14 @@ class Dict(Schema):
                         value_errors[key.name] = e.errors
                     else:
                         result_value[key.name] = key_value
+                else:
+                    if key.required is not None:
+                        key_required = key.required
+                    else:
+                        key_required = self.keys_required_by_default
 
-                elif key.required:
-                    key_errors[key.name] = [self.error("required_key")]
+                    if key_required:
+                        key_errors[key.name] = [self.error("required_key")]
 
             for key in value_keys:
                 key_errors[key] = [self.error("unknown_key")]

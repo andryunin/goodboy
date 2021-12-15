@@ -71,6 +71,18 @@ def test_rejects_without_required_key():
         schema({})
 
 
+def test_keys_are_required_by_default():
+    schema = Dict(keys=[Key("major_key")])
+
+    with assert_dict_key_errors({"major_key": [Error("required_key")]}):
+        schema({})
+
+
+def test_keys_are_not_required_by_default_if_option_set():
+    schema = Dict(keys=[Key("minor_key")], keys_required_by_default=False)
+    assert schema({}) == {}
+
+
 def test_rejects_unknown_key():
     schema = Dict(keys=[])
 
