@@ -79,7 +79,7 @@ class JSONErrorFormatter(I18nErrorFormatter):
         nested_errors: dict[Any, Any] = {}
 
         for key, nested_error in error.nested_errors.items():
-            nested_errors[key] = self.format_error(nested_error)
+            nested_errors[key] = self.format(nested_error)
 
         result = {
             "code": error.code,
