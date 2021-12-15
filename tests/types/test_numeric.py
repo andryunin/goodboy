@@ -2,7 +2,7 @@ import pytest
 
 from goodboy.errors import Error
 from goodboy.types.numeric import Float, Int
-from tests.types.conftest import assert_errors
+from tests.types.conftest import assert_errors, validate_value_is_42_and_double_it
 
 
 @pytest.mark.parametrize("type_class", [Int, Float])
@@ -72,3 +72,21 @@ class TestNumeric:
 
         with assert_errors([Error("less_than", {"value": greater_or_equal_to_value})]):
             schema(bad_value)
+
+    def test_applies_rules_when_value_not_none_and_has_expected_type(self, type_class):
+        schema = type_class(rules=[validate_value_is_42_and_double_it])
+
+        with assert_errors([Error("not_a_42")]):
+            schema(0)
+
+        assert schema(42) == 42 * 2
+
+    def test_ignores_rules_when_value_is_none_and_denied(self, type_class):
+        schema = type_class(rules=[validate_value_is_42_and_double_it])
+
+        with assert_errors([Error("cannot_be_none")]):
+            schema(None)
+
+    def test_ignores_rules_when_value_is_none_and_allowed(self, type_class):
+        schema = type_class(allow_none=True, rules=[validate_value_is_42_and_double_it])
+        assert schema(None) is None

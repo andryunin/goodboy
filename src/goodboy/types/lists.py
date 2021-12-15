@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Optional
 
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
-from goodboy.schema import Schema, SchemaError
+from goodboy.schema import Rule, Schema, SchemaError
 
 
 class List(Schema):
@@ -12,12 +12,13 @@ class List(Schema):
         *,
         allow_none: bool = False,
         messages: MessageCollectionType = DEFAULT_MESSAGES,
+        rules: list[Rule] = [],
         item: Optional[Schema] = None,
         min_length: Optional[int] = None,
         max_length: Optional[int] = None,
         length: Optional[int] = None,
     ):
-        super().__init__(allow_none=allow_none, messages=messages)
+        super().__init__(allow_none=allow_none, messages=messages, rules=rules)
         self.item = item
         self.min_length = min_length
         self.max_length = max_length
@@ -57,7 +58,9 @@ class List(Schema):
         else:
             result_value = value
 
-        return result_value, errors
+        result_value, rule_errors = self.call_rules(result_value, typecast, context)
+
+        return result_value, errors + rule_errors
 
     def typecast(self, input, context: dict = {}):
         return input, []

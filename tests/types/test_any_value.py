@@ -4,7 +4,7 @@ from goodboy.errors import Error
 from goodboy.messages import Message, MessageCollection
 from goodboy.schema import SchemaError
 from goodboy.types.simple import AnyValue
-from tests.types.conftest import assert_errors
+from tests.types.conftest import assert_errors, validate_value_is_42_and_double_it
 
 
 def test_none():
@@ -42,6 +42,27 @@ def test_rejects_not_allowed_value():
 
     with assert_errors([Error("not_allowed")]):
         schema(100)
+
+
+def test_applies_rules_when_value_not_none():
+    schema = AnyValue(rules=[validate_value_is_42_and_double_it])
+
+    with assert_errors([Error("not_a_42")]):
+        schema(100)
+
+    assert schema(42) == 42 * 2
+
+
+def test_ignores_rules_when_value_is_none_and_denied():
+    schema = AnyValue(rules=[validate_value_is_42_and_double_it])
+
+    with assert_errors([Error("cannot_be_none")]):
+        schema(None)
+
+
+def test_ignores_rules_when_value_is_none_and_allowed():
+    schema = AnyValue(allow_none=True, rules=[validate_value_is_42_and_double_it])
+    assert schema(None) is None
 
 
 @pytest.mark.parametrize(

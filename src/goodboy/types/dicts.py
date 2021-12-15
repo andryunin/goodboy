@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Callable, Optional
 
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
-from goodboy.schema import Schema, SchemaError
+from goodboy.schema import Rule, Schema, SchemaError
 
 
 class Key:
@@ -39,9 +39,10 @@ class Dict(Schema):
         *,
         allow_none: bool = False,
         messages: MessageCollectionType = DEFAULT_MESSAGES,
+        rules: list[Rule] = [],
         keys: Optional[list[Key]] = None,
     ):
-        super().__init__(allow_none=allow_none, messages=messages)
+        super().__init__(allow_none=allow_none, messages=messages, rules=rules)
         self.keys = keys
 
     def validate(self, value, typecast: bool, context: dict = {}):
@@ -50,7 +51,7 @@ class Dict(Schema):
                 self.error("unexpected_type", {"expected_type": type_name("dict")})
             ]
 
-        result_value = {}
+        result_value: dict = {}
         key_errors = {}
         value_errors = {}
 
@@ -85,10 +86,9 @@ class Dict(Schema):
         if value_errors:
             errors.append(self.error("value_errors", nested_errors=value_errors))
 
-        if errors:
-            return None, errors
+        result_value, rule_errors = self.call_rules(result_value, typecast, context)
 
-        return result_value, []
+        return result_value, errors + rule_errors
 
     def typecast(self, input, context: dict = {}):
         return input, []

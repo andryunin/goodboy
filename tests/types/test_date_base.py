@@ -4,7 +4,7 @@ import pytest
 
 from goodboy.errors import Error
 from goodboy.types.dates import Date, DateTime
-from tests.types.conftest import assert_errors
+from tests.types.conftest import assert_errors, validate_value_has_odd_year
 
 
 @pytest.mark.parametrize(
@@ -74,3 +74,24 @@ class TestDateBase:
 
         with assert_errors([Error("earlier_than", {"value": value})]):
             schema(value - timedelta(days=1))
+
+    def test_applies_rules_when_value_not_none_and_has_expected_type(
+        self, schema_class, value
+    ):
+        schema = schema_class(rules=[validate_value_has_odd_year])
+
+        with assert_errors([Error("not_an_odd_year")]):
+            schema(value)
+
+        odd_year_value = value.replace(year=value.year + 1)
+        assert schema(odd_year_value) == odd_year_value
+
+    def test_ignores_rules_when_value_is_none_and_denied(self, schema_class, value):
+        schema = schema_class(rules=[validate_value_has_odd_year])
+
+        with assert_errors([Error("cannot_be_none")]):
+            schema(None)
+
+    def test_ignores_rules_when_value_is_none_and_allowed(self, schema_class, value):
+        schema = schema_class(allow_none=True, rules=[validate_value_has_odd_year])
+        assert schema(None) is None

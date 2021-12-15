@@ -5,7 +5,7 @@ from typing import Generic, Optional, TypeVar
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
-from goodboy.schema import Schema
+from goodboy.schema import Rule, Schema
 
 N = TypeVar("N")
 
@@ -21,13 +21,14 @@ class NumericBase(Generic[N], Schema):
         *,
         allow_none: bool = False,
         messages: MessageCollectionType = DEFAULT_MESSAGES,
+        rules: list[Rule] = [],
         less_than: Optional[N] = None,
         less_or_equal_to: Optional[N] = None,
         greater_than: Optional[N] = None,
         greater_or_equal_to: Optional[N] = None,
         allowed: Optional[list[N]] = None,
     ):
-        super().__init__(allow_none=allow_none, messages=messages)
+        super().__init__(allow_none=allow_none, messages=messages, rules=rules)
         self.less_than = less_than
         self.less_or_equal_to = less_or_equal_to
         self.greater_than = greater_than
@@ -57,10 +58,12 @@ class NumericBase(Generic[N], Schema):
         if self.greater_or_equal_to is not None and value < self.greater_or_equal_to:
             errors.append(self.error("less_than", {"value": self.greater_or_equal_to}))
 
-        return value, errors
+        value, rule_errors = self.call_rules(value, typecast, context)
+
+        return value, errors + rule_errors
 
     @abstractmethod
-    def validate_exact_type(self, value) -> Optional[list[Error]]:
+    def validate_exact_type(self, value) -> tuple[N, list[Error]]:
         ...
 
 

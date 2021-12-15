@@ -6,7 +6,7 @@ from typing import Generic, Optional, TypeVar
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
-from goodboy.schema import Schema
+from goodboy.schema import Rule, Schema
 
 D = TypeVar("D")
 
@@ -22,6 +22,7 @@ class DateBase(Generic[D], Schema):
         *,
         allow_none: bool = False,
         messages: MessageCollectionType = DEFAULT_MESSAGES,
+        rules: list[Rule] = [],
         earlier_than: Optional[D] = None,
         earlier_or_equal_to: Optional[D] = None,
         later_than: Optional[D] = None,
@@ -29,7 +30,7 @@ class DateBase(Generic[D], Schema):
         format: str = None,
         allowed: Optional[list[D]] = None,
     ):
-        super().__init__(allow_none=allow_none, messages=messages)
+        super().__init__(allow_none=allow_none, messages=messages, rules=rules)
         self.earlier_than = earlier_than
         self.earlier_or_equal_to = earlier_or_equal_to
         self.later_than = later_than
@@ -60,7 +61,9 @@ class DateBase(Generic[D], Schema):
         if self.later_or_equal_to and value < self.later_or_equal_to:
             errors.append(self.error("earlier_than", {"value": self.later_or_equal_to}))
 
-        return value, errors
+        value, rule_errors = self.call_rules(value, typecast, context)
+
+        return value, errors + rule_errors
 
     @abstractmethod
     def validate_exact_type(self, value) -> list[Error]:

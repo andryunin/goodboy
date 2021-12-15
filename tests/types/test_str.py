@@ -152,3 +152,40 @@ def test_rejects_not_allowed_value():
 
     with assert_errors([Error("not_allowed", {"allowed": allowed})]):
         schema("baz")
+
+
+def test_applies_rules_when_value_not_none_and_has_expected_type():
+    schema = Str(rules=[validate_value_length_is_odd_and_add_is_ok])
+
+    with assert_errors([Error("length_is_not_odd")]):
+        schema("oops")
+
+    assert schema("foo") == "foo is ok"
+
+
+def test_ignores_rules_when_value_is_none_and_denied():
+    schema = Str(rules=[validate_value_length_is_odd_and_add_is_ok])
+
+    with assert_errors([Error("cannot_be_none")]):
+        schema(None)
+
+
+def test_ignores_rules_when_value_is_none_and_allowed():
+    schema = Str(allow_none=True, rules=[validate_value_length_is_odd_and_add_is_ok])
+    assert schema(None) is None
+
+
+def test_ignores_rules_when_value_has_unexpected_type():
+    schema = Str(rules=[validate_value_length_is_odd_and_add_is_ok])
+
+    with assert_errors([Error("unexpected_type", {"expected_type": type_name("str")})]):
+        schema(42)
+
+
+def validate_value_length_is_odd_and_add_is_ok(
+    self: Str, value, typecast: bool, context: dict
+):
+    if len(value) % 2 == 1:
+        return value + " is ok", []
+    else:
+        return value, [self.error("length_is_not_odd")]

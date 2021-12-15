@@ -150,3 +150,44 @@ def test_rejects_values_when_conditional_validation_failed(bad_value, type_name)
         {"value": [Error("unexpected_type", {"expected_type": type_name})]}
     ):
         schema(bad_value)
+
+
+def test_applies_rules_when_value_not_none_and_has_expected_type():
+    schema = Dict(rules=[validate_keys_count_is_odd_and_add_bar_dict_key])
+
+    with assert_errors([Error("key_count_is_not_odd")]):
+        schema({})
+
+    assert schema({"foo": 0}) == {"foo": 0, "bar": 1}
+
+
+def test_ignores_rules_when_value_is_none_and_denied():
+    schema = Dict(rules=[validate_keys_count_is_odd_and_add_bar_dict_key])
+
+    with assert_errors([Error("cannot_be_none")]):
+        schema(None)
+
+
+def test_ignores_rules_when_value_is_none_and_allowed():
+    schema = Dict(
+        allow_none=True, rules=[validate_keys_count_is_odd_and_add_bar_dict_key]
+    )
+    assert schema(None) is None
+
+
+def test_ignores_rules_when_value_has_unexpected_type():
+    schema = Dict(rules=[validate_keys_count_is_odd_and_add_bar_dict_key])
+
+    with assert_errors(
+        [Error("unexpected_type", {"expected_type": type_name("dict")})]
+    ):
+        schema(42)
+
+
+def validate_keys_count_is_odd_and_add_bar_dict_key(
+    self: Dict, value, typecast: bool, context: dict
+):
+    if len(value.keys()) % 2 == 1:
+        return {**value, "bar": 1}, []
+    else:
+        return value, [self.error("key_count_is_not_odd")]

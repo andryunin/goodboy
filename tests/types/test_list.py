@@ -120,3 +120,44 @@ def test_rejects_values_with_typecasting_errors():
 
     with assert_list_value_errors({0: [Error("invalid_date_format")]}):
         schema(["1970/01/01"], typecast=True)
+
+
+def test_applies_rules_when_value_not_none_and_has_expected_type():
+    schema = List(rules=[validate_value_length_is_odd_and_add_bar_list_item])
+
+    with assert_errors([Error("length_is_not_odd")]):
+        schema([])
+
+    assert schema(["foo"]) == ["foo", "bar"]
+
+
+def test_ignores_rules_when_value_is_none_and_denied():
+    schema = List(rules=[validate_value_length_is_odd_and_add_bar_list_item])
+
+    with assert_errors([Error("cannot_be_none")]):
+        schema(None)
+
+
+def test_ignores_rules_when_value_is_none_and_allowed():
+    schema = List(
+        allow_none=True, rules=[validate_value_length_is_odd_and_add_bar_list_item]
+    )
+    assert schema(None) is None
+
+
+def test_ignores_rules_when_value_has_unexpected_type():
+    schema = List(rules=[validate_value_length_is_odd_and_add_bar_list_item])
+
+    with assert_errors(
+        [Error("unexpected_type", {"expected_type": type_name("list")})]
+    ):
+        schema(42)
+
+
+def validate_value_length_is_odd_and_add_bar_list_item(
+    self: List, value, typecast: bool, context: dict
+):
+    if len(value) % 2 == 1:
+        return value + ["bar"], []
+    else:
+        return value, [self.error("length_is_not_odd")]

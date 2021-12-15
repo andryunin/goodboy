@@ -4,7 +4,7 @@ import re
 from typing import Any, Optional, Pattern, Union
 
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
-from goodboy.schema import Schema
+from goodboy.schema import Rule, Schema
 
 
 class AnyValue(Schema):
@@ -21,16 +21,19 @@ class AnyValue(Schema):
         *,
         allow_none: bool = False,
         messages: MessageCollectionType = DEFAULT_MESSAGES,
+        rules: list[Rule] = [],
         allowed: Optional[list[Any]] = None,
     ):
-        super().__init__(allow_none=allow_none, messages=messages)
+        super().__init__(allow_none=allow_none, messages=messages, rules=rules)
         self.allowed = allowed
 
     def validate(self, value, typecast: bool, context: dict = {}):
         if self.allowed is not None and value not in self.allowed:
             return None, [self.error("not_allowed")]
 
-        return value, []
+        value, rule_errors = self.call_rules(value, typecast, context)
+
+        return value, rule_errors
 
     def typecast(self, input, context: dict = {}):
         return input, []
@@ -47,14 +50,17 @@ class NoneValue(Schema):
         self,
         *,
         messages: MessageCollectionType = DEFAULT_MESSAGES,
+        rules: list[Rule] = [],
     ):
-        super().__init__(allow_none=True, messages=messages)
+        super().__init__(allow_none=True, messages=messages, rules=rules)
 
     def validate(self, value, typecast: bool, context: dict = {}):
         if value is not None:
             return None, [self.error("must_be_none")]
 
-        return value, []
+        value, rule_errors = self.call_rules(value, typecast, context)
+
+        return value, rule_errors
 
     def typecast(self, input, context: dict = {}):
         return input, []
@@ -85,6 +91,7 @@ class Str(Schema):
         *,
         allow_none: bool = False,
         messages: MessageCollectionType = DEFAULT_MESSAGES,
+        rules: list[Rule] = [],
         allow_blank: bool = False,
         min_length: Optional[int] = None,
         max_length: Optional[int] = None,
@@ -92,7 +99,7 @@ class Str(Schema):
         pattern: Union[str, Pattern[str], None] = None,
         allowed: Optional[list[str]] = None,
     ):
-        super().__init__(allow_none=allow_none, messages=messages)
+        super().__init__(allow_none=allow_none, messages=messages, rules=rules)
         self.allow_blank = allow_blank
         self.min_length = min_length
         self.max_length = max_length
@@ -136,7 +143,9 @@ class Str(Schema):
         if self.pattern and not self.pattern.match(value):
             errors.append(self.error("invalid_string_format"))
 
-        return value, errors
+        value, rule_errors = self.call_rules(value, typecast, context)
+
+        return value, errors + rule_errors
 
     def typecast(self, input, context: dict = {}):
         # Any python object usually can be casted to string, so casting any value to

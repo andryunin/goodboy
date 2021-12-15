@@ -3,7 +3,7 @@ import pytest
 from goodboy.errors import Error
 from goodboy.messages import type_name
 from goodboy.types.numeric import Float
-from tests.types.conftest import assert_errors
+from tests.types.conftest import assert_errors, validate_value_is_42_and_double_it
 
 
 @pytest.mark.parametrize("good_value", [42.0, 42])
@@ -55,3 +55,12 @@ def test_rejects_not_allowed_value():
 
     with assert_errors([Error("not_allowed", {"allowed": allowed})]):
         schema(150.0)
+
+
+def test_ignores_rules_when_value_has_unexpected_type():
+    schema = Float(rules=[validate_value_is_42_and_double_it])
+
+    with assert_errors(
+        [Error("unexpected_type", {"expected_type": type_name("float")})]
+    ):
+        schema("42")
