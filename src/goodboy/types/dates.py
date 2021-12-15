@@ -79,6 +79,7 @@ class Date(DateBase[date]):
 
     :param allow_none: If true, value is allowed to be ``None``.
     :param messages: Override error messages.
+    :param rules: Custom validation rules.
     :param earlier_than: Accept only values earlier than option value.
     :param earlier_or_equal_to: Accept only values earlier than or equal to option
         value.
@@ -125,6 +126,7 @@ class DateTime(DateBase[datetime]):
 
     :param allow_none: If true, value is allowed to be ``None``.
     :param messages: Override error messages.
+    :param rules: Custom validation rules.
     :param earlier_than: Accept only values earlier than option value.
     :param earlier_or_equal_to: Accept only values earlier than or equal to option
         value.

@@ -13,6 +13,7 @@ class AnyValue(Schema):
 
     :param allow_none: If true, value is allowed to be ``None``.
     :param messages: Override error messages.
+    :param rules: Custom validation rules.
     :param allowed: Allow only certain values.
     """
 
@@ -44,6 +45,7 @@ class NoneValue(Schema):
     Accept ``None`` values. Type casting is not performed.
 
     :param messages: Override error messages.
+    :param rules: Custom validation rules.
     """
 
     def __init__(
@@ -78,6 +80,7 @@ class Str(Schema):
 
     :param allow_none: If true, value is allowed to be ``None``.
     :param messages: Override error messages.
+    :param rules: Custom validation rules.
     :param allow_blank: If true, value is allowed to be empty string. Defaults to false.
     :param min_length: Minimal allowed string length.
     :param max_length: Maximum allowed string length.

@@ -77,6 +77,7 @@ class Float(NumericBase[float]):
 
     :param allow_none: If true, value is allowed to be ``None``.
     :param messages: Override error messages.
+    :param rules: Custom validation rules.
     :param less_than: Accept only values less than option value.
     :param less_or_equal_to: Accept only values less than or equal to option value.
     :param greater_than: Accept only values greater than option value.
@@ -123,6 +124,7 @@ class Int(NumericBase[int]):
 
     :param allow_none: If true, value is allowed to be ``None``.
     :param messages: Override error messages.
+    :param rules: Custom validation rules.
     :param less_than: Accept only values less than option value.
     :param less_or_equal_to: Accept only values less than or equal to option value.
     :param greater_than: Accept only values greater than option value.
