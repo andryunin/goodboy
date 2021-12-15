@@ -43,8 +43,8 @@ def test_complex_error_formatting():
         Error(
             "err_1",
             nested_errors={
-                "value_1": Error("value_1_err"),
-                "value_2": Error("value_2_err"),
+                "value_1": [Error("value_1_err")],
+                "value_2": [Error("value_2_err")],
             },
         ),
     ]
@@ -54,8 +54,8 @@ def test_complex_error_formatting():
             "code": "err_1",
             "message": "err_1",
             "nested_errors": {
-                "value_1": {"code": "value_1_err", "message": "value_1_err"},
-                "value_2": {"code": "value_2_err", "message": "value_2_err"},
+                "value_1": [{"code": "value_1_err", "message": "value_1_err"}],
+                "value_2": [{"code": "value_2_err", "message": "value_2_err"}],
             },
         },
     ]
