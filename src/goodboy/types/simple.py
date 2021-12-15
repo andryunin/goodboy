@@ -159,3 +159,67 @@ class Str(Schema):
             return None, [
                 self.error("unexpected_type", {"expected_type": type_name("str")})
             ]
+
+
+class Bool(Schema):
+    """
+    Accept ``bool`` values.
+
+    :param allow_none: If true, value is allowed to be ``None``.
+    :param messages: Override error messages.
+    :param rules: Custom validation rules.
+    :param only_false: Allow only ``False`` values.
+    :param only_true: Allow only ``True`` values.
+    """
+
+    def __init__(
+        self,
+        *,
+        allow_none: bool = False,
+        messages: MessageCollectionType = DEFAULT_MESSAGES,
+        rules: list[Rule] = [],
+        only_false: bool = False,
+        only_true: bool = False,
+        cast_anything: bool = False,
+    ):
+        super().__init__(allow_none=allow_none, messages=messages, rules=rules)
+        self.only_false = only_false
+        self.only_true = only_true
+        # TODO: override cast_anything in validation context
+        self.cast_anything = cast_anything
+
+    def validate(self, value, typecast: bool, context: dict = {}):
+        if not isinstance(value, bool):
+            return None, [
+                self.error("unexpected_type", {"expected_type": type_name("bool")})
+            ]
+
+        errors = []
+
+        if self.only_false and value:
+            errors.append(self.error("not_allowed", {"allowed": [False]}))
+
+        if self.only_true and not value:
+            errors.append(self.error("not_allowed", {"allowed": [True]}))
+
+        value, rule_errors = self.call_rules(value, typecast, context)
+
+        return value, errors + rule_errors
+
+    def typecast(self, input, context: dict = {}):
+        if isinstance(input, bool):
+            return input, []
+
+        if self.cast_anything:
+            return bool(input), []
+
+        if isinstance(input, str):
+            if input.lower() == "true":
+                return True, []
+
+            if input.lower() == "false":
+                return False, []
+
+        return None, [
+            self.error("unexpected_type", {"expected_type": type_name("bool")})
+        ]
