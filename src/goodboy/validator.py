@@ -53,7 +53,7 @@ class Validator:
     def __init__(self, schema: Schema):
         self.schema = schema
 
-    def validate(self, value, typecast: bool = False) -> Result:
+    def validate(self, value, typecast: bool = False, context: dict = {}) -> Result:
         try:
             result_value = self.schema(value, typecast=typecast)
         except SchemaError as e:

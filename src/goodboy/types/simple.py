@@ -26,14 +26,14 @@ class AnyValue(Schema):
         super().__init__(allow_none=allow_none, messages=messages)
         self.allowed = allowed
 
-    def validate(self, value, typecast):
+    def validate(self, value, typecast: bool, context: dict = {}):
         if self.allowed is not None and value not in self.allowed:
             return None, [self.error("not_allowed")]
 
         return value, []
 
-    def typecast(self, value):
-        return value, []
+    def typecast(self, input, context: dict = {}):
+        return input, []
 
 
 class NoneValue(Schema):
@@ -50,14 +50,14 @@ class NoneValue(Schema):
     ):
         super().__init__(allow_none=True, messages=messages)
 
-    def validate(self, value, typecast):
+    def validate(self, value, typecast: bool, context: dict = {}):
         if value is not None:
             return None, [self.error("must_be_none")]
 
         return value, []
 
-    def typecast(self, value):
-        return value, []
+    def typecast(self, input, context: dict = {}):
+        return input, []
 
 
 class Str(Schema):
@@ -107,7 +107,7 @@ class Str(Schema):
 
         self.allowed = allowed
 
-    def validate(self, value, typecast):
+    def validate(self, value, typecast: bool, context: dict = {}):
         if not isinstance(value, str):
             return None, [
                 self.error("unexpected_type", {"expected_type": type_name("str")})
@@ -138,7 +138,7 @@ class Str(Schema):
 
         return value, errors
 
-    def typecast(self, input):
+    def typecast(self, input, context: dict = {}):
         # Any python object usually can be casted to string, so casting any value to
         # string is too dangerous
         if isinstance(input, str):

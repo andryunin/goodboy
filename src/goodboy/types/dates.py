@@ -37,7 +37,7 @@ class DateBase(Generic[D], Schema):
         self.format = format
         self.allowed = allowed
 
-    def validate(self, value, typecast):
+    def validate(self, value, typecast: bool, context: dict = {}):
         type_errors = self.validate_exact_type(value)
 
         if type_errors:
@@ -94,7 +94,7 @@ class Date(DateBase[date]):
         else:
             return []
 
-    def typecast(self, input):
+    def typecast(self, input, context: dict = {}):
         if isinstance(input, date):
             return input, []
 
@@ -142,7 +142,7 @@ class DateTime(DateBase[datetime]):
         else:
             return []
 
-    def typecast(self, input):
+    def typecast(self, input, context: dict = {}):
         if isinstance(input, datetime):
             return input, []
 

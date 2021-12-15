@@ -26,7 +26,7 @@ class Schema(ABC):
         else:
             self.messages = MessageCollection(messages, parent=DEFAULT_MESSAGES)
 
-    def __call__(self, value, *, typecast=False):
+    def __call__(self, value, *, typecast=False, context: dict = {}):
         if value is None:
             if not self.allow_none:
                 raise SchemaError([self.error("cannot_be_none")])
@@ -34,12 +34,12 @@ class Schema(ABC):
             return None
 
         if typecast:
-            value, errors = self.typecast(value)
+            value, errors = self.typecast(value, context)
 
             if errors:
                 raise SchemaError(errors)
 
-        value, errors = self.validate(value, typecast)
+        value, errors = self.validate(value, typecast, context)
 
         if errors:
             raise SchemaError(errors)
@@ -47,11 +47,13 @@ class Schema(ABC):
         return value
 
     @abstractmethod
-    def validate(self, value: Any, typecast: bool) -> list[Error]:
+    def validate(
+        self, value: Any, typecast: bool, context: dict = {}
+    ) -> tuple[Any, list[Error]]:
         ...
 
     @abstractmethod
-    def typecast(self, value: Any) -> tuple[Any, list[Error]]:
+    def typecast(self, input: Any, context: dict = {}) -> tuple[Any, list[Error]]:
         ...
 
     def error(self, code: str, args: dict = {}, nested_errors: dict = {}):

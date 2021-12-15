@@ -23,7 +23,7 @@ class List(Schema):
         self.max_length = max_length
         self.length = length
 
-    def validate(self, value, typecast):
+    def validate(self, value, typecast: bool, context: dict = {}):
         if not isinstance(value, list):
             return None, [
                 self.error("unexpected_type", {"expected_type": type_name("list")})
@@ -59,5 +59,5 @@ class List(Schema):
 
         return result_value, errors
 
-    def typecast(self, input):
+    def typecast(self, input, context: dict = {}):
         return input, []

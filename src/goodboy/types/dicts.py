@@ -44,7 +44,7 @@ class Dict(Schema):
         super().__init__(allow_none=allow_none, messages=messages)
         self.keys = keys
 
-    def validate(self, value, typecast):
+    def validate(self, value, typecast: bool, context: dict = {}):
         if not isinstance(value, dict):
             return None, [
                 self.error("unexpected_type", {"expected_type": type_name("dict")})
@@ -90,5 +90,5 @@ class Dict(Schema):
 
         return result_value, []
 
-    def typecast(self, input):
+    def typecast(self, input, context: dict = {}):
         return input, []

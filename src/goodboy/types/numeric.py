@@ -34,7 +34,7 @@ class NumericBase(Generic[N], Schema):
         self.greater_or_equal_to = greater_or_equal_to
         self.allowed = allowed
 
-    def validate(self, value, typecast):
+    def validate(self, value, typecast: bool, context: dict = {}):
         value, type_errors = self.validate_exact_type(value)
 
         if type_errors:
@@ -92,7 +92,7 @@ class Float(NumericBase[float]):
                 self.error("unexpected_type", {"expected_type": type_name("float")})
             ]
 
-    def typecast(self, input):
+    def typecast(self, input, context: dict = {}):
         if isinstance(input, float):
             return input, []
 
@@ -136,7 +136,7 @@ class Int(NumericBase[int]):
         else:
             return value, []
 
-    def typecast(self, input):
+    def typecast(self, input, context: dict = {}):
         if isinstance(input, int):
             return input, []
 
