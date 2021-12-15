@@ -135,6 +135,7 @@ _TYPE_NAMES_LIST: list[Message] = [
     Message("datetime", json="string"),
     Message("int", json="integer"),
     Message("float", json="number"),
+    Message("bool", json="boolean"),
 ]
 
 _TYPE_NAMES = MessageCollection({m.get(): m for m in _TYPE_NAMES_LIST})
