@@ -53,7 +53,7 @@ class List(Schema):
                     result_value.append(item_value)
 
             if value_errors:
-                errors.append(self.error("value_errors", value_errors))
+                errors.append(self.error("value_errors", nested_errors=value_errors))
         else:
             result_value = value
 

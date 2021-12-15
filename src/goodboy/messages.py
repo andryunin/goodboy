@@ -17,7 +17,7 @@ class Message:
     python names for data types ("str" instead of "string", "dict" instead of "object"
     and so on).
 
-        >>> e = ErrorMessage("Cannot be None", json="Cannot be null")
+        >>> e = Message("Cannot be None", json="Cannot be null")
         >>> e.get()
         "Cannot be None"
         >>> e.get("json")

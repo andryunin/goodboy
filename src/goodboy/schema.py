@@ -54,5 +54,5 @@ class Schema(ABC):
     def typecast(self, value: Any) -> tuple[Any, list[Error]]:
         ...
 
-    def error(self, code: str, args: dict = {}):
-        return Error(code, args, self.messages)
+    def error(self, code: str, args: dict = {}, nested_errors: dict = {}):
+        return Error(code, args, nested_errors, self.messages)

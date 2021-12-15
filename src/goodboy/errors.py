@@ -9,10 +9,15 @@ from goodboy.messages import DEFAULT_MESSAGES, Message, MessageCollection
 
 class Error:
     def __init__(
-        self, code: str, args: dict = {}, messages: MessageCollection = DEFAULT_MESSAGES
+        self,
+        code: str,
+        args: dict = {},
+        nested_errors: dict = {},
+        messages: MessageCollection = DEFAULT_MESSAGES,
     ):
         self.code = code
         self.args = args
+        self.nested_errors: dict[str, Error] = nested_errors
         self.messages = messages
 
     def __str__(self):

@@ -80,10 +80,10 @@ class Dict(Schema):
         errors = []
 
         if key_errors:
-            errors.append(self.error("key_errors", key_errors))
+            errors.append(self.error("key_errors", nested_errors=key_errors))
 
         if value_errors:
-            errors.append(self.error("value_errors", value_errors))
+            errors.append(self.error("value_errors", nested_errors=value_errors))
 
         if errors:
             return None, errors
