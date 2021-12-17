@@ -108,8 +108,15 @@ class Date(DateBase[date]):
             ]
 
         try:
-            if self.format:
-                return datetime.strptime(input, self.format).date(), []
+            if context.get("date_format"):
+                format = context.get("date_format")
+            elif self.format:
+                format = self.format
+            else:
+                format = None
+
+            if format:
+                return datetime.strptime(input, format).date(), []
             else:
                 return date.fromisoformat(input), []
 
@@ -157,8 +164,15 @@ class DateTime(DateBase[datetime]):
             ]
 
         try:
-            if self.format:
-                return datetime.strptime(input, self.format), []
+            if context.get("date_format"):
+                format = context.get("date_format")
+            elif self.format:
+                format = self.format
+            else:
+                format = None
+
+            if format:
+                return datetime.strptime(input, format), []
             else:
                 return datetime.fromisoformat(input), []
 

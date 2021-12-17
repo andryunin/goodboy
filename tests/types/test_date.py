@@ -55,6 +55,24 @@ def test_type_casting_rejects_bad_input_with_custom_format():
         schema(bad_input, typecast=True)
 
 
+def test_type_casting_accepts_good_input_with_custom_format_from_context():
+    schema = Date(format="should_not_be_used")
+    good_input = "1985/10/26"
+    value = date(1985, 10, 26)
+    context = {"date_format": "%Y/%m/%d"}
+
+    assert schema(good_input, typecast=True, context=context) == value
+
+
+def test_type_casting_rejects_bad_input_with_custom_format_from_context():
+    schema = Date(format="should_not_be_used")
+    bad_input = "1985-10-26"
+    context = {"date_format": "%Y/%m/%d"}
+
+    with assert_errors([Error("invalid_date_format")]):
+        schema(bad_input, typecast=True, context=context)
+
+
 def test_type_casting_accepts_date_values():
     schema = Date()
     good_input = date(1985, 10, 26)
