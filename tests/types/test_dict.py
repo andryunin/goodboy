@@ -90,6 +90,13 @@ def test_rejects_unknown_key():
         schema({"oops": True})
 
 
+def test_accepts_any_key_when_no_keys_specified():
+    schema = Dict()
+    good_value = {"hello": "world", "the_answer": 42}
+
+    assert schema(good_value) == good_value
+
+
 def test_accepts_valid_values():
     schema = Dict(keys=[Key("minor", AnyValue(allow_none=True))])
     good_value = {"minor": None}
