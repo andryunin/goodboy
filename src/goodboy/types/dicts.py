@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from typing import Callable, Optional
 
+from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
 from goodboy.schema import Rule, Schema, SchemaError
+from goodboy.types.simple import Str
 
 
 class Key:
@@ -35,7 +37,7 @@ class Key:
         return Key(self.name, self.schema, self.required, predicate)
 
 
-# TODO: key_schema and value_schema params for dynamic dicts
+# TODO: maybe support non string keys?
 class Dict(Schema):
     def __init__(
         self,
@@ -44,11 +46,15 @@ class Dict(Schema):
         messages: MessageCollectionType = DEFAULT_MESSAGES,
         rules: list[Rule] = [],
         keys: Optional[list[Key]] = None,
+        key_schema: Optional[Str] = None,
+        value_schema: Optional[Schema] = None,
         keys_required_by_default: bool = True,
     ):
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
         self.keys = keys
         self.keys_required_by_default = keys_required_by_default
+        self.key_schema = key_schema
+        self.value_schema = value_schema
 
     def validate(self, value, typecast: bool, context: dict = {}):
         if not isinstance(value, dict):
@@ -56,39 +62,47 @@ class Dict(Schema):
                 self.error("unexpected_type", {"expected_type": type_name("dict")})
             ]
 
-        result_value: dict = {}
-        key_errors = {}
-        value_errors = {}
-
         if self.keys is not None:
-            value_keys = list(value.keys())
-
-            for key in self.keys:
-                if not key.predicate_result(result_value):
-                    continue
-
-                if key.name in value_keys:
-                    value_keys.remove(key.name)
-
-                    try:
-                        key_value = key.validate(value[key.name], typecast)
-                    except SchemaError as e:
-                        value_errors[key.name] = e.errors
-                    else:
-                        result_value[key.name] = key_value
-                else:
-                    if key.required is not None:
-                        key_required = key.required
-                    else:
-                        key_required = self.keys_required_by_default
-
-                    if key_required:
-                        key_errors[key.name] = [self.error("required_key")]
-
-            for key in value_keys:
-                key_errors[key] = [self.error("unknown_key")]
+            (
+                result_value,
+                key_errors,
+                value_errors,
+                key_names_to_validate_by_key_schema,
+            ) = self.validate_keys(value, typecast, context)
         else:
-            result_value = value
+            result_value = value.copy()
+            key_errors = {}
+            value_errors = {}
+            key_names_to_validate_by_key_schema = list(value.keys())
+
+        if self.keys is None or self.key_schema or self.value_schema:
+            unknown_key_names = []
+        else:
+            unknown_key_names = key_names_to_validate_by_key_schema
+
+        if self.key_schema:
+            values, errors = self.validate_keys_by_schema(
+                value, key_names_to_validate_by_key_schema, typecast, context
+            )
+
+            result_value.update(values)
+            key_errors.update(errors)
+
+            key_names_to_validate_by_value_schema = list(values.keys())
+        else:
+            key_names_to_validate_by_value_schema = key_names_to_validate_by_key_schema
+
+        if self.value_schema:
+            values, errors = self.validate_values_by_schema(
+                value, key_names_to_validate_by_value_schema, typecast, context
+            )
+
+            result_value.update(values)
+            value_errors.update(errors)
+
+        if unknown_key_names:
+            for key_name in unknown_key_names:
+                key_errors[key_name] = [self.error("unknown_key")]
 
         errors = []
 
@@ -101,6 +115,70 @@ class Dict(Schema):
         result_value, rule_errors = self.call_rules(result_value, typecast, context)
 
         return result_value, errors + rule_errors
+
+    def validate_keys(self, value, typecast: bool, context: dict):
+        result_value: dict = {}
+        result_key_errors = {}
+        result_value_errors = {}
+
+        unknown_keys = list(value.keys())
+
+        for key in self.keys:
+            if not key.predicate_result(result_value):
+                continue
+
+            if key.name in unknown_keys:
+                unknown_keys.remove(key.name)
+
+                try:
+                    key_value = key.validate(value[key.name], typecast)
+                except SchemaError as e:
+                    result_value_errors[key.name] = e.errors
+                else:
+                    result_value[key.name] = key_value
+            else:
+                if key.required is not None:
+                    key_required = key.required
+                else:
+                    key_required = self.keys_required_by_default
+
+                if key_required:
+                    result_key_errors[key.name] = [self.error("required_key")]
+
+        return result_value, result_key_errors, result_value_errors, unknown_keys
+
+    def validate_keys_by_schema(
+        self, value, key_names: list[str], typecast: bool, context: dict
+    ) -> tuple[dict, list[Error]]:
+        result_value = {}
+        result_errors = {}
+
+        for key_name in key_names:
+            try:
+                # TODO: maybe allow keys to be modified here?
+                self.key_schema(key_name, context=context)
+            except SchemaError as e:
+                result_errors[key_name] = e.errors
+            else:
+                result_value[key_name] = value[key_name]
+
+        return result_value, result_errors
+
+    def validate_values_by_schema(
+        self, value, key_names: list[str], typecast: bool, context: dict
+    ):
+        result_value = {}
+        result_errors = {}
+
+        for key_name in key_names:
+            try:
+                key_value = self.value_schema(value[key_name], context=context)
+            except SchemaError as e:
+                result_errors[key_name] = e.errors
+            else:
+                result_value[key_name] = key_value
+
+        return result_value, result_errors
 
     def typecast(self, input, context: dict = {}):
         return input, []

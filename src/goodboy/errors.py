@@ -24,7 +24,10 @@ class Error:
         return self.code
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} {self.code} {repr(self.args)}>"
+        args = repr(self.args)
+        nested = repr(self.nested_errors)
+
+        return f"<{self.__class__.__name__} {self.code} {args} {nested}>"
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
