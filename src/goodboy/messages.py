@@ -17,11 +17,11 @@ class Message:
     python names for data types ("str" instead of "string", "dict" instead of "object"
     and so on).
 
-        >>> e = Message("Cannot be None", json="Cannot be null")
+        >>> e = Message('Cannot be None', json='Cannot be null')
         >>> e.get()
-        "Cannot be None"
+        'Cannot be None'
         >>> e.get("json")
-        "Cannot be null"
+        'Cannot be null'
     """
 
     def __init__(self, default_message, **other_messages):
