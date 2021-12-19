@@ -24,8 +24,8 @@ class Message:
         'Cannot be null'
     """
 
-    def __init__(self, default_message, **other_messages):
-        self.messages = {"default": default_message, **other_messages}
+    def __init__(self, default, **other_messages):
+        self.messages = {"default": default, **other_messages}
 
     def get(
         self,
@@ -61,8 +61,10 @@ class MessageCollection:
         parent: Optional["MessageCollection"] = None,
     ):
         for code, message in messages.items():
-            if not isinstance(message, Message):
+            if isinstance(message, str):
                 messages[code] = Message(message)
+            elif isinstance(message, dict):
+                messages[code] = Message(**message)
 
         self.messages = messages
         self.parent = parent

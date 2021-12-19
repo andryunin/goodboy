@@ -3,6 +3,8 @@ from __future__ import annotations
 import sys
 from typing import Type
 
+from goodboy.types.variants import AnyOf
+
 if sys.version_info >= (3, 8):
     from typing import Protocol
 else:
@@ -39,12 +41,29 @@ class SimpleDeclarativeSchemaFabric:
         return self.schema_class(**options)
 
 
-# TODO: support "messages" and "rules" options here
+MESSAGES_SCHEMA = Dict(
+    key_schema=Str(),
+    value_schema=AnyOf(
+        [
+            Str(),
+            Dict(
+                keys=[
+                    Key("default", Str(), required=True),
+                ],
+                key_schema=Str(),
+                value_schema=Str(),
+            ),
+        ]
+    ),
+)
+
+# TODO: support "rules" option here
 DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
     "str": SimpleDeclarativeSchemaFabric(
         Str,
         [
             Key("allow_none", Bool()),
+            Key("messages", MESSAGES_SCHEMA),
             Key("allow_blank", Bool()),
             Key("min_length", Int(greater_or_equal_to=0)),
             Key("max_length", Int(greater_or_equal_to=0)),
@@ -57,6 +76,7 @@ DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
         Int,
         [
             Key("allow_none", Bool()),
+            Key("messages", MESSAGES_SCHEMA),
             Key("less_than", Int()),
             Key("less_or_equal_to", Int()),
             Key("greater_than", Int()),
