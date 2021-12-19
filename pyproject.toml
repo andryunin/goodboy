@@ -23,6 +23,10 @@ mypy = "^0.910"
 module = "pytest.*"
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = "sphinx_rtd_theme"
+ignore_missing_imports = true
+
 [tool.isort]
 profile = "black"
 

@@ -10,7 +10,7 @@ from goodboy.schema import SchemaError
 
 
 @contextmanager
-def assert_declarative_errors(value_errors: list[Error]):
+def assert_declarative_errors(value_errors: dict[str, list[Error]]):
     with pytest.raises(DeclarationError) as e:
         yield
 

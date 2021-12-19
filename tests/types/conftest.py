@@ -17,7 +17,7 @@ def assert_errors(errors: list[Error]):
 
 
 @contextmanager
-def assert_dict_key_errors(key_errors: dict[str, Error]):
+def assert_dict_key_errors(key_errors: dict[str, list[Error]]):
     with pytest.raises(SchemaError) as e:
         yield
 
@@ -25,7 +25,7 @@ def assert_dict_key_errors(key_errors: dict[str, Error]):
 
 
 @contextmanager
-def assert_dict_value_errors(value_errors: dict[str, Error]):
+def assert_dict_value_errors(value_errors: dict[str, list[Error]]):
     with pytest.raises(SchemaError) as e:
         yield
 
@@ -33,7 +33,7 @@ def assert_dict_value_errors(value_errors: dict[str, Error]):
 
 
 @contextmanager
-def assert_list_value_errors(value_errors: dict[int, Error]):
+def assert_list_value_errors(value_errors: dict[str, list[Error]]):
     with pytest.raises(SchemaError) as e:
         yield
 

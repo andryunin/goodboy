@@ -81,30 +81,30 @@ class Dict(Schema):
             unknown_key_names = key_names_to_validate_by_key_schema
 
         if self.key_schema:
-            values, errors = self.validate_keys_by_schema(
+            key_schema_values, key_schema_errors = self.validate_keys_by_schema(
                 value, key_names_to_validate_by_key_schema, typecast, context
             )
 
-            result_value.update(values)
-            key_errors.update(errors)
+            result_value.update(key_schema_values)
+            key_errors.update(key_schema_errors)
 
-            key_names_to_validate_by_value_schema = list(values.keys())
+            key_names_to_validate_by_value_schema = list(key_schema_values.keys())
         else:
             key_names_to_validate_by_value_schema = key_names_to_validate_by_key_schema
 
         if self.value_schema:
-            values, errors = self.validate_values_by_schema(
+            value_schema_values, value_schema_errors = self.validate_values_by_schema(
                 value, key_names_to_validate_by_value_schema, typecast, context
             )
 
-            result_value.update(values)
-            value_errors.update(errors)
+            result_value.update(value_schema_values)
+            value_errors.update(value_schema_errors)
 
         if unknown_key_names:
             for key_name in unknown_key_names:
                 key_errors[key_name] = [self.error("unknown_key")]
 
-        errors = []
+        errors: list[Error] = []
 
         if key_errors:
             errors.append(self.error("key_errors", nested_errors=key_errors))
@@ -117,6 +117,8 @@ class Dict(Schema):
         return result_value, errors + rule_errors
 
     def validate_keys(self, value, typecast: bool, context: dict):
+        assert self.keys is not None
+
         result_value: dict = {}
         result_key_errors = {}
         result_value_errors = {}
@@ -149,7 +151,9 @@ class Dict(Schema):
 
     def validate_keys_by_schema(
         self, value, key_names: list[str], typecast: bool, context: dict
-    ) -> tuple[dict, list[Error]]:
+    ) -> tuple[dict, dict[str, list[Error]]]:
+        assert self.key_schema is not None
+
         result_value = {}
         result_errors = {}
 
@@ -167,6 +171,8 @@ class Dict(Schema):
     def validate_values_by_schema(
         self, value, key_names: list[str], typecast: bool, context: dict
     ):
+        assert self.value_schema is not None
+
         result_value = {}
         result_errors = {}
 

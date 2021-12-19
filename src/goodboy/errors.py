@@ -12,12 +12,12 @@ class Error:
         self,
         code: str,
         args: dict = {},
-        nested_errors: dict = {},
+        nested_errors: dict[str, list[Error]] = {},
         messages: MessageCollection = DEFAULT_MESSAGES,
     ):
         self.code = code
         self.args = args
-        self.nested_errors: dict[str, Error] = nested_errors
+        self.nested_errors = nested_errors
         self.messages = messages
 
     def __str__(self):
@@ -79,10 +79,10 @@ class JSONErrorFormatter(I18nErrorFormatter):
         for key, value in error.args.items():
             args[key] = self.format_argument_value(value)
 
-        nested_errors: dict[Any, Any] = {}
+        formatted_nested_errors: dict[Any, Any] = {}
 
-        for key, nested_error in error.nested_errors.items():
-            nested_errors[key] = self.format(nested_error)
+        for key, nested_errors in error.nested_errors.items():
+            formatted_nested_errors[key] = self.format(nested_errors)
 
         result = {
             "code": error.code,
@@ -92,8 +92,8 @@ class JSONErrorFormatter(I18nErrorFormatter):
         if args:
             result["args"] = args
 
-        if nested_errors:
-            result["nested_errors"] = nested_errors
+        if formatted_nested_errors:
+            result["nested_errors"] = formatted_nested_errors
 
         return result
 
