@@ -15,7 +15,8 @@ from goodboy.schema import Schema, SchemaError
 from goodboy.types.dicts import Dict, Key
 from goodboy.types.lists import List
 from goodboy.types.numeric import Int
-from goodboy.types.simple import Bool, CallableValue, Str
+from goodboy.types.python import CallableValue
+from goodboy.types.simple import Bool, Str
 
 
 class DeclarativeSchemaFabric(Protocol):

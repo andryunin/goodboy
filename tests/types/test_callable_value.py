@@ -1,5 +1,5 @@
 from goodboy.errors import Error
-from goodboy.types.simple import CallableValue
+from goodboy.types.python import CallableValue
 from tests.types.conftest import assert_errors
 
 
