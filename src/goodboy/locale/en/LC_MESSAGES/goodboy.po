@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-12-19 23:01+0700\n"
+"POT-Creation-Date: 2021-12-20 21:37+0700\n"
 "PO-Revision-Date: 2021-08-26 12:06+0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,127 +18,131 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: src/goodboy/messages.py:93
+#: src/goodboy/messages.py:95
 msgid "cannot be None"
 msgstr "cannot be None"
 
-#: src/goodboy/messages.py:93
+#: src/goodboy/messages.py:95
 msgid "cannot be null"
 msgstr "cannot be null"
 
-#: src/goodboy/messages.py:94
+#: src/goodboy/messages.py:96
 msgid "cannot be blank"
 msgstr "cannot be blank"
 
-#: src/goodboy/messages.py:95
+#: src/goodboy/messages.py:97
 msgid "must be None"
 msgstr "must be None"
 
-#: src/goodboy/messages.py:95
+#: src/goodboy/messages.py:97
 msgid "must be null"
 msgstr "must be null"
 
-#: src/goodboy/messages.py:96
+#: src/goodboy/messages.py:98
 msgid "expected type is \"{expected_type}\""
 msgstr "expected type is \"{expected_type}\""
 
-#: src/goodboy/messages.py:97
+#: src/goodboy/messages.py:99
 msgid "value is not allowed"
 msgstr "value is not allowed"
 
-#: src/goodboy/messages.py:99
+#: src/goodboy/messages.py:101
 msgid "must be later than {value}"
 msgstr "must be later than {value}"
 
-#: src/goodboy/messages.py:100
+#: src/goodboy/messages.py:102
 msgid "must be later or equal to {value}"
 msgstr "must be later or equal to {value}"
 
-#: src/goodboy/messages.py:101
+#: src/goodboy/messages.py:103
 msgid "must be earlier than {value}"
 msgstr "must be earlier than {value}"
 
-#: src/goodboy/messages.py:102
+#: src/goodboy/messages.py:104
 msgid "must be earlier or equal to {value}"
 msgstr "must be earlier or equal to {value}"
 
-#: src/goodboy/messages.py:103
+#: src/goodboy/messages.py:105
 msgid "invalid date format"
 msgstr "invalid date format"
 
-#: src/goodboy/messages.py:104
+#: src/goodboy/messages.py:106
 msgid "invalid date and time format"
 msgstr "invalid date and time format"
 
-#: src/goodboy/messages.py:106
+#: src/goodboy/messages.py:108
 msgid "must be less than {value}"
 msgstr "must be less than {value}"
 
-#: src/goodboy/messages.py:107
+#: src/goodboy/messages.py:109
 msgid "must be less or equal to {value}"
 msgstr "must be less or equal to {value}"
 
-#: src/goodboy/messages.py:108
+#: src/goodboy/messages.py:110
 msgid "must be greater than {value}"
 msgstr "must be greater than {value}"
 
-#: src/goodboy/messages.py:109
+#: src/goodboy/messages.py:111
 msgid "must be greater or equal to {value}"
 msgstr "must be greater or equal to {value}"
 
-#: src/goodboy/messages.py:110
+#: src/goodboy/messages.py:112
 msgid "invalid integer format"
 msgstr "invalid integer format"
 
-#: src/goodboy/messages.py:111
+#: src/goodboy/messages.py:113
 msgid "invalid numeric format"
 msgstr "invalid numeric format"
 
-#: src/goodboy/messages.py:113
+#: src/goodboy/messages.py:115
 msgid "invalid string format"
 msgstr "invalid string format"
 
-#: src/goodboy/messages.py:114
+#: src/goodboy/messages.py:116
 msgid "must be {value} characters long"
 msgstr "must be {value} characters long"
 
-#: src/goodboy/messages.py:115
+#: src/goodboy/messages.py:117
 msgid "must be shorter than {value} characters"
 msgstr "must be shorter than {value} characters"
 
-#: src/goodboy/messages.py:116
+#: src/goodboy/messages.py:118
 msgid "must be longer than {value} characters"
 msgstr "must be longer than {value} characters"
 
-#: src/goodboy/messages.py:118
+#: src/goodboy/messages.py:120
 msgid "key errors"
 msgstr "key errors"
 
-#: src/goodboy/messages.py:119
+#: src/goodboy/messages.py:121
 msgid "value errors"
 msgstr "value errors"
 
-#: src/goodboy/messages.py:120
+#: src/goodboy/messages.py:122
 msgid "key is required"
 msgstr "key is required"
 
-#: src/goodboy/messages.py:121
+#: src/goodboy/messages.py:123
 msgid "unknown key"
 msgstr "unknown key"
 
-#: src/goodboy/messages.py:123
+#: src/goodboy/messages.py:125
 msgid "must be {value} items long"
 msgstr "must be {value} items long"
 
-#: src/goodboy/messages.py:124
+#: src/goodboy/messages.py:126
 msgid "must be shorter than {value} items"
 msgstr "must be shorter than {value} items"
 
-#: src/goodboy/messages.py:125
+#: src/goodboy/messages.py:127
 msgid "must be longer than {value} items"
 msgstr "must be longer than {value} items"
 
-#: src/goodboy/messages.py:127
+#: src/goodboy/messages.py:129
 msgid "does not match any of the variants"
 msgstr "does not match any of the variants"
+
+#: src/goodboy/messages.py:131
+msgid "object is not callable"
+msgstr "object is not callable"
 

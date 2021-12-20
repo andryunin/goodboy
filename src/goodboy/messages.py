@@ -127,6 +127,8 @@ DEFAULT_MESSAGES = MessageCollection(
         "too_short": Message(_("must be longer than {value} items")),
         # AnyOf
         "no_variant_found": Message(_("does not match any of the variants")),
+        # Callable
+        "not_callable": Message(_("object is not callable")),
     }
 )
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-12-19 23:01+0700\n"
+"POT-Creation-Date: 2021-12-20 21:37+0700\n"
 "PO-Revision-Date: 2021-08-26 11:51+0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,127 +19,130 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: src/goodboy/messages.py:93
+#: src/goodboy/messages.py:95
 msgid "cannot be None"
 msgstr "не может быть None"
 
-#: src/goodboy/messages.py:93
+#: src/goodboy/messages.py:95
 msgid "cannot be null"
 msgstr "не может быть null"
 
-#: src/goodboy/messages.py:94
+#: src/goodboy/messages.py:96
 msgid "cannot be blank"
 msgstr "не может быть пустым"
 
-#: src/goodboy/messages.py:95
+#: src/goodboy/messages.py:97
 msgid "must be None"
 msgstr "ожидается значение None"
 
-#: src/goodboy/messages.py:95
+#: src/goodboy/messages.py:97
 msgid "must be null"
 msgstr "ожидается значение null"
 
-#: src/goodboy/messages.py:96
+#: src/goodboy/messages.py:98
 msgid "expected type is \"{expected_type}\""
 msgstr "ожидается тип \"{expected_type}\""
 
-#: src/goodboy/messages.py:97
+#: src/goodboy/messages.py:99
 msgid "value is not allowed"
 msgstr "непредусмотренное значение"
 
-#: src/goodboy/messages.py:99
+#: src/goodboy/messages.py:101
 msgid "must be later than {value}"
 msgstr "должно быть позже {value}"
 
-#: src/goodboy/messages.py:100
+#: src/goodboy/messages.py:102
 msgid "must be later or equal to {value}"
 msgstr "должно быть позже либо равно {value}"
 
-#: src/goodboy/messages.py:101
+#: src/goodboy/messages.py:103
 msgid "must be earlier than {value}"
 msgstr "должно быть раньше {value}"
 
-#: src/goodboy/messages.py:102
+#: src/goodboy/messages.py:104
 msgid "must be earlier or equal to {value}"
 msgstr "должно быть раньше или равно {value}"
 
-#: src/goodboy/messages.py:103
+#: src/goodboy/messages.py:105
 msgid "invalid date format"
 msgstr "неверный формат даты"
 
-#: src/goodboy/messages.py:104
+#: src/goodboy/messages.py:106
 msgid "invalid date and time format"
 msgstr "неверный формат даты и времени"
 
-#: src/goodboy/messages.py:106
+#: src/goodboy/messages.py:108
 msgid "must be less than {value}"
 msgstr "должно быть меньше {value}"
 
-#: src/goodboy/messages.py:107
+#: src/goodboy/messages.py:109
 msgid "must be less or equal to {value}"
 msgstr "должно быть меньше или равно {value}"
 
-#: src/goodboy/messages.py:108
+#: src/goodboy/messages.py:110
 msgid "must be greater than {value}"
 msgstr "должно быть больше {value}"
 
-#: src/goodboy/messages.py:109
+#: src/goodboy/messages.py:111
 msgid "must be greater or equal to {value}"
 msgstr "должно быть больше либо равно {value}"
 
-#: src/goodboy/messages.py:110
+#: src/goodboy/messages.py:112
 msgid "invalid integer format"
 msgstr "не является целым числом"
 
-#: src/goodboy/messages.py:111
+#: src/goodboy/messages.py:113
 msgid "invalid numeric format"
 msgstr "не является числом"
 
-#: src/goodboy/messages.py:113
+#: src/goodboy/messages.py:115
 msgid "invalid string format"
 msgstr "не является строкой"
 
-#: src/goodboy/messages.py:114
+#: src/goodboy/messages.py:116
 msgid "must be {value} characters long"
 msgstr "неверной длины (должно быть ровно {value} символов)"
 
-#: src/goodboy/messages.py:115
+#: src/goodboy/messages.py:117
 msgid "must be shorter than {value} characters"
 msgstr "должно быть короче {value} символов"
 
-#: src/goodboy/messages.py:116
+#: src/goodboy/messages.py:118
 msgid "must be longer than {value} characters"
 msgstr "должно быть длинее {value} символов"
 
-#: src/goodboy/messages.py:118
+#: src/goodboy/messages.py:120
 msgid "key errors"
 msgstr "ошибки в ключах"
 
-#: src/goodboy/messages.py:119
+#: src/goodboy/messages.py:121
 msgid "value errors"
 msgstr "ошибки в значениях"
 
-#: src/goodboy/messages.py:120
+#: src/goodboy/messages.py:122
 msgid "key is required"
 msgstr "ключ обязателен"
 
-#: src/goodboy/messages.py:121
+#: src/goodboy/messages.py:123
 msgid "unknown key"
 msgstr "неизвестный ключ"
 
-#: src/goodboy/messages.py:123
+#: src/goodboy/messages.py:125
 msgid "must be {value} items long"
 msgstr "неверной длины (должно быть ровно {value} элементов)"
 
-#: src/goodboy/messages.py:124
+#: src/goodboy/messages.py:126
 msgid "must be shorter than {value} items"
 msgstr "должно быть короче {value} элементов"
 
-#: src/goodboy/messages.py:125
+#: src/goodboy/messages.py:127
 msgid "must be longer than {value} items"
 msgstr "должно быть длинее {value} элементов"
 
-#: src/goodboy/messages.py:127
+#: src/goodboy/messages.py:129
 msgid "does not match any of the variants"
 msgstr "не соответствует ни одному из вариантов"
 
+#: src/goodboy/messages.py:131
+msgid "object is not callable"
+msgstr "объект не является вызываемым"
