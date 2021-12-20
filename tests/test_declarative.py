@@ -22,15 +22,29 @@ def test_rejects_invalid_schema_options():
         builder.build({"schema": "str", "max_length": -1})
 
 
-def test_builds_invalid_schema_options():
+def test_builds_valid_schema_options():
+    def validate_is_even(self, value, typecast: bool, context: dict):
+        if value % 2 == 0:
+            return value, []
+        else:
+            return value, [self.error("not_an_event_value")]
+
     schema = DeclarativeBuilder().build(
-        {"schema": "int", "less_or_equal_to": 100, "greater_or_equal_to": 0}
+        {
+            "schema": "int",
+            "less_or_equal_to": 100,
+            "greater_or_equal_to": 0,
+            "rules": [validate_is_even],
+        }
     )
 
     assert schema(42) == 42
 
     with assert_errors([Error("less_than", {"value": 0})]):
-        schema(-1)
+        schema(-50)
 
     with assert_errors([Error("greater_than", {"value": 100})]):
         schema(200)
+
+    with assert_errors([Error("not_an_event_value")]):
+        schema(1)

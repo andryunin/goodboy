@@ -15,7 +15,7 @@ from goodboy.schema import Schema, SchemaError
 from goodboy.types.dicts import Dict, Key
 from goodboy.types.lists import List
 from goodboy.types.numeric import Int
-from goodboy.types.simple import Bool, Str
+from goodboy.types.simple import Bool, CallableValue, Str
 
 
 class DeclarativeSchemaFabric(Protocol):
@@ -57,7 +57,8 @@ MESSAGES_SCHEMA = Dict(
     ),
 )
 
-# TODO: support "rules" option here
+RULES_SCHEMA = List(item=CallableValue())
+
 DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
     "str": SimpleDeclarativeSchemaFabric(
         Str,
@@ -65,6 +66,7 @@ DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
             Key("allow_none", Bool()),
             Key("messages", MESSAGES_SCHEMA),
             Key("allow_blank", Bool()),
+            Key("rules", RULES_SCHEMA),
             Key("min_length", Int(greater_or_equal_to=0)),
             Key("max_length", Int(greater_or_equal_to=0)),
             Key("length", Int(greater_or_equal_to=0)),
@@ -77,6 +79,7 @@ DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
         [
             Key("allow_none", Bool()),
             Key("messages", MESSAGES_SCHEMA),
+            Key("rules", RULES_SCHEMA),
             Key("less_than", Int()),
             Key("less_or_equal_to", Int()),
             Key("greater_than", Int()),
