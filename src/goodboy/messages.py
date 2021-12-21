@@ -116,6 +116,7 @@ DEFAULT_MESSAGES = MessageCollection(
         "invalid_string_length": Message(_("must be {value} characters long")),
         "string_too_long": Message(_("must be shorter than {value} characters")),
         "string_too_short": Message(_("must be longer than {value} characters")),
+        "invalid_regex": Message(_("must be valid regex")),
         # Dict messages
         "key_errors": Message(_("key errors")),
         "value_errors": Message(_("value errors")),

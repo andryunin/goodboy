@@ -130,6 +130,21 @@ def test_pattern_option_rejects_bad_string(pattern):
         schema(bad_string)
 
 
+def test_is_regex_option_accepts_valid_re():
+    schema = Str(is_regex=True)
+    good_string = "^hello$"
+
+    assert schema(good_string) == good_string
+
+
+def test_is_regex_option_rejects_invalid_re():
+    schema = Str(is_regex=True)
+    bad_string = "**"
+
+    with assert_errors([Error("invalid_regex")]):
+        schema(bad_string)
+
+
 def test_accepts_allowed_value():
     schema = Str(allowed=["foo", "bar"])
     assert schema("foo") == "foo"

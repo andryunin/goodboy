@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-12-20 21:37+0700\n"
+"POT-Creation-Date: 2021-12-21 21:40+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -109,39 +109,43 @@ msgstr ""
 msgid "must be longer than {value} characters"
 msgstr ""
 
-#: src/goodboy/messages.py:120
-msgid "key errors"
+#: src/goodboy/messages.py:119
+msgid "must be valid regex"
 msgstr ""
 
 #: src/goodboy/messages.py:121
-msgid "value errors"
+msgid "key errors"
 msgstr ""
 
 #: src/goodboy/messages.py:122
-msgid "key is required"
+msgid "value errors"
 msgstr ""
 
 #: src/goodboy/messages.py:123
+msgid "key is required"
+msgstr ""
+
+#: src/goodboy/messages.py:124
 msgid "unknown key"
 msgstr ""
 
-#: src/goodboy/messages.py:125
+#: src/goodboy/messages.py:126
 msgid "must be {value} items long"
 msgstr ""
 
-#: src/goodboy/messages.py:126
+#: src/goodboy/messages.py:127
 msgid "must be shorter than {value} items"
 msgstr ""
 
-#: src/goodboy/messages.py:127
+#: src/goodboy/messages.py:128
 msgid "must be longer than {value} items"
 msgstr ""
 
-#: src/goodboy/messages.py:129
+#: src/goodboy/messages.py:130
 msgid "does not match any of the variants"
 msgstr ""
 
-#: src/goodboy/messages.py:131
+#: src/goodboy/messages.py:132
 msgid "object is not callable"
 msgstr ""
 

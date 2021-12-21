@@ -68,7 +68,6 @@ class NoneValue(Schema):
         return input, []
 
 
-# TODO: add option to check value is valid regex (for declarative schema validation)
 class Str(Schema):
     """
     Accept ``str`` values.
@@ -86,7 +85,8 @@ class Str(Schema):
     :param min_length: Minimal allowed string length.
     :param max_length: Maximum allowed string length.
     :param length: Exact allowed string length.
-    :param pattern: Regexp to match string value.
+    :param pattern: Regex to match string value.
+    :param is_regex: Value itself should be valid regex.
     :param allowed: Allow only certain values.
     """
 
@@ -101,6 +101,7 @@ class Str(Schema):
         max_length: Optional[int] = None,
         length: Optional[int] = None,
         pattern: Union[str, Pattern[str], None] = None,
+        is_regex: bool = False,
         allowed: Optional[list[str]] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
@@ -116,6 +117,7 @@ class Str(Schema):
         else:
             self.pattern = pattern
 
+        self.is_regex = is_regex
         self.allowed = allowed
 
     def validate(self, value, typecast: bool, context: dict = {}):
@@ -146,6 +148,12 @@ class Str(Schema):
 
         if self.pattern and not self.pattern.match(value):
             errors.append(self.error("invalid_string_format"))
+
+        if self.is_regex:
+            try:
+                re.compile(value)
+            except re.error:
+                errors.append(self.error("invalid_regex"))
 
         value, rule_errors = self.call_rules(value, typecast, context)
 
