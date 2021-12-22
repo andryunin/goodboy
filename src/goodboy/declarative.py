@@ -257,10 +257,10 @@ class DeclarativeBuilder:
     ):
         self.fabrics = fabrics
 
-    def build(self, declaration, validate=True):
+    def build(self, declaration, validate=True, typecast=True):
         if validate:
             try:
-                self.validate(declaration)
+                declaration = self.validate(declaration, typecast=typecast)
             except SchemaError as e:
                 raise DeclarationError(e.errors)
 
@@ -272,9 +272,9 @@ class DeclarativeBuilder:
 
         return schema_fabric.create(declaration, self)
 
-    def validate(self, declaration):
+    def validate(self, declaration, typecast=True):
         schema = self.declaration_schema()
-        schema(declaration)
+        return schema(declaration, typecast=typecast)
 
     def declaration_schema(self):
         schema_names = list(self.fabrics.keys())
