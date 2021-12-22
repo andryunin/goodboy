@@ -89,6 +89,17 @@ DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
             Key("allowed", List(item=Int())),
         ],
     ),
+    "bool": SimpleDeclarativeSchemaFabric(
+        Bool,
+        [
+            Key("allow_none", Bool()),
+            Key("messages", MESSAGES_SCHEMA),
+            Key("rules", RULES_SCHEMA),
+            Key("only_false", Bool()),
+            Key("only_true", Bool()),
+            Key("cast_anything", Bool()),
+        ],
+    ),
 }
 
 

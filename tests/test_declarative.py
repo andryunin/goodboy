@@ -1,5 +1,6 @@
 from goodboy.declarative import DEFAULT_DECLARATIVE_SCHEMA_FABRICS, DeclarativeBuilder
 from goodboy.errors import Error
+from goodboy.messages import type_name
 
 from .conftest import assert_declarative_errors, assert_errors
 
@@ -48,3 +49,15 @@ def test_builds_valid_schema_options():
 
     with assert_errors([Error("not_an_event_value")]):
         schema(1)
+
+
+def test_build_bool():
+    schema = DeclarativeBuilder().build({"schema": "bool"})
+
+    assert schema(True) is True
+    assert schema(False) is False
+
+    with assert_errors(
+        [Error("unexpected_type", {"expected_type": type_name("bool")})]
+    ):
+        schema("oops", typecast=True)
