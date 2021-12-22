@@ -75,6 +75,12 @@ class MessageCollection:
         except KeyError:
             return Message(code)
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.messages == other.messages and self.parent == other.parent
+
+        return super().__eq__(other)
+
     def __getitem__(self, code):
         if code in self.messages:
             return self.messages[code]
