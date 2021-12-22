@@ -56,6 +56,10 @@ class Dict(Schema):
         self.key_schema = key_schema
         self.value_schema = value_schema
 
+    def append_key(self, key: Key):
+        self.keys = self.keys or []
+        self.keys.append(key)
+
     def validate(self, value, typecast: bool, context: dict = {}):
         if not isinstance(value, dict):
             return None, [

@@ -20,10 +20,10 @@ from goodboy.types.simple import Bool, Str
 
 
 class DeclarativeSchemaFabric(Protocol):
-    def option_dict_keys(self, schema_name: str):
+    def option_dict_keys(self, schema_name: str, full_schema: Schema):
         ...
 
-    def create(self, options: dict):
+    def create(self, options: dict, builder: DeclarativeBuilder):
         ...
 
 
@@ -32,14 +32,65 @@ class SimpleDeclarativeSchemaFabric:
         self.schema_class = schema_class
         self.keys = keys
 
-    def option_dict_keys(self, schema_name: str):
+    def option_dict_keys(self, schema_name: str, full_schema: Schema):
         def predicate(value):
             return value.get("schema") == schema_name
 
         return list(map(lambda key: key.with_predicate(predicate), self.keys))
 
-    def create(self, options: dict):
+    def create(self, options: dict, builder: DeclarativeBuilder):
         return self.schema_class(**options)
+
+
+class DictDeclarativeSchemaFabric:
+    def option_dict_keys(self, schema_name: str, full_schema: Schema):
+        def predicate(value):
+            return value.get("schema") == schema_name
+
+        keys = [
+            Key("allow_none", Bool()),
+            Key("messages", MESSAGES_SCHEMA),
+            Key("rules", RULES_SCHEMA),
+            Key(
+                "keys",
+                List(
+                    item=Dict(
+                        keys=[
+                            Key("name", Str(), required=True),
+                            Key("schema", full_schema),
+                            Key("required", Bool(allow_none=True)),
+                            Key("predicate", CallableValue(allow_none=True)),
+                        ],
+                        keys_required_by_default=False,
+                    )
+                ),
+            ),
+            Key("key_schema", full_schema),
+            Key("value_schema", full_schema),
+            Key("keys_required_by_default", Bool()),
+        ]
+
+        return list(map(lambda key: key.with_predicate(predicate), keys))
+
+    def create(self, options: dict, builder: DeclarativeBuilder):
+        if options.get("keys"):
+            keys = []
+
+            for key_options in options["keys"]:
+                if "schema" in key_options:
+                    key_options["schema"] = builder.build(key_options["schema"], False)
+
+                keys.append(Key(**key_options))
+
+            options["keys"] = keys
+
+        if options.get("key_schema"):
+            options["key_schema"] = builder.build(options["key_schema"], False)
+
+        if options.get("value_schema"):
+            options["value_schema"] = builder.build(options["value_schema"], False)
+
+        return Dict(**options)
 
 
 MESSAGES_SCHEMA = Dict(
@@ -100,6 +151,7 @@ DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
             Key("cast_anything", Bool()),
         ],
     ),
+    "dict": DictDeclarativeSchemaFabric(),
 }
 
 
@@ -130,7 +182,7 @@ class DeclarativeBuilder:
         declaration = declaration.copy()
         declaration.pop("schema")
 
-        return schema_fabric.create(declaration)
+        return schema_fabric.create(declaration, self)
 
     def validate(self, declaration):
         schema = self.declaration_schema()
@@ -139,11 +191,16 @@ class DeclarativeBuilder:
     def declaration_schema(self):
         schema_names = list(self.fabrics.keys())
 
-        option_keys = [
-            Key("schema", Str(allowed=schema_names), required=True),
-        ]
+        schema = Dict(
+            keys=[
+                Key("schema", Str(allowed=schema_names), required=True),
+            ],
+            keys_required_by_default=False,
+        )
 
         for schema_name, fabric in self.fabrics.items():
-            option_keys += fabric.option_dict_keys(schema_name)
+            # TODO: use weakref of schema
+            for key in fabric.option_dict_keys(schema_name, schema):
+                schema.append_key(key)
 
-        return Dict(keys=option_keys, keys_required_by_default=False)
+        return schema

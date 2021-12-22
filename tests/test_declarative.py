@@ -2,7 +2,7 @@ from goodboy.declarative import DEFAULT_DECLARATIVE_SCHEMA_FABRICS, DeclarativeB
 from goodboy.errors import Error
 from goodboy.messages import type_name
 
-from .conftest import assert_declarative_errors, assert_errors
+from .conftest import assert_declarative_errors, assert_dict_value_errors, assert_errors
 
 ALLOWED_SCHEMA_NAMES = list(DEFAULT_DECLARATIVE_SCHEMA_FABRICS.keys())
 
@@ -11,7 +11,7 @@ def test_allows_only_exist_schemas():
     builder = DeclarativeBuilder()
 
     with assert_declarative_errors(
-        {"schema": Error("not_allowed", {"allowed": ALLOWED_SCHEMA_NAMES})}
+        {"schema": [Error("not_allowed", {"allowed": ALLOWED_SCHEMA_NAMES})]}
     ):
         builder.build({"schema": "spaceship"})
 
@@ -19,7 +19,7 @@ def test_allows_only_exist_schemas():
 def test_rejects_invalid_schema_options():
     builder = DeclarativeBuilder()
 
-    with assert_declarative_errors({"max_length": Error("less_than", {"value": 0})}):
+    with assert_declarative_errors({"max_length": [Error("less_than", {"value": 0})]}):
         builder.build({"schema": "str", "max_length": -1})
 
 
@@ -51,7 +51,7 @@ def test_builds_valid_schema_options():
         schema(1)
 
 
-def test_build_bool():
+def test_bool_building():
     schema = DeclarativeBuilder().build({"schema": "bool"})
 
     assert schema(True) is True
@@ -61,3 +61,49 @@ def test_build_bool():
         [Error("unexpected_type", {"expected_type": type_name("bool")})]
     ):
         schema("oops", typecast=True)
+
+
+def test_dict_building():
+    schema = DeclarativeBuilder().build(
+        {
+            "schema": "dict",
+            "keys": [
+                {
+                    "name": "title",
+                    "schema": {"schema": "str"},
+                },
+                {
+                    "name": "flags",
+                    "schema": {
+                        "schema": "dict",
+                        "key_schema": {"schema": "str"},
+                        "value_schema": {"schema": "bool"},
+                    },
+                },
+            ],
+        }
+    )
+
+    good_value = {"title": "Good title", "flags": {"foo": True, "bar": False}}
+
+    assert schema(good_value) == good_value
+
+    bad_value = {"title": "Good title", "flags": {"foo": 42, "bar": "false"}}
+
+    with assert_dict_value_errors(
+        {
+            "flags": [
+                Error(
+                    "value_errors",
+                    nested_errors={
+                        "foo": [
+                            Error(
+                                "unexpected_type", {"expected_type": type_name("bool")}
+                            )
+                        ]
+                    },
+                )
+            ]
+        }
+    ):
+        schema(bad_value, typecast=True)
