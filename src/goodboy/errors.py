@@ -112,7 +112,44 @@ class JSONErrorFormatter(I18nErrorFormatter):
             raise ValueError(f"unexpected type of error argument: '{type(value)}'")
 
 
-FORMATTERS: dict[str, type[I18nErrorFormatter]] = {"json": JSONErrorFormatter}
+class TextErrorFormatter(I18nErrorFormatter):
+    def __init__(self, translations: Optional[Translations] = None):
+        super().__init__(translations)
+
+    def format(self, errors: list[Error]):
+        lines = self._format_level(errors, 0)
+        return "\n".join(lines)
+
+    def _format_level(self, errors: list[Error], level):
+        lines = []
+
+        for error in errors:
+            indent = self._indent(level)
+            code = error.code
+            message = error.get_message(translations=self.translations)
+
+            if error.args:
+                args = " " + repr(error.args)
+            else:
+                args = ""
+
+            lines.append(f"{indent}{code}: {message}. {args}")
+
+            for nested_key, nested_errors in error.nested_errors.items():
+                key_indent = self._indent(level + 1)
+                lines.append(f"{key_indent}{nested_key}:")
+                lines += self._format_level(nested_errors, level + 2)
+
+        return lines
+
+    def _indent(self, level):
+        return "    " * level
+
+
+FORMATTERS: dict[str, type[I18nErrorFormatter]] = {
+    "json": JSONErrorFormatter,
+    "text": TextErrorFormatter,
+}
 
 
 def get_formatter_class(code: str) -> type[I18nErrorFormatter]:
