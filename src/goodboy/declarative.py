@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 from typing import Type
 
+from goodboy.types.dates import Date, DateTime
 from goodboy.types.variants import AnyOf
 
 if sys.version_info >= (3, 8):
@@ -14,9 +15,9 @@ from goodboy.errors import Error
 from goodboy.schema import Schema, SchemaError
 from goodboy.types.dicts import Dict, Key
 from goodboy.types.lists import List
-from goodboy.types.numeric import Int
+from goodboy.types.numeric import Float, Int
 from goodboy.types.python import CallableValue
-from goodboy.types.simple import Bool, Str
+from goodboy.types.simple import AnyValue, Bool, NoneValue, Str
 
 
 class DeclarativeSchemaFabric(Protocol):
@@ -136,6 +137,23 @@ MESSAGES_SCHEMA = Dict(
 RULES_SCHEMA = List(item=CallableValue())
 
 DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
+    # Simple
+    "any": SimpleDeclarativeSchemaFabric(
+        AnyValue,
+        [
+            Key("allow_none", Bool()),
+            Key("messages", MESSAGES_SCHEMA),
+            Key("rules", RULES_SCHEMA),
+            Key("allowed", List(item=AnyValue())),
+        ],
+    ),
+    "none": SimpleDeclarativeSchemaFabric(
+        NoneValue,
+        [
+            Key("messages", MESSAGES_SCHEMA),
+            Key("rules", RULES_SCHEMA),
+        ],
+    ),
     "str": SimpleDeclarativeSchemaFabric(
         Str,
         [
@@ -151,6 +169,47 @@ DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
             Key("allowed", List(item=Str())),
         ],
     ),
+    "bool": SimpleDeclarativeSchemaFabric(
+        Bool,
+        [
+            Key("allow_none", Bool()),
+            Key("messages", MESSAGES_SCHEMA),
+            Key("rules", RULES_SCHEMA),
+            Key("only_false", Bool()),
+            Key("only_true", Bool()),
+            Key("cast_anything", Bool()),
+        ],
+    ),
+    # Date/Datetime
+    "date": SimpleDeclarativeSchemaFabric(
+        Date,
+        [
+            Key("allow_none", Bool()),
+            Key("messages", MESSAGES_SCHEMA),
+            Key("rules", RULES_SCHEMA),
+            Key("earlier_than", Date()),
+            Key("earlier_or_equal_to", Date()),
+            Key("later_than", Date()),
+            Key("later_or_equal_to", Date()),
+            Key("format", Str()),
+            Key("allowed", List(item=Date())),
+        ],
+    ),
+    "datetime": SimpleDeclarativeSchemaFabric(
+        DateTime,
+        [
+            Key("allow_none", Bool()),
+            Key("messages", MESSAGES_SCHEMA),
+            Key("rules", RULES_SCHEMA),
+            Key("earlier_than", DateTime()),
+            Key("earlier_or_equal_to", DateTime()),
+            Key("later_than", DateTime()),
+            Key("later_or_equal_to", DateTime()),
+            Key("format", Str()),
+            Key("allowed", List(item=DateTime())),
+        ],
+    ),
+    # Numeric
     "int": SimpleDeclarativeSchemaFabric(
         Int,
         [
@@ -164,18 +223,22 @@ DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
             Key("allowed", List(item=Int())),
         ],
     ),
-    "bool": SimpleDeclarativeSchemaFabric(
-        Bool,
+    "float": SimpleDeclarativeSchemaFabric(
+        Float,
         [
             Key("allow_none", Bool()),
             Key("messages", MESSAGES_SCHEMA),
             Key("rules", RULES_SCHEMA),
-            Key("only_false", Bool()),
-            Key("only_true", Bool()),
-            Key("cast_anything", Bool()),
+            Key("less_than", Float()),
+            Key("less_or_equal_to", Float()),
+            Key("greater_than", Float()),
+            Key("greater_or_equal_to", Float()),
+            Key("allowed", List(item=Float())),
         ],
     ),
+    # Dict
     "dict": DictDeclarativeSchemaFabric(),
+    # List
     "list": ListDeclarativeSchemaFabric(),
 }
 
