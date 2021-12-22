@@ -108,7 +108,9 @@ def test_rejects_keys_invalid_by_key_schema():
     schema = Dict(key_schema=Str(length=3))
     bad_value = {"hello": 1, "bar": 2}
 
-    with assert_dict_key_errors({"hello": [Error("invalid_string_length")]}):
+    with assert_dict_key_errors(
+        {"hello": [Error("invalid_string_length", {"value": 3})]}
+    ):
         schema(bad_value)
 
 
@@ -116,7 +118,9 @@ def test_key_schema_validation_not_applied_to_special_keys():
     schema = Dict(keys=[Key("one_special_key")], key_schema=Str(length=3))
     bad_value = {"one_special_key": 1, "bar": 2, "bad_key": 3}
 
-    with assert_dict_key_errors({"bad_key": [Error("invalid_string_length")]}):
+    with assert_dict_key_errors(
+        {"bad_key": [Error("invalid_string_length", {"value": 3})]}
+    ):
         schema(bad_value)
 
 
@@ -133,7 +137,7 @@ def test_rejects_values_invalid_by_value_schema():
 
     with assert_dict_value_errors(
         {
-            "key_1": [Error("invalid_string_length")],
+            "key_1": [Error("invalid_string_length", {"value": 3})],
             "key_2": [Error("cannot_be_none")],
         }
     ):
@@ -144,7 +148,9 @@ def test_value_schema_validation_not_applied_to_special_keys():
     schema = Dict(keys=[Key("one_special_key")], value_schema=Str(length=3))
     bad_value = {"one_special_key": 1, "key_1": "foo", "key_2": "hello"}
 
-    with assert_dict_value_errors({"key_2": [Error("invalid_string_length")]}):
+    with assert_dict_value_errors(
+        {"key_2": [Error("invalid_string_length", {"value": 3})]}
+    ):
         schema(bad_value)
 
 
