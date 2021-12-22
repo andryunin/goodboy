@@ -292,3 +292,10 @@ class DeclarativeBuilder:
                 schema.append_key(key)
 
         return schema
+
+
+DEFAULT_DECLARATIVE_BUILDER = DeclarativeBuilder()
+
+
+def build(declaration, validate=True, typecast=True):
+    return DEFAULT_DECLARATIVE_BUILDER.build(declaration, validate, typecast)
