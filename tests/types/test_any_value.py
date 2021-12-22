@@ -4,7 +4,7 @@ from goodboy.errors import Error
 from goodboy.messages import Message, MessageCollection
 from goodboy.schema import SchemaError
 from goodboy.types.simple import AnyValue
-from tests.types.conftest import assert_errors, validate_value_is_42_and_double_it
+from tests.conftest import assert_errors, validate_value_is_42_and_double_it
 
 
 def test_none():

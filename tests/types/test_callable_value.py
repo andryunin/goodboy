@@ -1,6 +1,6 @@
 from goodboy.errors import Error
 from goodboy.types.python import CallableValue
-from tests.types.conftest import assert_errors
+from tests.conftest import assert_errors
 
 
 def test_accepts_none_when_none_allowed():

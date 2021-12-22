@@ -7,7 +7,7 @@ from goodboy.messages import type_name
 from goodboy.types.dates import Date
 from goodboy.types.dicts import Dict, Key
 from goodboy.types.simple import AnyValue, Str
-from tests.types.conftest import (
+from tests.conftest import (
     assert_dict_key_errors,
     assert_dict_value_errors,
     assert_errors,

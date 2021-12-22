@@ -5,7 +5,7 @@ import pytest
 from goodboy.errors import Error
 from goodboy.messages import type_name
 from goodboy.types.simple import Str
-from tests.types.conftest import assert_errors
+from tests.conftest import assert_errors
 
 
 def test_accepts_none_when_none_allowed():

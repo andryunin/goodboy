@@ -3,7 +3,7 @@ from datetime import date
 from goodboy.errors import Error
 from goodboy.messages import type_name
 from goodboy.types.dates import Date
-from tests.types.conftest import assert_errors, validate_value_has_odd_year
+from tests.conftest import assert_errors, validate_value_has_odd_year
 
 
 def test_accepts_date_type():

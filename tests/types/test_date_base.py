@@ -4,7 +4,7 @@ import pytest
 
 from goodboy.errors import Error
 from goodboy.types.dates import Date, DateTime
-from tests.types.conftest import assert_errors, validate_value_has_odd_year
+from tests.conftest import assert_errors, validate_value_has_odd_year
 
 
 @pytest.mark.parametrize(

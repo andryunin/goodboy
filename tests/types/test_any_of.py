@@ -3,7 +3,7 @@ import pytest
 from goodboy.errors import Error
 from goodboy.types.simple import Str
 from goodboy.types.variants import AnyOf
-from tests.types.conftest import assert_errors
+from tests.conftest import assert_errors
 
 schemas = [Str(allowed=["foo"]), Str(allowed=["bar"])]
 

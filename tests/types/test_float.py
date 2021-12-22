@@ -3,7 +3,7 @@ import pytest
 from goodboy.errors import Error
 from goodboy.messages import type_name
 from goodboy.types.numeric import Float
-from tests.types.conftest import assert_errors, validate_value_is_42_and_double_it
+from tests.conftest import assert_errors, validate_value_is_42_and_double_it
 
 
 @pytest.mark.parametrize("good_value", [42.0, 42])

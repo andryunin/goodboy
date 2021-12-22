@@ -7,7 +7,7 @@ from goodboy.messages import type_name
 from goodboy.types.dates import Date
 from goodboy.types.lists import List
 from goodboy.types.simple import AnyValue
-from tests.types.conftest import assert_errors, assert_list_value_errors
+from tests.conftest import assert_errors, assert_list_value_errors
 
 
 def test_accepts_none_when_none_allowed():

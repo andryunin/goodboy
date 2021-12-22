@@ -2,7 +2,7 @@ import pytest
 
 from goodboy.errors import Error
 from goodboy.types.numeric import Float, Int
-from tests.types.conftest import assert_errors, validate_value_is_42_and_double_it
+from tests.conftest import assert_errors, validate_value_is_42_and_double_it
 
 
 @pytest.mark.parametrize("type_class", [Int, Float])
