@@ -2,7 +2,12 @@ from goodboy.declarative import DEFAULT_DECLARATIVE_SCHEMA_FABRICS, DeclarativeB
 from goodboy.errors import Error
 from goodboy.messages import type_name
 
-from .conftest import assert_declarative_errors, assert_dict_value_errors, assert_errors
+from .conftest import (
+    assert_declarative_errors,
+    assert_dict_value_errors,
+    assert_errors,
+    assert_list_value_errors,
+)
 
 ALLOWED_SCHEMA_NAMES = list(DEFAULT_DECLARATIVE_SCHEMA_FABRICS.keys())
 
@@ -105,5 +110,25 @@ def test_dict_building():
                 )
             ]
         }
+    ):
+        schema(bad_value, typecast=True)
+
+
+def test_list_building():
+    schema = DeclarativeBuilder().build(
+        {
+            "schema": "list",
+            "item": {"schema": "str"},
+        }
+    )
+
+    good_value = ["foo", "bar"]
+
+    assert schema(good_value) == good_value
+
+    bad_value = ["foo", 42]
+
+    with assert_list_value_errors(
+        {1: [Error("unexpected_type", {"expected_type": type_name("str")})]}
     ):
         schema(bad_value, typecast=True)

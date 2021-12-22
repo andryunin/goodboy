@@ -93,6 +93,30 @@ class DictDeclarativeSchemaFabric:
         return Dict(**options)
 
 
+class ListDeclarativeSchemaFabric:
+    def option_dict_keys(self, schema_name: str, full_schema: Schema):
+        def predicate(value):
+            return value.get("schema") == schema_name
+
+        keys = [
+            Key("allow_none", Bool()),
+            Key("messages", MESSAGES_SCHEMA),
+            Key("rules", RULES_SCHEMA),
+            Key("item", full_schema),
+            Key("min_length", Int(greater_or_equal_to=0)),
+            Key("max_length", Int(greater_or_equal_to=0)),
+            Key("length", Int(greater_or_equal_to=0)),
+        ]
+
+        return list(map(lambda key: key.with_predicate(predicate), keys))
+
+    def create(self, options: dict, builder: DeclarativeBuilder):
+        if options.get("item"):
+            options["item"] = builder.build(options["item"], False)
+
+        return List(**options)
+
+
 MESSAGES_SCHEMA = Dict(
     key_schema=Str(),
     value_schema=AnyOf(
@@ -152,6 +176,7 @@ DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
         ],
     ),
     "dict": DictDeclarativeSchemaFabric(),
+    "list": ListDeclarativeSchemaFabric(),
 }
 
 
