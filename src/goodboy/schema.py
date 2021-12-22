@@ -75,3 +75,9 @@ class Schema(ABC):
             result_errors += errors
 
         return value, result_errors
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+
+        return super().__eq__(other)

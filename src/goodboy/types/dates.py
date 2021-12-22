@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from datetime import date, datetime
-from typing import Generic, Optional, TypeVar
+from typing import Generic, Optional, TypeVar, Union
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
@@ -23,20 +23,24 @@ class DateBase(Generic[D], Schema):
         allow_none: bool = False,
         messages: MessageCollectionType = DEFAULT_MESSAGES,
         rules: list[Rule] = [],
-        earlier_than: Optional[D] = None,
-        earlier_or_equal_to: Optional[D] = None,
-        later_than: Optional[D] = None,
-        later_or_equal_to: Optional[D] = None,
+        earlier_than: Optional[Union[D, str]] = None,
+        earlier_or_equal_to: Optional[Union[D, str]] = None,
+        later_than: Optional[Union[D, str]] = None,
+        later_or_equal_to: Optional[Union[D, str]] = None,
         format: str = None,
-        allowed: Optional[list[D]] = None,
+        allowed: Optional[list[Union[D, str]]] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
-        self.earlier_than = earlier_than
-        self.earlier_or_equal_to = earlier_or_equal_to
-        self.later_than = later_than
-        self.later_or_equal_to = later_or_equal_to
+        self.earlier_than = self._typecast_option(earlier_than)
+        self.earlier_or_equal_to = self._typecast_option(earlier_or_equal_to)
+        self.later_than = self._typecast_option(later_than)
+        self.later_or_equal_to = self._typecast_option(later_or_equal_to)
         self.format = format
-        self.allowed = allowed
+
+        if allowed:
+            self.allowed = list(map(self._typecast_option, allowed))
+        else:
+            self.allowed = allowed
 
     def validate(self, value, typecast: bool, context: dict = {}):
         type_errors = self.validate_exact_type(value)
@@ -67,6 +71,10 @@ class DateBase(Generic[D], Schema):
 
     @abstractmethod
     def validate_exact_type(self, value) -> list[Error]:
+        ...
+
+    @abstractmethod
+    def _typecast_option(self, input: Optional[Union[D, str]]) -> Optional[D]:
         ...
 
 
@@ -123,6 +131,15 @@ class Date(DateBase[date]):
         except ValueError:
             return None, [self.error("invalid_date_format")]
 
+    def _typecast_option(self, input: Optional[Union[date, str]]) -> Optional[date]:
+        if input is None:
+            return None
+
+        if isinstance(input, date):
+            return input
+
+        return date.fromisoformat(input)
+
 
 class DateTime(DateBase[datetime]):
     """
@@ -178,3 +195,14 @@ class DateTime(DateBase[datetime]):
 
         except ValueError:
             return None, [self.error("invalid_datetime_format")]
+
+    def _typecast_option(
+        self, input: Optional[Union[datetime, str]]
+    ) -> Optional[datetime]:
+        if input is None:
+            return None
+
+        if isinstance(input, datetime):
+            return input
+
+        return datetime.fromisoformat(input)

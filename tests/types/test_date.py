@@ -116,3 +116,26 @@ def test_ignores_rules_when_value_has_unexpected_type():
         [Error("unexpected_type", {"expected_type": type_name("date")})]
     ):
         schema("oops")
+
+
+def test_options_type_casting():
+    option_val = date(2000, 1, 1)
+    option_str = "2000-01-01"
+
+    schema_val = Date(
+        earlier_than=option_val,
+        earlier_or_equal_to=option_val,
+        later_than=option_val,
+        later_or_equal_to=option_val,
+        allowed=[option_val],
+    )
+
+    schema_str = Date(
+        earlier_than=option_str,
+        earlier_or_equal_to=option_str,
+        later_than=option_str,
+        later_or_equal_to=option_str,
+        allowed=[option_str],
+    )
+
+    assert schema_val == schema_str
