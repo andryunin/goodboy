@@ -31,7 +31,11 @@ class Error:
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self.code == other.code and self.args == other.args
+            return (
+                self.code == other.code
+                and self.args == other.args
+                and self.nested_errors == other.nested_errors
+            )
 
         return super().__eq__(other)
 
