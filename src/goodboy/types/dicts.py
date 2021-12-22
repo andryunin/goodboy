@@ -36,6 +36,12 @@ class Key:
     def with_predicate(self, predicate: Callable[[dict], bool]) -> Key:
         return Key(self.name, self.schema, self.required, predicate)
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+
+        return super().__eq__(other)
+
 
 # TODO: maybe support non string keys?
 class Dict(Schema):
