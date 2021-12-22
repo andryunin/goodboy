@@ -178,7 +178,9 @@ class Dict(Schema):
 
         for key_name in key_names:
             try:
-                key_value = self.value_schema(value[key_name], context=context)
+                key_value = self.value_schema(
+                    value[key_name], typecast=typecast, context=context
+                )
             except SchemaError as e:
                 result_errors[key_name] = e.errors
             else:
