@@ -118,6 +118,24 @@ class ListDeclarativeSchemaFabric:
         return List(**options)
 
 
+class AnyOfDeclarativeSchemaFabric:
+    def option_dict_keys(self, schema_name: str, full_schema: Schema):
+        def predicate(value):
+            return value.get("type") == schema_name
+
+        keys = [
+            Key("schemas", List(item=full_schema)),
+            Key("messages", MESSAGES_SCHEMA),
+            Key("rules", RULES_SCHEMA),
+        ]
+
+        return list(map(lambda key: key.with_predicate(predicate), keys))
+
+    def create(self, options: dict, builder: DeclarativeBuilder):
+        options["schemas"] = list(map(builder.build, options["schemas"]))
+        return AnyOf(**options)
+
+
 MESSAGES_SCHEMA = Dict(
     key_schema=Str(),
     value_schema=AnyOf(
@@ -240,6 +258,8 @@ DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
     "dict": DictDeclarativeSchemaFabric(),
     # List
     "list": ListDeclarativeSchemaFabric(),
+    # Variants
+    "any_of": AnyOfDeclarativeSchemaFabric(),
 }
 
 

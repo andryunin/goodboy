@@ -9,6 +9,7 @@ from goodboy.types.dicts import Dict, Key
 from goodboy.types.lists import List
 from goodboy.types.numeric import Float, Int
 from goodboy.types.simple import AnyValue, Bool, NoneValue, Str
+from goodboy.types.variants import AnyOf
 
 from .conftest import assert_declarative_errors, dummy_key_predicate, dummy_rule
 
@@ -201,3 +202,22 @@ def test_declarative_build_list():
     )
 
     assert build({"type": "list", **options}) == schema
+
+
+def test_declarative_build_any_of():
+    options = {
+        "schemas": [
+            {"type": "str"},
+            {"type": "int"},
+        ],
+        "messages": {"cannot_be_none": "No None here"},
+        "rules": [dummy_rule],
+    }
+
+    schema = AnyOf(
+        [Str(), Int()],
+        messages={"cannot_be_none": "No None here"},
+        rules=[dummy_rule],
+    )
+
+    assert build({"type": "any_of", **options}) == schema
