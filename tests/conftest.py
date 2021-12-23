@@ -55,3 +55,11 @@ def validate_value_has_odd_year(self, value, typecast: bool, context: dict):
         return value, []
     else:
         return value, [self.error("not_an_odd_year")]
+
+
+def dummy_rule(value, typecast: bool, context: dict):
+    return value, []
+
+
+def dummy_key_predicate(value):
+    return True

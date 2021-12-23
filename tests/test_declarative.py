@@ -1,134 +1,203 @@
-from goodboy.declarative import DEFAULT_DECLARATIVE_SCHEMA_FABRICS, DeclarativeBuilder
-from goodboy.errors import Error
-from goodboy.messages import type_name
-
-from .conftest import (
-    assert_declarative_errors,
-    assert_dict_value_errors,
-    assert_errors,
-    assert_list_value_errors,
+from goodboy.declarative import (
+    DEFAULT_DECLARATIVE_SCHEMA_FABRICS,
+    DeclarativeBuilder,
+    build,
 )
+from goodboy.errors import Error
+from goodboy.types.dates import Date, DateTime
+from goodboy.types.dicts import Dict, Key
+from goodboy.types.lists import List
+from goodboy.types.numeric import Float, Int
+from goodboy.types.simple import AnyValue, Bool, NoneValue, Str
+
+from .conftest import assert_declarative_errors, dummy_key_predicate, dummy_rule
 
 ALLOWED_SCHEMA_NAMES = list(DEFAULT_DECLARATIVE_SCHEMA_FABRICS.keys())
 
 
-def test_allows_only_exist_schemas():
+def test_allows_only_known_schemas():
     builder = DeclarativeBuilder()
 
     with assert_declarative_errors(
-        {"schema": [Error("not_allowed", {"allowed": ALLOWED_SCHEMA_NAMES})]}
+        {"type": [Error("not_allowed", {"allowed": ALLOWED_SCHEMA_NAMES})]}
     ):
-        builder.build({"schema": "spaceship"})
+        builder.build({"type": "spaceship"})
 
 
 def test_rejects_invalid_schema_options():
     builder = DeclarativeBuilder()
 
     with assert_declarative_errors({"max_length": [Error("less_than", {"value": 0})]}):
-        builder.build({"schema": "str", "max_length": -1})
+        builder.build({"type": "str", "max_length": -1})
 
 
-def test_builds_valid_schema_options():
-    def validate_is_even(self, value, typecast: bool, context: dict):
-        if value % 2 == 0:
-            return value, []
-        else:
-            return value, [self.error("not_an_event_value")]
+def test_declarative_build_any():
+    options = {
+        "allow_none": True,
+        "messages": {"oops": "Oops!"},
+        "rules": [dummy_rule],
+        "allowed": ["hello", 123],
+    }
 
-    schema = DeclarativeBuilder().build(
-        {
-            "schema": "int",
-            "less_or_equal_to": 100,
-            "greater_or_equal_to": 0,
-            "rules": [validate_is_even],
-        }
+    assert build({"type": "any", **options}) == AnyValue(**options)
+
+
+def test_declarative_build_none():
+    options = {
+        "messages": {"oops": "Oops!"},
+        "rules": [dummy_rule],
+    }
+
+    assert build({"type": "none", **options}) == NoneValue(**options)
+
+
+def test_declarative_build_str():
+    options = {
+        "allow_none": True,
+        "messages": {"cannot_be_none": "No None here"},
+        "rules": [dummy_rule],
+        "allow_blank": False,
+        "min_length": 2,
+        "max_length": 5,
+        "length": 50,
+        "pattern": r"^\d+$",
+        "is_regex": False,
+        "allowed": ["123", "456"],
+    }
+
+    assert build({"type": "str", **options}) == Str(**options)
+
+
+def test_declarative_build_bool():
+    options = {
+        "allow_none": True,
+        "messages": {"cannot_be_none": "No None here"},
+        "rules": [dummy_rule],
+        "only_false": True,
+        "only_true": True,
+        "cast_anything": True,
+    }
+
+    assert build({"type": "bool", **options}) == Bool(**options)
+
+
+def test_declarative_build_int():
+    options = {
+        "allow_none": True,
+        "messages": {"cannot_be_none": "No None here"},
+        "rules": [dummy_rule],
+        "less_than": 10,
+        "less_or_equal_to": 9,
+        "greater_than": 0,
+        "greater_or_equal_to": 1,
+        "allowed": [123, 456],
+    }
+
+    assert build({"type": "int", **options}) == Int(**options)
+
+
+def test_declarative_build_float():
+    options = {
+        "allow_none": True,
+        "messages": {"cannot_be_none": "No None here"},
+        "rules": [dummy_rule],
+        "less_than": 10.0,
+        "less_or_equal_to": 9.0,
+        "greater_than": 0.0,
+        "greater_or_equal_to": 1.0,
+        "allowed": [123.0, 456.0],
+    }
+
+    assert build({"type": "float", **options}) == Float(**options)
+
+
+def test_declarative_build_date():
+    options = {
+        "allow_none": True,
+        "messages": {"cannot_be_none": "No None here"},
+        "rules": [dummy_rule],
+        "earlier_than": "2010-01-01",
+        "earlier_or_equal_to": "2009-12-31",
+        "later_than": "1999-12-31",
+        "later_or_equal_to": "2000-01-01",
+        "allowed": ["2000-01-01", "2009-12-31"],
+    }
+
+    assert build({"type": "date", **options}) == Date(**options)
+
+
+def test_declarative_build_datetime():
+    options = {
+        "allow_none": True,
+        "messages": {"cannot_be_none": "No None here"},
+        "rules": [dummy_rule],
+        "earlier_than": "2010-01-01T00:00:00",
+        "earlier_or_equal_to": "2009-12-31T00:00:00",
+        "later_than": "1999-12-31T00:00:00",
+        "later_or_equal_to": "2000-01-01T00:00:00",
+        "allowed": ["2000-01-01T00:00:00", "2009-12-31T00:00:00"],
+    }
+
+    assert build({"type": "datetime", **options}) == DateTime(**options)
+
+
+def test_declarative_build_dict():
+    options = {
+        "allow_none": True,
+        "messages": {"cannot_be_none": "No None here"},
+        "rules": [dummy_rule],
+        "keys": [
+            {
+                "name": "foo",
+                "schema": {"type": "str", "allow_none": True},
+                "required": True,
+            },
+            {
+                "name": "bar",
+                "schema": {"type": "int"},
+                "predicate": dummy_key_predicate,
+            },
+        ],
+        "key_schema": {"type": "str", "length": 3},
+        "value_schema": {"type": "str", "length": 3},
+        "keys_required_by_default": False,
+    }
+
+    schema = Dict(
+        allow_none=True,
+        messages={"cannot_be_none": "No None here"},
+        rules=[dummy_rule],
+        keys=[
+            Key("foo", Str(allow_none=True), required=True),
+            Key("bar", Int(), predicate=dummy_key_predicate),
+        ],
+        key_schema=Str(length=3),
+        value_schema=Str(length=3),
+        keys_required_by_default=False,
     )
 
-    assert schema(42) == 42
-
-    with assert_errors([Error("less_than", {"value": 0})]):
-        schema(-50)
-
-    with assert_errors([Error("greater_than", {"value": 100})]):
-        schema(200)
-
-    with assert_errors([Error("not_an_event_value")]):
-        schema(1)
+    assert build({"type": "dict", **options}) == schema
 
 
-def test_bool_building():
-    schema = DeclarativeBuilder().build({"schema": "bool"})
+def test_declarative_build_list():
+    options = {
+        "allow_none": True,
+        "messages": {"cannot_be_none": "No None here"},
+        "rules": [dummy_rule],
+        "item": {"type": "str", "length": 3},
+        "min_length": 5,
+        "max_length": 10,
+        "length": 7,
+    }
 
-    assert schema(True) is True
-    assert schema(False) is False
-
-    with assert_errors(
-        [Error("unexpected_type", {"expected_type": type_name("bool")})]
-    ):
-        schema("oops", typecast=True)
-
-
-def test_dict_building():
-    schema = DeclarativeBuilder().build(
-        {
-            "schema": "dict",
-            "keys": [
-                {
-                    "name": "title",
-                    "schema": {"schema": "str"},
-                },
-                {
-                    "name": "flags",
-                    "schema": {
-                        "schema": "dict",
-                        "key_schema": {"schema": "str"},
-                        "value_schema": {"schema": "bool"},
-                    },
-                },
-            ],
-        }
+    schema = List(
+        allow_none=True,
+        messages={"cannot_be_none": "No None here"},
+        rules=[dummy_rule],
+        item=Str(length=3),
+        min_length=5,
+        max_length=10,
+        length=7,
     )
 
-    good_value = {"title": "Good title", "flags": {"foo": True, "bar": False}}
-
-    assert schema(good_value) == good_value
-
-    bad_value = {"title": "Good title", "flags": {"foo": 42, "bar": "false"}}
-
-    with assert_dict_value_errors(
-        {
-            "flags": [
-                Error(
-                    "value_errors",
-                    nested_errors={
-                        "foo": [
-                            Error(
-                                "unexpected_type", {"expected_type": type_name("bool")}
-                            )
-                        ]
-                    },
-                )
-            ]
-        }
-    ):
-        schema(bad_value, typecast=True)
-
-
-def test_list_building():
-    schema = DeclarativeBuilder().build(
-        {
-            "schema": "list",
-            "item": {"schema": "str"},
-        }
-    )
-
-    good_value = ["foo", "bar"]
-
-    assert schema(good_value) == good_value
-
-    bad_value = ["foo", 42]
-
-    with assert_list_value_errors(
-        {1: [Error("unexpected_type", {"expected_type": type_name("str")})]}
-    ):
-        schema(bad_value, typecast=True)
+    assert build({"type": "list", **options}) == schema
