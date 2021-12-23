@@ -1,5 +1,3 @@
-import re
-
 import pytest
 
 from goodboy.errors import Error

@@ -31,16 +31,18 @@ class DateBase(Generic[D], Schema):
         allowed: Optional[list[Union[D, str]]] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
-        self.earlier_than = self._typecast_option(earlier_than)
-        self.earlier_or_equal_to = self._typecast_option(earlier_or_equal_to)
-        self.later_than = self._typecast_option(later_than)
-        self.later_or_equal_to = self._typecast_option(later_or_equal_to)
+        self.earlier_than = self._typecast_optional_option(earlier_than)
+        self.earlier_or_equal_to = self._typecast_optional_option(earlier_or_equal_to)
+        self.later_than = self._typecast_optional_option(later_than)
+        self.later_or_equal_to = self._typecast_optional_option(later_or_equal_to)
         self.format = format
 
-        if allowed:
+        self.allowed: Optional[list[D]]
+
+        if allowed is not None:
             self.allowed = list(map(self._typecast_option, allowed))
         else:
-            self.allowed = allowed
+            self.allowed = None
 
     def validate(self, value, typecast: bool, context: dict = {}):
         type_errors = self.validate_exact_type(value)
@@ -73,8 +75,14 @@ class DateBase(Generic[D], Schema):
     def validate_exact_type(self, value) -> list[Error]:
         ...
 
+    def _typecast_optional_option(self, input: Union[D, str, None]) -> Optional[D]:
+        if input is None:
+            return None
+
+        return self._typecast_option(input)
+
     @abstractmethod
-    def _typecast_option(self, input: Optional[Union[D, str]]) -> Optional[D]:
+    def _typecast_option(self, input: Union[D, str]) -> D:
         ...
 
 
@@ -131,10 +139,7 @@ class Date(DateBase[date]):
         except ValueError:
             return None, [self.error("invalid_date_format")]
 
-    def _typecast_option(self, input: Optional[Union[date, str]]) -> Optional[date]:
-        if input is None:
-            return None
-
+    def _typecast_option(self, input: Union[date, str]) -> date:
         if isinstance(input, date):
             return input
 
@@ -196,12 +201,7 @@ class DateTime(DateBase[datetime]):
         except ValueError:
             return None, [self.error("invalid_datetime_format")]
 
-    def _typecast_option(
-        self, input: Optional[Union[datetime, str]]
-    ) -> Optional[datetime]:
-        if input is None:
-            return None
-
+    def _typecast_option(self, input: Union[datetime, str]) -> datetime:
         if isinstance(input, datetime):
             return input
 

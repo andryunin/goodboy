@@ -1,5 +1,3 @@
-import pytest
-
 from goodboy.errors import Error
 from goodboy.types.simple import Str
 from goodboy.types.variants import AnyOf
