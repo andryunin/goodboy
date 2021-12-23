@@ -7,6 +7,18 @@ from goodboy.schema import Rule, Schema, SchemaError
 
 
 class List(Schema):
+    """
+    Accept ``list`` value.
+
+    :param allow_none: If true, value is allowed to be ``None``.
+    :param messages: Override error messages.
+    :param rules: Custom validation rules.
+    :param item: Schema for list item.
+    :param min_length: Minimal allowed list length.
+    :param max_length: Maximum allowed list length.
+    :param length: Exact allowed list length.
+    """
+
     def __init__(
         self,
         *,

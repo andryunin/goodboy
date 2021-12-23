@@ -9,9 +9,18 @@ from goodboy.types.simple import Str
 
 
 class Key:
+    """
+    Dict key.
+
+    :param name: Key name.
+    :param schema: Value schema.
+    :param required: Is key required.
+    :param predicate: Key is allowed only if predicate returns true.
+    """
+
     def __init__(
         self,
-        name,
+        name: str,
         schema: Optional[Schema] = None,
         required: Optional[bool] = None,
         predicate: Optional[Callable[[dict], bool]] = None,
@@ -45,6 +54,18 @@ class Key:
 
 # TODO: maybe support non string keys?
 class Dict(Schema):
+    """
+    Accept ``dict`` value. Only string keys supported.
+
+    :param allow_none: If true, value is allowed to be ``None``.
+    :param messages: Override error messages.
+    :param rules: Custom validation rules.
+    :param keys: List of allowed keys
+    :param key_schema: Schema to validate dict keys (only Str is supported)
+    :param value_schema: Schema to validate dict key values
+    :param keys_required_by_default: default required flag for ``keys``.
+    """
+
     def __init__(
         self,
         *,
