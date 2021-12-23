@@ -26,10 +26,10 @@ class AnyValue(Schema):
         allowed: Optional[list[Any]] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
-        self.allowed = allowed
+        self._allowed = allowed
 
     def validate(self, value, typecast: bool, context: dict = {}):
-        if self.allowed is not None and value not in self.allowed:
+        if self._allowed is not None and value not in self._allowed:
             return None, [self.error("not_allowed")]
 
         value, rule_errors = self.call_rules(value, typecast, context)
@@ -105,20 +105,20 @@ class Str(Schema):
         allowed: Optional[list[str]] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
-        self.allow_blank = allow_blank
-        self.min_length = min_length
-        self.max_length = max_length
-        self.length = length
+        self._allow_blank = allow_blank
+        self._min_length = min_length
+        self._max_length = max_length
+        self._length = length
 
-        self.pattern: Optional[Pattern[str]]
+        self._pattern: Optional[Pattern[str]]
 
         if isinstance(pattern, str):
-            self.pattern = re.compile(pattern)
+            self._pattern = re.compile(pattern)
         else:
-            self.pattern = pattern
+            self._pattern = pattern
 
-        self.is_regex = is_regex
-        self.allowed = allowed
+        self._is_regex = is_regex
+        self._allowed = allowed
 
     def validate(self, value, typecast: bool, context: dict = {}):
         if not isinstance(value, str):
@@ -127,29 +127,29 @@ class Str(Schema):
             ]
 
         if not value:
-            if self.allow_blank:
+            if self._allow_blank:
                 return value, []
             else:
                 return None, [self.error("cannot_be_blank")]
 
         errors = []
 
-        if self.allowed is not None and value not in self.allowed:
-            errors.append(self.error("not_allowed", {"allowed": self.allowed}))
+        if self._allowed is not None and value not in self._allowed:
+            errors.append(self.error("not_allowed", {"allowed": self._allowed}))
 
-        if self.min_length is not None and len(value) < self.min_length:
-            errors.append(self.error("string_too_short", {"value": self.min_length}))
+        if self._min_length is not None and len(value) < self._min_length:
+            errors.append(self.error("string_too_short", {"value": self._min_length}))
 
-        if self.max_length is not None and len(value) > self.max_length:
-            errors.append(self.error("string_too_long", {"value": self.max_length}))
+        if self._max_length is not None and len(value) > self._max_length:
+            errors.append(self.error("string_too_long", {"value": self._max_length}))
 
-        if self.length is not None and len(value) != self.length:
-            errors.append(self.error("invalid_string_length", {"value": self.length}))
+        if self._length is not None and len(value) != self._length:
+            errors.append(self.error("invalid_string_length", {"value": self._length}))
 
-        if self.pattern and not self.pattern.match(value):
+        if self._pattern and not self._pattern.match(value):
             errors.append(self.error("invalid_string_format"))
 
-        if self.is_regex:
+        if self._is_regex:
             try:
                 re.compile(value)
             except re.error:
@@ -192,10 +192,10 @@ class Bool(Schema):
         cast_anything: bool = False,
     ):
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
-        self.only_false = only_false
-        self.only_true = only_true
+        self._only_false = only_false
+        self._only_true = only_true
         # TODO: override cast_anything in validation context
-        self.cast_anything = cast_anything
+        self._cast_anything = cast_anything
 
     def validate(self, value, typecast: bool, context: dict = {}):
         if not isinstance(value, bool):
@@ -205,10 +205,10 @@ class Bool(Schema):
 
         errors = []
 
-        if self.only_false and value:
+        if self._only_false and value:
             errors.append(self.error("not_allowed", {"allowed": [False]}))
 
-        if self.only_true and not value:
+        if self._only_true and not value:
             errors.append(self.error("not_allowed", {"allowed": [True]}))
 
         value, rule_errors = self.call_rules(value, typecast, context)
@@ -219,7 +219,7 @@ class Bool(Schema):
         if isinstance(input, bool):
             return input, []
 
-        if self.cast_anything:
+        if self._cast_anything:
             return bool(input), []
 
         if isinstance(input, str):

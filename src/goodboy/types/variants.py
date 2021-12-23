@@ -23,7 +23,7 @@ class AnyOf(Schema):
         rules: list[Rule] = [],
     ):
         super().__init__(messages=messages, rules=rules)
-        self.schemas = schemas
+        self._schemas = schemas
 
     def __call__(self, value, *, typecast=False, context: dict = {}):
         value, errors = self.validate(value, typecast, context)
@@ -37,7 +37,7 @@ class AnyOf(Schema):
         schema_errors = {}
         errors = []
 
-        for schema_index, schema in enumerate(self.schemas):
+        for schema_index, schema in enumerate(self._schemas):
             try:
                 value = schema(value)
             except SchemaError as e:

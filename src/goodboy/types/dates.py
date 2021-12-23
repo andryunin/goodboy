@@ -31,55 +31,63 @@ class DateBase(Generic[D], Schema):
         allowed: Optional[list[Union[D, str]]] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
-        self.earlier_than = self._typecast_optional_option(earlier_than)
-        self.earlier_or_equal_to = self._typecast_optional_option(earlier_or_equal_to)
-        self.later_than = self._typecast_optional_option(later_than)
-        self.later_or_equal_to = self._typecast_optional_option(later_or_equal_to)
-        self.format = format
+        self._earlier_than = self._typecast_optional_option(earlier_than)
+        self._earlier_or_equal_to = self._typecast_optional_option(earlier_or_equal_to)
+        self._later_than = self._typecast_optional_option(later_than)
+        self._later_or_equal_to = self._typecast_optional_option(later_or_equal_to)
+        self._format = format
 
-        self.allowed: Optional[list[D]]
+        self._allowed: Optional[list[D]]
 
         if allowed is not None:
-            self.allowed = list(map(self._typecast_option, allowed))
+            self._allowed = list(map(self._typecast_option, allowed))
         else:
-            self.allowed = None
+            self._allowed = None
 
     def validate(self, value, typecast: bool, context: dict = {}):
-        type_errors = self.validate_exact_type(value)
+        type_errors = self._validate_exact_type(value)
 
         if type_errors:
             return value, type_errors
 
         errors = []
 
-        if self.allowed is not None and value not in self.allowed:
-            errors.append(self.error("not_allowed", {"allowed": self.allowed}))
+        if self._allowed is not None and value not in self._allowed:
+            errors.append(self.error("not_allowed", {"allowed": self._allowed}))
 
-        if self.earlier_than and value >= self.earlier_than:
-            errors.append(self.error("later_or_equal_to", {"value": self.earlier_than}))
+        if self._earlier_than and value >= self._earlier_than:
+            errors.append(
+                self.error("later_or_equal_to", {"value": self._earlier_than})
+            )
 
-        if self.earlier_or_equal_to and value > self.earlier_or_equal_to:
-            errors.append(self.error("later_than", {"value": self.earlier_or_equal_to}))
+        if self._earlier_or_equal_to and value > self._earlier_or_equal_to:
+            errors.append(
+                self.error("later_than", {"value": self._earlier_or_equal_to})
+            )
 
-        if self.later_than and value <= self.later_than:
-            errors.append(self.error("earlier_or_equal_to", {"value": self.later_than}))
+        if self._later_than and value <= self._later_than:
+            errors.append(
+                self.error("earlier_or_equal_to", {"value": self._later_than})
+            )
 
-        if self.later_or_equal_to and value < self.later_or_equal_to:
-            errors.append(self.error("earlier_than", {"value": self.later_or_equal_to}))
+        if self._later_or_equal_to and value < self._later_or_equal_to:
+            errors.append(
+                self.error("earlier_than", {"value": self._later_or_equal_to})
+            )
 
         value, rule_errors = self.call_rules(value, typecast, context)
 
         return value, errors + rule_errors
-
-    @abstractmethod
-    def validate_exact_type(self, value) -> list[Error]:
-        ...
 
     def _typecast_optional_option(self, input: Union[D, str, None]) -> Optional[D]:
         if input is None:
             return None
 
         return self._typecast_option(input)
+
+    @abstractmethod
+    def _validate_exact_type(self, value) -> list[Error]:
+        ...
 
     @abstractmethod
     def _typecast_option(self, input: Union[D, str]) -> D:
@@ -108,12 +116,6 @@ class Date(DateBase[date]):
     :param allowed: Allow only certain values.
     """  # noqa: E501
 
-    def validate_exact_type(self, value) -> list[Error]:
-        if not isinstance(value, date):
-            return [self.error("unexpected_type", {"expected_type": type_name("date")})]
-        else:
-            return []
-
     def typecast(self, input, context: dict = {}):
         if isinstance(input, date):
             return input, []
@@ -126,8 +128,8 @@ class Date(DateBase[date]):
         try:
             if context.get("date_format"):
                 format = context.get("date_format")
-            elif self.format:
-                format = self.format
+            elif self._format:
+                format = self._format
             else:
                 format = None
 
@@ -138,6 +140,12 @@ class Date(DateBase[date]):
 
         except ValueError:
             return None, [self.error("invalid_date_format")]
+
+    def _validate_exact_type(self, value) -> list[Error]:
+        if not isinstance(value, date):
+            return [self.error("unexpected_type", {"expected_type": type_name("date")})]
+        else:
+            return []
 
     def _typecast_option(self, input: Union[date, str]) -> date:
         if isinstance(input, date):
@@ -168,14 +176,6 @@ class DateTime(DateBase[datetime]):
     :param allowed: Allow only certain values.
     """  # noqa: E501
 
-    def validate_exact_type(self, value) -> list[Error]:
-        if not isinstance(value, datetime):
-            return [
-                self.error("unexpected_type", {"expected_type": type_name("datetime")})
-            ]
-        else:
-            return []
-
     def typecast(self, input, context: dict = {}):
         if isinstance(input, datetime):
             return input, []
@@ -188,8 +188,8 @@ class DateTime(DateBase[datetime]):
         try:
             if context.get("date_format"):
                 format = context.get("date_format")
-            elif self.format:
-                format = self.format
+            elif self._format:
+                format = self._format
             else:
                 format = None
 
@@ -200,6 +200,14 @@ class DateTime(DateBase[datetime]):
 
         except ValueError:
             return None, [self.error("invalid_datetime_format")]
+
+    def _validate_exact_type(self, value) -> list[Error]:
+        if not isinstance(value, datetime):
+            return [
+                self.error("unexpected_type", {"expected_type": type_name("datetime")})
+            ]
+        else:
+            return []
 
     def _typecast_option(self, input: Union[datetime, str]) -> datetime:
         if isinstance(input, datetime):

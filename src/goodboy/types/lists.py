@@ -31,10 +31,10 @@ class List(Schema):
         length: Optional[int] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
-        self.item = item
-        self.min_length = min_length
-        self.max_length = max_length
-        self.length = length
+        self._item = item
+        self._min_length = min_length
+        self._max_length = max_length
+        self._length = length
 
     def validate(self, value, typecast: bool, context: dict = {}):
         if not isinstance(value, list):
@@ -44,22 +44,22 @@ class List(Schema):
 
         errors = []
 
-        if self.min_length is not None and len(value) < self.min_length:
-            errors.append(self.error("too_short", {"value": self.min_length}))
+        if self._min_length is not None and len(value) < self._min_length:
+            errors.append(self.error("too_short", {"value": self._min_length}))
 
-        if self.max_length is not None and len(value) > self.max_length:
-            errors.append(self.error("too_long", {"value": self.max_length}))
+        if self._max_length is not None and len(value) > self._max_length:
+            errors.append(self.error("too_long", {"value": self._max_length}))
 
-        if self.length is not None and len(value) != self.length:
-            errors.append(self.error("invalid_length", {"value": self.length}))
+        if self._length is not None and len(value) != self._length:
+            errors.append(self.error("invalid_length", {"value": self._length}))
 
-        if self.item:
+        if self._item:
             value_errors = {}
             result_value = []
 
             for item_index, item_value in enumerate(value):
                 try:
-                    item_value = self.item(item_value, typecast=typecast)
+                    item_value = self._item(item_value, typecast=typecast)
                 except SchemaError as e:
                     value_errors[item_index] = e.errors
                 else:

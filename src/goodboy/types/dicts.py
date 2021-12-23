@@ -22,28 +22,29 @@ class Key:
         self,
         name: str,
         schema: Optional[Schema] = None,
+        *,
         required: Optional[bool] = None,
         predicate: Optional[Callable[[dict], bool]] = None,
     ):
-        self.name = name
-        self.schema = schema
         self.required = required
-        self.predicate = predicate
+        self.name = name
+        self._schema = schema
+        self._predicate = predicate
 
     def predicate_result(self, prev_values: dict):
-        if self.predicate:
-            return self.predicate(prev_values)
+        if self._predicate:
+            return self._predicate(prev_values)
         else:
             return True
 
     def validate(self, value, typecast: bool):
-        if self.schema:
-            return self.schema(value, typecast=typecast)
+        if self._schema:
+            return self._schema(value, typecast=typecast)
         else:
             return value
 
     def with_predicate(self, predicate: Callable[[dict], bool]) -> Key:
-        return Key(self.name, self.schema, self.required, predicate)
+        return Key(self.name, self._schema, required=self.required, predicate=predicate)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -78,14 +79,14 @@ class Dict(Schema):
         keys_required_by_default: bool = True,
     ):
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
-        self.keys = keys
-        self.keys_required_by_default = keys_required_by_default
-        self.key_schema = key_schema
-        self.value_schema = value_schema
+        self._keys = keys
+        self._keys_required_by_default = keys_required_by_default
+        self._key_schema = key_schema
+        self._value_schema = value_schema
 
     def append_key(self, key: Key):
-        self.keys = self.keys or []
-        self.keys.append(key)
+        self._keys = self._keys or []
+        self._keys.append(key)
 
     def validate(self, value, typecast: bool, context: dict = {}):
         if not isinstance(value, dict):
@@ -93,26 +94,26 @@ class Dict(Schema):
                 self.error("unexpected_type", {"expected_type": type_name("dict")})
             ]
 
-        if self.keys is not None:
+        if self._keys is not None:
             (
                 result_value,
                 key_errors,
                 value_errors,
                 key_names_to_validate_by_key_schema,
-            ) = self.validate_keys(value, typecast, context)
+            ) = self._validate_keys(value, typecast, context)
         else:
             result_value = value.copy()
             key_errors = {}
             value_errors = {}
             key_names_to_validate_by_key_schema = list(value.keys())
 
-        if self.keys is None or self.key_schema or self.value_schema:
+        if self._keys is None or self._key_schema or self._value_schema:
             unknown_key_names = []
         else:
             unknown_key_names = key_names_to_validate_by_key_schema
 
-        if self.key_schema:
-            key_schema_values, key_schema_errors = self.validate_keys_by_schema(
+        if self._key_schema:
+            key_schema_values, key_schema_errors = self._validate_keys_by_schema(
                 value, key_names_to_validate_by_key_schema, typecast, context
             )
 
@@ -123,8 +124,8 @@ class Dict(Schema):
         else:
             key_names_to_validate_by_value_schema = key_names_to_validate_by_key_schema
 
-        if self.value_schema:
-            value_schema_values, value_schema_errors = self.validate_values_by_schema(
+        if self._value_schema:
+            value_schema_values, value_schema_errors = self._validate_values_by_schema(
                 value, key_names_to_validate_by_value_schema, typecast, context
             )
 
@@ -147,8 +148,8 @@ class Dict(Schema):
 
         return result_value, errors + rule_errors
 
-    def validate_keys(self, value, typecast: bool, context: dict):
-        assert self.keys is not None
+    def _validate_keys(self, value, typecast: bool, context: dict):
+        assert self._keys is not None
 
         result_value: dict = {}
         result_key_errors = {}
@@ -156,7 +157,7 @@ class Dict(Schema):
 
         unknown_keys = list(value.keys())
 
-        for key in self.keys:
+        for key in self._keys:
             if not key.predicate_result(result_value):
                 continue
 
@@ -173,17 +174,17 @@ class Dict(Schema):
                 if key.required is not None:
                     key_required = key.required
                 else:
-                    key_required = self.keys_required_by_default
+                    key_required = self._keys_required_by_default
 
                 if key_required:
                     result_key_errors[key.name] = [self.error("required_key")]
 
         return result_value, result_key_errors, result_value_errors, unknown_keys
 
-    def validate_keys_by_schema(
+    def _validate_keys_by_schema(
         self, value, key_names: list[str], typecast: bool, context: dict
     ) -> tuple[dict, dict[str, list[Error]]]:
-        assert self.key_schema is not None
+        assert self._key_schema is not None
 
         result_value = {}
         result_errors = {}
@@ -191,7 +192,7 @@ class Dict(Schema):
         for key_name in key_names:
             try:
                 # TODO: maybe allow keys to be modified here?
-                self.key_schema(key_name, context=context)
+                self._key_schema(key_name, context=context)
             except SchemaError as e:
                 result_errors[key_name] = e.errors
             else:
@@ -199,17 +200,17 @@ class Dict(Schema):
 
         return result_value, result_errors
 
-    def validate_values_by_schema(
+    def _validate_values_by_schema(
         self, value, key_names: list[str], typecast: bool, context: dict
     ):
-        assert self.value_schema is not None
+        assert self._value_schema is not None
 
         result_value = {}
         result_errors = {}
 
         for key_name in key_names:
             try:
-                key_value = self.value_schema(
+                key_value = self._value_schema(
                     value[key_name], typecast=typecast, context=context
                 )
             except SchemaError as e:
