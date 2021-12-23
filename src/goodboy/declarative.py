@@ -35,7 +35,7 @@ class SimpleDeclarativeSchemaFabric:
 
     def option_dict_keys(self, schema_name: str, full_schema: Schema):
         def predicate(value):
-            return value.get("schema") == schema_name
+            return value.get("type") == schema_name
 
         return list(map(lambda key: key.with_predicate(predicate), self.keys))
 
@@ -46,7 +46,7 @@ class SimpleDeclarativeSchemaFabric:
 class DictDeclarativeSchemaFabric:
     def option_dict_keys(self, schema_name: str, full_schema: Schema):
         def predicate(value):
-            return value.get("schema") == schema_name
+            return value.get("type") == schema_name
 
         keys = [
             Key("allow_none", Bool()),
@@ -97,7 +97,7 @@ class DictDeclarativeSchemaFabric:
 class ListDeclarativeSchemaFabric:
     def option_dict_keys(self, schema_name: str, full_schema: Schema):
         def predicate(value):
-            return value.get("schema") == schema_name
+            return value.get("type") == schema_name
 
         keys = [
             Key("allow_none", Bool()),
@@ -264,11 +264,11 @@ class DeclarativeBuilder:
             except SchemaError as e:
                 raise DeclarationError(e.errors)
 
-        schema_name = declaration["schema"]
+        schema_name = declaration["type"]
         schema_fabric = self.fabrics[schema_name]
 
         declaration = declaration.copy()
-        declaration.pop("schema")
+        declaration.pop("type")
 
         return schema_fabric.create(declaration, self)
 
@@ -281,7 +281,7 @@ class DeclarativeBuilder:
 
         schema = Dict(
             keys=[
-                Key("schema", Str(allowed=schema_names), required=True),
+                Key("type", Str(allowed=schema_names), required=True),
             ],
             keys_required_by_default=False,
         )
