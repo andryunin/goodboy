@@ -88,10 +88,10 @@ class Dict(Schema):
         self._keys = self._keys or []
         self._keys.append(key)
 
-    def validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(self, value, typecast: bool, context: dict = {}):
         if not isinstance(value, dict):
             return None, [
-                self.error("unexpected_type", {"expected_type": type_name("dict")})
+                self._error("unexpected_type", {"expected_type": type_name("dict")})
             ]
 
         if self._keys is not None:
@@ -134,17 +134,17 @@ class Dict(Schema):
 
         if unknown_key_names:
             for key_name in unknown_key_names:
-                key_errors[key_name] = [self.error("unknown_key")]
+                key_errors[key_name] = [self._error("unknown_key")]
 
         errors: list[Error] = []
 
         if key_errors:
-            errors.append(self.error("key_errors", nested_errors=key_errors))
+            errors.append(self._error("key_errors", nested_errors=key_errors))
 
         if value_errors:
-            errors.append(self.error("value_errors", nested_errors=value_errors))
+            errors.append(self._error("value_errors", nested_errors=value_errors))
 
-        result_value, rule_errors = self.call_rules(result_value, typecast, context)
+        result_value, rule_errors = self._call_rules(result_value, typecast, context)
 
         return result_value, errors + rule_errors
 
@@ -177,7 +177,7 @@ class Dict(Schema):
                     key_required = self._keys_required_by_default
 
                 if key_required:
-                    result_key_errors[key.name] = [self.error("required_key")]
+                    result_key_errors[key.name] = [self._error("required_key")]
 
         return result_value, result_key_errors, result_value_errors, unknown_keys
 
@@ -220,5 +220,5 @@ class Dict(Schema):
 
         return result_value, result_errors
 
-    def typecast(self, input, context: dict = {}):
+    def _typecast(self, input, context: dict = {}):
         return input, []

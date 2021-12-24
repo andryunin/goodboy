@@ -266,4 +266,4 @@ def validate_keys_count_is_odd_and_add_bar_dict_key(
     if len(value.keys()) % 2 == 1:
         return {**value, "bar": 1}, []
     else:
-        return value, [self.error("key_count_is_not_odd")]
+        return value, [self._error("key_count_is_not_odd")]

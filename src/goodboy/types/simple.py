@@ -28,15 +28,15 @@ class AnyValue(Schema):
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
         self._allowed = allowed
 
-    def validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(self, value, typecast: bool, context: dict = {}):
         if self._allowed is not None and value not in self._allowed:
-            return None, [self.error("not_allowed")]
+            return None, [self._error("not_allowed")]
 
-        value, rule_errors = self.call_rules(value, typecast, context)
+        value, rule_errors = self._call_rules(value, typecast, context)
 
         return value, rule_errors
 
-    def typecast(self, input, context: dict = {}):
+    def _typecast(self, input, context: dict = {}):
         return input, []
 
 
@@ -56,15 +56,15 @@ class NoneValue(Schema):
     ):
         super().__init__(allow_none=True, messages=messages, rules=rules)
 
-    def validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(self, value, typecast: bool, context: dict = {}):
         if value is not None:
-            return None, [self.error("must_be_none")]
+            return None, [self._error("must_be_none")]
 
-        value, rule_errors = self.call_rules(value, typecast, context)
+        value, rule_errors = self._call_rules(value, typecast, context)
 
         return value, rule_errors
 
-    def typecast(self, input, context: dict = {}):
+    def _typecast(self, input, context: dict = {}):
         return input, []
 
 
@@ -120,53 +120,53 @@ class Str(Schema):
         self._is_regex = is_regex
         self._allowed = allowed
 
-    def validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(self, value, typecast: bool, context: dict = {}):
         if not isinstance(value, str):
             return None, [
-                self.error("unexpected_type", {"expected_type": type_name("str")})
+                self._error("unexpected_type", {"expected_type": type_name("str")})
             ]
 
         if not value:
             if self._allow_blank:
                 return value, []
             else:
-                return None, [self.error("cannot_be_blank")]
+                return None, [self._error("cannot_be_blank")]
 
         errors = []
 
         if self._allowed is not None and value not in self._allowed:
-            errors.append(self.error("not_allowed", {"allowed": self._allowed}))
+            errors.append(self._error("not_allowed", {"allowed": self._allowed}))
 
         if self._min_length is not None and len(value) < self._min_length:
-            errors.append(self.error("string_too_short", {"value": self._min_length}))
+            errors.append(self._error("string_too_short", {"value": self._min_length}))
 
         if self._max_length is not None and len(value) > self._max_length:
-            errors.append(self.error("string_too_long", {"value": self._max_length}))
+            errors.append(self._error("string_too_long", {"value": self._max_length}))
 
         if self._length is not None and len(value) != self._length:
-            errors.append(self.error("invalid_string_length", {"value": self._length}))
+            errors.append(self._error("invalid_string_length", {"value": self._length}))
 
         if self._pattern and not self._pattern.match(value):
-            errors.append(self.error("invalid_string_format"))
+            errors.append(self._error("invalid_string_format"))
 
         if self._is_regex:
             try:
                 re.compile(value)
             except re.error:
-                errors.append(self.error("invalid_regex"))
+                errors.append(self._error("invalid_regex"))
 
-        value, rule_errors = self.call_rules(value, typecast, context)
+        value, rule_errors = self._call_rules(value, typecast, context)
 
         return value, errors + rule_errors
 
-    def typecast(self, input, context: dict = {}):
+    def _typecast(self, input, context: dict = {}):
         # Any python object usually can be casted to string, so casting any value to
         # string is too dangerous
         if isinstance(input, str):
             return input, []
         else:
             return None, [
-                self.error("unexpected_type", {"expected_type": type_name("str")})
+                self._error("unexpected_type", {"expected_type": type_name("str")})
             ]
 
 
@@ -197,25 +197,25 @@ class Bool(Schema):
         # TODO: override cast_anything in validation context
         self._cast_anything = cast_anything
 
-    def validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(self, value, typecast: bool, context: dict = {}):
         if not isinstance(value, bool):
             return None, [
-                self.error("unexpected_type", {"expected_type": type_name("bool")})
+                self._error("unexpected_type", {"expected_type": type_name("bool")})
             ]
 
         errors = []
 
         if self._only_false and value:
-            errors.append(self.error("not_allowed", {"allowed": [False]}))
+            errors.append(self._error("not_allowed", {"allowed": [False]}))
 
         if self._only_true and not value:
-            errors.append(self.error("not_allowed", {"allowed": [True]}))
+            errors.append(self._error("not_allowed", {"allowed": [True]}))
 
-        value, rule_errors = self.call_rules(value, typecast, context)
+        value, rule_errors = self._call_rules(value, typecast, context)
 
         return value, errors + rule_errors
 
-    def typecast(self, input, context: dict = {}):
+    def _typecast(self, input, context: dict = {}):
         if isinstance(input, bool):
             return input, []
 
@@ -230,5 +230,5 @@ class Bool(Schema):
                 return False, []
 
         return None, [
-            self.error("unexpected_type", {"expected_type": type_name("bool")})
+            self._error("unexpected_type", {"expected_type": type_name("bool")})
         ]

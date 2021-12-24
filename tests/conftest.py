@@ -47,14 +47,14 @@ def validate_value_is_42_and_double_it(self, value, typecast: bool, context: dic
     if value == 42:
         return value * 2, []
     else:
-        return 42, [self.error("not_a_42")]
+        return 42, [self._error("not_a_42")]
 
 
 def validate_value_has_odd_year(self, value, typecast: bool, context: dict):
     if value.year % 2 == 1:
         return value, []
     else:
-        return value, [self.error("not_an_odd_year")]
+        return value, [self._error("not_an_odd_year")]
 
 
 def dummy_rule(value, typecast: bool, context: dict):

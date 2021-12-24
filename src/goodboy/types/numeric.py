@@ -35,7 +35,7 @@ class NumericBase(Generic[N], Schema):
         self._greater_or_equal_to = greater_or_equal_to
         self._allowed = allowed
 
-    def validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(self, value, typecast: bool, context: dict = {}):
         value, type_errors = self._validate_exact_type(value)
 
         if type_errors:
@@ -44,21 +44,29 @@ class NumericBase(Generic[N], Schema):
         errors = []
 
         if self._allowed is not None and value not in self._allowed:
-            errors.append(self.error("not_allowed", {"allowed": self._allowed}))
+            errors.append(self._error("not_allowed", {"allowed": self._allowed}))
 
         if self._less_than is not None and value >= self._less_than:
-            errors.append(self.error("greater_or_equal_to", {"value": self._less_than}))
+            errors.append(
+                self._error("greater_or_equal_to", {"value": self._less_than})
+            )
 
         if self._less_or_equal_to is not None and value > self._less_or_equal_to:
-            errors.append(self.error("greater_than", {"value": self._less_or_equal_to}))
+            errors.append(
+                self._error("greater_than", {"value": self._less_or_equal_to})
+            )
 
         if self._greater_than is not None and value <= self._greater_than:
-            errors.append(self.error("less_or_equal_to", {"value": self._greater_than}))
+            errors.append(
+                self._error("less_or_equal_to", {"value": self._greater_than})
+            )
 
         if self._greater_or_equal_to is not None and value < self._greater_or_equal_to:
-            errors.append(self.error("less_than", {"value": self._greater_or_equal_to}))
+            errors.append(
+                self._error("less_than", {"value": self._greater_or_equal_to})
+            )
 
-        value, rule_errors = self.call_rules(value, typecast, context)
+        value, rule_errors = self._call_rules(value, typecast, context)
 
         return value, errors + rule_errors
 
@@ -86,7 +94,7 @@ class Float(NumericBase[float]):
     :param allowed: Allow only certain values.
     """
 
-    def typecast(self, input, context: dict = {}):
+    def _typecast(self, input, context: dict = {}):
         if isinstance(input, float):
             return input, []
 
@@ -95,13 +103,13 @@ class Float(NumericBase[float]):
 
         if not isinstance(input, str):
             return None, [
-                self.error("unexpected_type", {"expected_type": type_name("float")})
+                self._error("unexpected_type", {"expected_type": type_name("float")})
             ]
 
         try:
             return float(input), []
         except ValueError:
-            return None, [self.error("invalid_numeric_format")]
+            return None, [self._error("invalid_numeric_format")]
 
     def _validate_exact_type(self, value):
         if isinstance(value, float):
@@ -110,7 +118,7 @@ class Float(NumericBase[float]):
             return float(value), []
         else:
             return None, [
-                self.error("unexpected_type", {"expected_type": type_name("float")})
+                self._error("unexpected_type", {"expected_type": type_name("float")})
             ]
 
 
@@ -133,24 +141,24 @@ class Int(NumericBase[int]):
     :param allowed: Allow only certain values.
     """
 
-    def typecast(self, input, context: dict = {}):
+    def _typecast(self, input, context: dict = {}):
         if isinstance(input, int):
             return input, []
 
         if not isinstance(input, str):
             return None, [
-                self.error("unexpected_type", {"expected_type": type_name("int")})
+                self._error("unexpected_type", {"expected_type": type_name("int")})
             ]
 
         try:
             return int(input), []
         except ValueError:
-            return None, [self.error("invalid_integer_format")]
+            return None, [self._error("invalid_integer_format")]
 
     def _validate_exact_type(self, value):
         if not isinstance(value, int):
             return None, [
-                self.error("unexpected_type", {"expected_type": type_name("int")})
+                self._error("unexpected_type", {"expected_type": type_name("int")})
             ]
         else:
             return value, []

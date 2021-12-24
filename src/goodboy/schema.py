@@ -23,29 +23,29 @@ class Schema(ABC):
         messages: MessageCollectionType = DEFAULT_MESSAGES,
         rules: list[Rule] = [],
     ):
-        self.allow_none = allow_none
+        self._allow_none = allow_none
 
         if isinstance(messages, MessageCollection):
-            self.messages = messages
+            self._messages = messages
         else:
-            self.messages = MessageCollection(messages, parent=DEFAULT_MESSAGES)
+            self._messages = MessageCollection(messages, parent=DEFAULT_MESSAGES)
 
-        self.rules = rules
+        self._rules = rules
 
     def __call__(self, value, *, typecast=False, context: dict = {}):
         if value is None:
-            if not self.allow_none:
-                raise SchemaError([self.error("cannot_be_none")])
+            if not self._allow_none:
+                raise SchemaError([self._error("cannot_be_none")])
 
             return None
 
         if typecast:
-            value, errors = self.typecast(value, context)
+            value, errors = self._typecast(value, context)
 
             if errors:
                 raise SchemaError(errors)
 
-        value, errors = self.validate(value, typecast, context)
+        value, errors = self._validate(value, typecast, context)
 
         if errors:
             raise SchemaError(errors)
@@ -53,24 +53,24 @@ class Schema(ABC):
         return value
 
     @abstractmethod
-    def validate(
+    def _validate(
         self, value: Any, typecast: bool, context: dict = {}
     ) -> tuple[Any, list[Error]]:
         ...
 
     @abstractmethod
-    def typecast(self, input: Any, context: dict = {}) -> tuple[Any, list[Error]]:
+    def _typecast(self, input: Any, context: dict = {}) -> tuple[Any, list[Error]]:
         ...
 
-    def error(self, code: str, args: dict = {}, nested_errors: dict = {}):
-        return Error(code, args, nested_errors, self.messages)
+    def _error(self, code: str, args: dict = {}, nested_errors: dict = {}):
+        return Error(code, args, nested_errors, self._messages)
 
-    def call_rules(
+    def _call_rules(
         self, value: Any, typecast=False, context: dict = {}
     ) -> tuple[Any, list[Error]]:
         result_errors = []
 
-        for rule in self.rules:
+        for rule in self._rules:
             value, errors = rule(self, value, typecast, context)
             result_errors += errors
 

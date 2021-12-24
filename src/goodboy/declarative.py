@@ -30,17 +30,17 @@ class DeclarativeSchemaFabric(Protocol):
 
 class SimpleDeclarativeSchemaFabric:
     def __init__(self, schema_class: Type[Schema], keys=[]):
-        self.schema_class = schema_class
-        self.keys = keys
+        self._schema_class = schema_class
+        self._keys = keys
 
     def option_dict_keys(self, schema_name: str, full_schema: Schema):
         def predicate(value):
             return value.get("type") == schema_name
 
-        return list(map(lambda key: key.with_predicate(predicate), self.keys))
+        return list(map(lambda key: key.with_predicate(predicate), self._keys))
 
     def create(self, options: dict, builder: DeclarativeBuilder):
-        return self.schema_class(**options)
+        return self._schema_class(**options)
 
 
 class DictDeclarativeSchemaFabric:
@@ -50,8 +50,8 @@ class DictDeclarativeSchemaFabric:
 
         keys = [
             Key("allow_none", Bool()),
-            Key("messages", MESSAGES_SCHEMA),
-            Key("rules", RULES_SCHEMA),
+            Key("messages", _MESSAGES_SCHEMA),
+            Key("rules", _RULES_SCHEMA),
             Key(
                 "keys",
                 List(
@@ -101,8 +101,8 @@ class ListDeclarativeSchemaFabric:
 
         keys = [
             Key("allow_none", Bool()),
-            Key("messages", MESSAGES_SCHEMA),
-            Key("rules", RULES_SCHEMA),
+            Key("messages", _MESSAGES_SCHEMA),
+            Key("rules", _RULES_SCHEMA),
             Key("item", full_schema),
             Key("min_length", Int(greater_or_equal_to=0)),
             Key("max_length", Int(greater_or_equal_to=0)),
@@ -125,8 +125,8 @@ class AnyOfDeclarativeSchemaFabric:
 
         keys = [
             Key("schemas", List(item=full_schema)),
-            Key("messages", MESSAGES_SCHEMA),
-            Key("rules", RULES_SCHEMA),
+            Key("messages", _MESSAGES_SCHEMA),
+            Key("rules", _RULES_SCHEMA),
         ]
 
         return list(map(lambda key: key.with_predicate(predicate), keys))
@@ -136,7 +136,7 @@ class AnyOfDeclarativeSchemaFabric:
         return AnyOf(**options)
 
 
-MESSAGES_SCHEMA = Dict(
+_MESSAGES_SCHEMA = Dict(
     key_schema=Str(),
     value_schema=AnyOf(
         [
@@ -152,33 +152,33 @@ MESSAGES_SCHEMA = Dict(
     ),
 )
 
-RULES_SCHEMA = List(item=CallableValue())
+_RULES_SCHEMA = List(item=CallableValue())
 
-DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
+_DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
     # Simple
     "any": SimpleDeclarativeSchemaFabric(
         AnyValue,
         [
             Key("allow_none", Bool()),
-            Key("messages", MESSAGES_SCHEMA),
-            Key("rules", RULES_SCHEMA),
+            Key("messages", _MESSAGES_SCHEMA),
+            Key("rules", _RULES_SCHEMA),
             Key("allowed", List(item=AnyValue())),
         ],
     ),
     "none": SimpleDeclarativeSchemaFabric(
         NoneValue,
         [
-            Key("messages", MESSAGES_SCHEMA),
-            Key("rules", RULES_SCHEMA),
+            Key("messages", _MESSAGES_SCHEMA),
+            Key("rules", _RULES_SCHEMA),
         ],
     ),
     "str": SimpleDeclarativeSchemaFabric(
         Str,
         [
             Key("allow_none", Bool()),
-            Key("messages", MESSAGES_SCHEMA),
+            Key("messages", _MESSAGES_SCHEMA),
             Key("allow_blank", Bool()),
-            Key("rules", RULES_SCHEMA),
+            Key("rules", _RULES_SCHEMA),
             Key("min_length", Int(greater_or_equal_to=0)),
             Key("max_length", Int(greater_or_equal_to=0)),
             Key("length", Int(greater_or_equal_to=0)),
@@ -191,8 +191,8 @@ DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
         Bool,
         [
             Key("allow_none", Bool()),
-            Key("messages", MESSAGES_SCHEMA),
-            Key("rules", RULES_SCHEMA),
+            Key("messages", _MESSAGES_SCHEMA),
+            Key("rules", _RULES_SCHEMA),
             Key("only_false", Bool()),
             Key("only_true", Bool()),
             Key("cast_anything", Bool()),
@@ -203,8 +203,8 @@ DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
         Date,
         [
             Key("allow_none", Bool()),
-            Key("messages", MESSAGES_SCHEMA),
-            Key("rules", RULES_SCHEMA),
+            Key("messages", _MESSAGES_SCHEMA),
+            Key("rules", _RULES_SCHEMA),
             Key("earlier_than", Date()),
             Key("earlier_or_equal_to", Date()),
             Key("later_than", Date()),
@@ -217,8 +217,8 @@ DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
         DateTime,
         [
             Key("allow_none", Bool()),
-            Key("messages", MESSAGES_SCHEMA),
-            Key("rules", RULES_SCHEMA),
+            Key("messages", _MESSAGES_SCHEMA),
+            Key("rules", _RULES_SCHEMA),
             Key("earlier_than", DateTime()),
             Key("earlier_or_equal_to", DateTime()),
             Key("later_than", DateTime()),
@@ -232,8 +232,8 @@ DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
         Int,
         [
             Key("allow_none", Bool()),
-            Key("messages", MESSAGES_SCHEMA),
-            Key("rules", RULES_SCHEMA),
+            Key("messages", _MESSAGES_SCHEMA),
+            Key("rules", _RULES_SCHEMA),
             Key("less_than", Int()),
             Key("less_or_equal_to", Int()),
             Key("greater_than", Int()),
@@ -245,8 +245,8 @@ DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
         Float,
         [
             Key("allow_none", Bool()),
-            Key("messages", MESSAGES_SCHEMA),
-            Key("rules", RULES_SCHEMA),
+            Key("messages", _MESSAGES_SCHEMA),
+            Key("rules", _RULES_SCHEMA),
             Key("less_than", Float()),
             Key("less_or_equal_to", Float()),
             Key("greater_than", Float()),
@@ -273,9 +273,9 @@ class DeclarativeBuilder:
         self,
         fabrics: dict[
             str, DeclarativeSchemaFabric
-        ] = DEFAULT_DECLARATIVE_SCHEMA_FABRICS,
+        ] = _DEFAULT_DECLARATIVE_SCHEMA_FABRICS,
     ):
-        self.fabrics = fabrics
+        self._fabrics = fabrics
 
     def build(self, declaration, validate=True, typecast=True):
         if validate:
@@ -285,7 +285,7 @@ class DeclarativeBuilder:
                 raise DeclarationError(e.errors)
 
         schema_name = declaration["type"]
-        schema_fabric = self.fabrics[schema_name]
+        schema_fabric = self._fabrics[schema_name]
 
         declaration = declaration.copy()
         declaration.pop("type")
@@ -297,7 +297,7 @@ class DeclarativeBuilder:
         return schema(declaration, typecast=typecast)
 
     def declaration_schema(self):
-        schema_names = list(self.fabrics.keys())
+        schema_names = list(self._fabrics.keys())
 
         schema = Dict(
             keys=[
@@ -306,7 +306,7 @@ class DeclarativeBuilder:
             keys_required_by_default=False,
         )
 
-        for schema_name, fabric in self.fabrics.items():
+        for schema_name, fabric in self._fabrics.items():
             # TODO: use weakref of schema
             for key in fabric.option_dict_keys(schema_name, schema):
                 schema.append_key(key)

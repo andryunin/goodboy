@@ -16,7 +16,7 @@ class Result:
     ):
         self.value = value
         self.errors = errors
-        self.translations_getter = translations_getter
+        self._translations_getter = translations_getter
 
     @property
     def is_valid(self) -> bool:
@@ -33,10 +33,10 @@ class Result:
             languages = get_default_locale()
 
         if languages:
-            if not self.translations_getter:
+            if not self._translations_getter:
                 raise ValueError("tranlations_getter is not set")
 
-            translations = self.translations_getter(languages)
+            translations = self._translations_getter(languages)
         else:
             translations = None
 

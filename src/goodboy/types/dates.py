@@ -44,7 +44,7 @@ class DateBase(Generic[D], Schema):
         else:
             self._allowed = None
 
-    def validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(self, value, typecast: bool, context: dict = {}):
         type_errors = self._validate_exact_type(value)
 
         if type_errors:
@@ -53,29 +53,29 @@ class DateBase(Generic[D], Schema):
         errors = []
 
         if self._allowed is not None and value not in self._allowed:
-            errors.append(self.error("not_allowed", {"allowed": self._allowed}))
+            errors.append(self._error("not_allowed", {"allowed": self._allowed}))
 
         if self._earlier_than and value >= self._earlier_than:
             errors.append(
-                self.error("later_or_equal_to", {"value": self._earlier_than})
+                self._error("later_or_equal_to", {"value": self._earlier_than})
             )
 
         if self._earlier_or_equal_to and value > self._earlier_or_equal_to:
             errors.append(
-                self.error("later_than", {"value": self._earlier_or_equal_to})
+                self._error("later_than", {"value": self._earlier_or_equal_to})
             )
 
         if self._later_than and value <= self._later_than:
             errors.append(
-                self.error("earlier_or_equal_to", {"value": self._later_than})
+                self._error("earlier_or_equal_to", {"value": self._later_than})
             )
 
         if self._later_or_equal_to and value < self._later_or_equal_to:
             errors.append(
-                self.error("earlier_than", {"value": self._later_or_equal_to})
+                self._error("earlier_than", {"value": self._later_or_equal_to})
             )
 
-        value, rule_errors = self.call_rules(value, typecast, context)
+        value, rule_errors = self._call_rules(value, typecast, context)
 
         return value, errors + rule_errors
 
@@ -116,13 +116,13 @@ class Date(DateBase[date]):
     :param allowed: Allow only certain values.
     """  # noqa: E501
 
-    def typecast(self, input, context: dict = {}):
+    def _typecast(self, input, context: dict = {}):
         if isinstance(input, date):
             return input, []
 
         if not isinstance(input, str):
             return None, [
-                self.error("unexpected_type", {"expected_type": type_name("date")})
+                self._error("unexpected_type", {"expected_type": type_name("date")})
             ]
 
         try:
@@ -139,11 +139,13 @@ class Date(DateBase[date]):
                 return date.fromisoformat(input), []
 
         except ValueError:
-            return None, [self.error("invalid_date_format")]
+            return None, [self._error("invalid_date_format")]
 
     def _validate_exact_type(self, value) -> list[Error]:
         if not isinstance(value, date):
-            return [self.error("unexpected_type", {"expected_type": type_name("date")})]
+            return [
+                self._error("unexpected_type", {"expected_type": type_name("date")})
+            ]
         else:
             return []
 
@@ -176,13 +178,13 @@ class DateTime(DateBase[datetime]):
     :param allowed: Allow only certain values.
     """  # noqa: E501
 
-    def typecast(self, input, context: dict = {}):
+    def _typecast(self, input, context: dict = {}):
         if isinstance(input, datetime):
             return input, []
 
         if not isinstance(input, str):
             return None, [
-                self.error("unexpected_type", {"expected_type": type_name("datetime")})
+                self._error("unexpected_type", {"expected_type": type_name("datetime")})
             ]
 
         try:
@@ -199,12 +201,12 @@ class DateTime(DateBase[datetime]):
                 return datetime.fromisoformat(input), []
 
         except ValueError:
-            return None, [self.error("invalid_datetime_format")]
+            return None, [self._error("invalid_datetime_format")]
 
     def _validate_exact_type(self, value) -> list[Error]:
         if not isinstance(value, datetime):
             return [
-                self.error("unexpected_type", {"expected_type": type_name("datetime")})
+                self._error("unexpected_type", {"expected_type": type_name("datetime")})
             ]
         else:
             return []

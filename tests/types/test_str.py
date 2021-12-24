@@ -203,4 +203,4 @@ def validate_value_length_is_odd_and_add_is_ok(
     if len(value) % 2 == 1:
         return value + " is ok", []
     else:
-        return value, [self.error("length_is_not_odd")]
+        return value, [self._error("length_is_not_odd")]

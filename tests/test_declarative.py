@@ -1,5 +1,5 @@
 from goodboy.declarative import (
-    DEFAULT_DECLARATIVE_SCHEMA_FABRICS,
+    _DEFAULT_DECLARATIVE_SCHEMA_FABRICS,
     DeclarativeBuilder,
     build,
 )
@@ -13,7 +13,7 @@ from goodboy.types.variants import AnyOf
 
 from .conftest import assert_declarative_errors, dummy_key_predicate, dummy_rule
 
-ALLOWED_SCHEMA_NAMES = list(DEFAULT_DECLARATIVE_SCHEMA_FABRICS.keys())
+ALLOWED_SCHEMA_NAMES = list(_DEFAULT_DECLARATIVE_SCHEMA_FABRICS.keys())
 
 
 def test_allows_only_known_schemas():

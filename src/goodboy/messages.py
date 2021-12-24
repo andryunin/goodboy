@@ -25,7 +25,7 @@ class Message:
     """
 
     def __init__(self, default, **other_messages):
-        self.messages = {"default": default, **other_messages}
+        self._messages = {"default": default, **other_messages}
 
     def get(
         self,
@@ -34,10 +34,10 @@ class Message:
         format_args: list = [],
         format_kwargs: dict = {},
     ):
-        if format not in self.messages:
+        if format not in self._messages:
             format = "default"
 
-        message = self.messages[format]
+        message = self._messages[format]
 
         if isinstance(message, I18nLazyStub):
             if translations:
@@ -49,7 +49,7 @@ class Message:
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self.messages == other.messages
+            return self._messages == other._messages
 
         return super().__eq__(other)
 
@@ -66,8 +66,8 @@ class MessageCollection:
             elif isinstance(message, dict):
                 messages[code] = Message(**message)
 
-        self.messages = messages
-        self.parent = parent
+        self._messages = messages
+        self._parent = parent
 
     def get_message(self, code: str) -> Message:
         try:
@@ -77,16 +77,16 @@ class MessageCollection:
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self.messages == other.messages and self.parent == other.parent
+            return self._messages == other._messages and self._parent == other._parent
 
         return super().__eq__(other)
 
     def __getitem__(self, code):
-        if code in self.messages:
-            return self.messages[code]
+        if code in self._messages:
+            return self._messages[code]
 
-        if self.parent:
-            return self.parent.get_message(code)
+        if self._parent:
+            return self._parent.get_message(code)
 
         raise KeyError(code)
 

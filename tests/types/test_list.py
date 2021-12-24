@@ -160,4 +160,4 @@ def validate_value_length_is_odd_and_add_bar_list_item(
     if len(value) % 2 == 1:
         return value + ["bar"], []
     else:
-        return value, [self.error("length_is_not_odd")]
+        return value, [self._error("length_is_not_odd")]

@@ -52,21 +52,21 @@ class I18nLoader:
 
 class I18nLazyStub:
     def __init__(self, message: str):
-        self.message = message
+        self._message = message
 
     def eval(self, translations) -> str:
-        return translations.gettext(self.message)
+        return translations.gettext(self._message)
 
     def get_original_message(self) -> str:
-        return self.message
+        return self._message
 
 
 def lazy_gettext(message):
     return I18nLazyStub(message)
 
 
-global_locale: Optional[list[str]] = ["en"]
-thread_locale = threading.local()
+_global_locale: Optional[list[str]] = ["en"]
+_thread_locale = threading.local()
 
 
 class DefaultLocaleScope(Enum):
@@ -78,19 +78,19 @@ def set_default_locale(
     languages: Optional[list[str]],
     scope: DefaultLocaleScope = DefaultLocaleScope.GLOBAL,
 ):
-    global global_locale
+    global _global_locale
 
     if scope == DefaultLocaleScope.GLOBAL:
-        global_locale = languages
+        _global_locale = languages
     elif scope == DefaultLocaleScope.THREAD:
-        thread_locale.locale = languages
-        thread_locale.locale_is_set = True
+        _thread_locale.locale = languages
+        _thread_locale.locale_is_set = True
     else:
         raise ValueError(f"unexpected default locale scope: {repr(scope)}")
 
 
 def get_default_locale() -> Union[list[str], None]:
-    if getattr(thread_locale, "locale_is_set", False):
-        return thread_locale.locale
+    if getattr(_thread_locale, "locale_is_set", False):
+        return _thread_locale.locale
     else:
-        return global_locale
+        return _global_locale

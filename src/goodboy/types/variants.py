@@ -26,14 +26,14 @@ class AnyOf(Schema):
         self._schemas = schemas
 
     def __call__(self, value, *, typecast=False, context: dict = {}):
-        value, errors = self.validate(value, typecast, context)
+        value, errors = self._validate(value, typecast, context)
 
         if errors:
             raise SchemaError(errors)
 
         return value
 
-    def validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(self, value, typecast: bool, context: dict = {}):
         schema_errors = {}
         errors = []
 
@@ -45,11 +45,11 @@ class AnyOf(Schema):
             else:
                 break
         else:
-            errors.append(self.error("no_variant_found", {"errors": schema_errors}))
+            errors.append(self._error("no_variant_found", {"errors": schema_errors}))
 
-        value, rule_errors = self.call_rules(value, typecast, context)
+        value, rule_errors = self._call_rules(value, typecast, context)
 
         return value, errors + rule_errors
 
-    def typecast(self, input, context: dict = {}):
+    def _typecast(self, input, context: dict = {}):
         raise NotImplementedError()

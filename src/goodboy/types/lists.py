@@ -36,22 +36,22 @@ class List(Schema):
         self._max_length = max_length
         self._length = length
 
-    def validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(self, value, typecast: bool, context: dict = {}):
         if not isinstance(value, list):
             return None, [
-                self.error("unexpected_type", {"expected_type": type_name("list")})
+                self._error("unexpected_type", {"expected_type": type_name("list")})
             ]
 
         errors = []
 
         if self._min_length is not None and len(value) < self._min_length:
-            errors.append(self.error("too_short", {"value": self._min_length}))
+            errors.append(self._error("too_short", {"value": self._min_length}))
 
         if self._max_length is not None and len(value) > self._max_length:
-            errors.append(self.error("too_long", {"value": self._max_length}))
+            errors.append(self._error("too_long", {"value": self._max_length}))
 
         if self._length is not None and len(value) != self._length:
-            errors.append(self.error("invalid_length", {"value": self._length}))
+            errors.append(self._error("invalid_length", {"value": self._length}))
 
         if self._item:
             value_errors = {}
@@ -66,13 +66,13 @@ class List(Schema):
                     result_value.append(item_value)
 
             if value_errors:
-                errors.append(self.error("value_errors", nested_errors=value_errors))
+                errors.append(self._error("value_errors", nested_errors=value_errors))
         else:
             result_value = value
 
-        result_value, rule_errors = self.call_rules(result_value, typecast, context)
+        result_value, rule_errors = self._call_rules(result_value, typecast, context)
 
         return result_value, errors + rule_errors
 
-    def typecast(self, input, context: dict = {}):
+    def _typecast(self, input, context: dict = {}):
         return input, []
