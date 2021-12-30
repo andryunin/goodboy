@@ -42,14 +42,8 @@ class Error:
     def get_message(
         self, format: Optional[str] = None, translations: Optional[Translations] = None
     ):
-        format_kwargs = self.args
-
-        for key, value in format_kwargs.items():
-            if isinstance(value, Message):
-                format_kwargs[key] = value.get(format, translations)
-
-        return self.messages.get_message(self.code).get(
-            format, translations, format_kwargs=format_kwargs
+        return self.messages.get_message(self.code).render(
+            format, self.args, translations
         )
 
 
@@ -109,7 +103,7 @@ class JSONErrorFormatter(I18nErrorFormatter):
         elif isinstance(value, float):
             return value
         elif isinstance(value, Message):
-            return value.get("json", self._translations)
+            return value.render("json", self._translations)
         elif isinstance(value, list):
             return [self._format_argument_value(v) for v in value]
         else:

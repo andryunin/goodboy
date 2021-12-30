@@ -8,50 +8,114 @@ from goodboy.i18n import lazy_gettext as _
 
 class Message:
     """
-    Error message class, allows using different messages for different input formats.
+    Error message class.
 
-    For example, when returning an error from the JSON API, it allows you to get "is
-    not an object" instead of "is not a dict".
+    Allows rendering different messages for different API formats. For example, when
+    returning an error from JSON API, it allows you to get "not an object" instead of
+    "not a dict".
 
-    Default format is "python", which means that primary error messages should use
-    python names for data types ("str" instead of "string", "dict" instead of "object"
-    and so on).
+    Default format should use native python names for data types ("str" instead of
+    "string", "dict" instead of "object" and so on).
 
-        >>> e = Message('Cannot be None', json='Cannot be null')
-        >>> e.get()
+    When rendered with unknown format, default format is used.
+
+    Example:
+
+        >>> m = Message('Cannot be None', json='Cannot be null')
+        >>> m.render()
         'Cannot be None'
-        >>> e.get("json")
+        >>> m.render('json')
         'Cannot be null'
+        >>> m.render('grpc')
+        'Cannot be None'
+
+    Messages can use string formatting (uses
+    `str.format <https://docs.python.org/3/library/stdtypes.html#str.format>`_ method
+    with kwargs), keyword arguments are passed to :meth:`render` method as dict.
+
+    Formatting example:
+
+        >>> m = Message('Must be less than {max_length} character long')
+        >>> m.render(kwargs={'max_length': 100})
+        'Must be less than 100 character long'
+
+    Formatting arguments can be messages, too:
+
+        >>> m = Message('Must be {type}')
+        >>> m.render(kwargs={'type': Message('int', json='integer')})
+        'Must be int'
+        >>> m.render(kwargs={'type': Message('int', json='integer')}, format='json')
+        'Must be integer'
+
+    Format arguments are taken from error args (see :class:`~goodboy.errors.Error`).
+
+    :param default: Default error message, should use native python type names.
+    :param \\**other_formats: Error messages for other formats.
+
+    TODO: Link i18n documentation.
     """
 
-    def __init__(self, default, **other_messages):
-        self._messages = {"default": default, **other_messages}
+    def __init__(self, default, **other_formats):
+        self._formats = {"default": default, **other_formats}
 
-    def get(
+    def render(
         self,
         format: Optional[str] = None,
+        kwargs: dict = {},
         translations: Optional[Translations] = None,
-        format_args: list = [],
-        format_kwargs: dict = {},
-    ):
-        if format not in self._messages:
-            format = "default"
+    ) -> str:
+        """
+        Render message.
 
-        message = self._messages[format]
+        Evaluates lazy gettext values (see :func:`goodboy.i18n.lazy_gettext`) with
+        specified or default translations.
+
+        :param format: Output format. When rendered with unknown format, or no format
+            specified, "default" format is used.
+        :param kwargs: String formatting keyword arguments.
+        :param translations: Translations object. When no translations specified, uses
+            default goodboy translations.
+
+        TODO: Link i18n documentation.
+        """
+
+        if format in self._formats:
+            pattern = self._formats[format]
+        else:
+            pattern = self._formats["default"]
 
         if translations is None:
             translations = get_current_translations()
 
-        if isinstance(message, I18nLazyString):
-            message = message.translate(translations)
+        if isinstance(pattern, I18nLazyString):
+            pattern = pattern.translate(translations)
 
-        return message.format(*format_args, **format_kwargs)
+        kwargs = kwargs.copy()
+
+        for key, argument in kwargs.items():
+            if isinstance(argument, Message):
+                kwargs[key] = argument.render(format, translations=translations)
+
+        return pattern.format(**kwargs)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self._messages == other._messages
+            return self._formats == other._formats
 
         return super().__eq__(other)
+
+    def __repr__(self):
+        arguments = [repr(self._formats["default"])]
+
+        for format, pattern in self._formats.items():
+            if format == "default":
+                continue
+
+            arguments.append(f"{format}={repr(pattern)}")
+
+        arguments_repr = ", ".join(arguments)
+
+        return f"Message({arguments_repr})"
 
 
 class MessageCollection:
@@ -151,7 +215,7 @@ _TYPE_NAMES_LIST: list[Message] = [
     Message("bool", json="boolean"),
 ]
 
-_TYPE_NAMES = MessageCollection({m.get(): m for m in _TYPE_NAMES_LIST})
+_TYPE_NAMES = MessageCollection({m.render(): m for m in _TYPE_NAMES_LIST})
 
 
 def type_name(python_type_name: str):

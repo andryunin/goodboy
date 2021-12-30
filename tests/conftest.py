@@ -9,6 +9,14 @@ from goodboy.errors import Error
 from goodboy.schema import SchemaError
 
 
+class TranslationsMock:
+    def __init__(self, translations):
+        self._translations = translations
+
+    def gettext(self, message):
+        return self._translations[message]
+
+
 @contextmanager
 def assert_declarative_errors(value_errors: dict[str, list[Error]]):
     with pytest.raises(DeclarationError) as e:
