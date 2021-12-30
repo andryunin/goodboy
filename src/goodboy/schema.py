@@ -63,7 +63,7 @@ class Schema(ABC):
         ...
 
     def _error(self, code: str, args: dict = {}, nested_errors: dict = {}):
-        return Error(code, args, nested_errors, self._messages)
+        return Error(code, args, nested_errors, self._messages.get_message(code))
 
     def _call_rules(
         self, value: Any, typecast=False, context: dict = {}
