@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, Optional, Union
 
-from goodboy.i18n import I18nLazyStub, Translations
+from goodboy.i18n import I18nLazyString, Translations, get_current_translations
 from goodboy.i18n import lazy_gettext as _
 
 
@@ -39,11 +39,11 @@ class Message:
 
         message = self._messages[format]
 
-        if isinstance(message, I18nLazyStub):
-            if translations:
-                message = message.eval(translations)
-            else:
-                message = message.get_original_message()
+        if translations is None:
+            translations = get_current_translations()
+
+        if isinstance(message, I18nLazyString):
+            message = message.translate(translations)
 
         return message.format(*format_args, **format_kwargs)
 
@@ -57,7 +57,7 @@ class Message:
 class MessageCollection:
     def __init__(
         self,
-        messages: dict[str, Union[Message, I18nLazyStub, str]],
+        messages: dict[str, Union[Message, I18nLazyString, str]],
         parent: Optional["MessageCollection"] = None,
     ):
         for code, message in messages.items():
@@ -92,7 +92,7 @@ class MessageCollection:
 
 
 MessageCollectionType = Union[
-    MessageCollection, Dict[str, Union[Message, I18nLazyStub, str]]
+    MessageCollection, Dict[str, Union[Message, I18nLazyString, str]]
 ]
 
 DEFAULT_MESSAGES = MessageCollection(

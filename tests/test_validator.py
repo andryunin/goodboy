@@ -1,6 +1,6 @@
 import pytest
 
-from goodboy.i18n import set_default_locale
+from goodboy.i18n import set_process_locale
 from goodboy.types.numeric import Int
 from goodboy.validator import Validator
 
@@ -38,5 +38,5 @@ def test_messages_translation(languages, message):
 )
 def test_messages_translation_with_default_locale(languages, message):
     result = Validator(schema).validate(None)
-    set_default_locale(languages)
+    set_process_locale(languages)
     assert result.format_errors("json")[0]["message"] == message

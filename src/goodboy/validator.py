@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Callable, ClassVar, Optional, Union
 
 from goodboy.errors import Error, ErrorFormatter, get_formatter_class
-from goodboy.i18n import I18nLoader, Translations, get_default_locale
+from goodboy.i18n import I18nLoader, Translations, get_current_locale
 from goodboy.schema import Schema, SchemaError
 
 
@@ -30,7 +30,7 @@ class Result:
         translations: Optional[Translations]
 
         if not languages:
-            languages = get_default_locale()
+            languages = get_current_locale()
 
         if languages:
             if not self._translations_getter:
