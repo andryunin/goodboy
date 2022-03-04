@@ -95,46 +95,6 @@ class Error:
         return super().__eq__(other)
 
 
-class ErrorCollection:
-    def __init__(
-        self, errors: list[Error] = None, messages: MessageCollection = DEFAULT_MESSAGES
-    ):
-        self._errors = errors or []
-        self._messages = messages
-
-    def append(self, error: Error):
-        self._errors.append(error)
-
-    def append_error(
-        self,
-        code: str,
-        args: dict = {},
-        nested_errors: dict[str, list[Error]] = {},
-        message: Optional[Message] = None,
-    ):
-        if not message:
-            message = self._messages.get_message(code)
-
-        print([repr(x) for x in [code, args, nested_errors, message]])
-
-        self.append(Error(code, args, nested_errors, message))
-
-    def __iter__(self):
-        return iter(self._errors)
-
-    def __len__(self):
-        return len(self._errors)
-
-    def __getitem__(self, index: int):
-        return self._errors[index]
-
-    def __add__(self, other):
-        if isinstance(other, ErrorCollection):
-            return ErrorCollection(self._errors + other._errors)
-
-        return super().__add__(other)
-
-
 class ErrorFormatter(ABC):
     @abstractmethod
     def format(self, errors: list[Error]):
