@@ -1,4 +1,5 @@
 from goodboy.declarative import DeclarativeBuilder, SimpleDeclarativeSchemaFabric
+from goodboy.schema import Schema, SchemaError
 from goodboy.types.dates import Date, DateTime
 from goodboy.types.dicts import Dict, Key
 from goodboy.types.lists import List
@@ -25,6 +26,8 @@ __all__ = [
     "List",
     "NoneValue",
     "Result",
+    "Schema",
+    "SchemaError",
     "SimpleDeclarativeSchemaFabric",
     "Str",
     "validate",
