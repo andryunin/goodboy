@@ -91,7 +91,10 @@ class DictDeclarativeSchemaFabric:
         if options.get("value_schema"):
             options["value_schema"] = builder.build(options["value_schema"], False)
 
-        return Dict(**options)
+        return self._schema_class()(**options)
+
+    def _schema_class(self) -> Type[Dict]:
+        return Dict
 
 
 class ListDeclarativeSchemaFabric:
@@ -115,7 +118,10 @@ class ListDeclarativeSchemaFabric:
         if options.get("item"):
             options["item"] = builder.build(options["item"], False)
 
-        return List(**options)
+        return self._schema_class()(**options)
+
+    def _schema_class(self) -> Type[List]:
+        return List
 
 
 class AnyOfDeclarativeSchemaFabric:
@@ -277,7 +283,7 @@ class DeclarativeBuilder:
     ):
         self._fabrics = fabrics
 
-    def build(self, declaration, validate=True, typecast=True):
+    def build(self, declaration, validate=True, typecast=True) -> Schema:
         if validate:
             try:
                 declaration = self.validate(declaration, typecast=typecast)
