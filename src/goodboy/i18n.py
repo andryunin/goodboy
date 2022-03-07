@@ -91,7 +91,7 @@ class I18nLazyString:
         return translations.gettext(self._message)
 
     def __repr__(self):
-        message_repr = repr(self.message)
+        message_repr = repr(self._message)
         return f"_({message_repr})"
 
 
