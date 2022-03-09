@@ -37,9 +37,9 @@ class Key:
         else:
             return True
 
-    def validate(self, value, typecast: bool):
+    def validate(self, value, typecast: bool, context: dict):
         if self._schema:
-            return self._schema(value, typecast=typecast)
+            return self._schema(value, typecast=typecast, context=context)
         else:
             return value
 
@@ -165,7 +165,7 @@ class Dict(Schema):
                 unknown_keys.remove(key.name)
 
                 try:
-                    key_value = key.validate(value[key.name], typecast)
+                    key_value = key.validate(value[key.name], typecast, context)
                 except SchemaError as e:
                     result_value_errors[key.name] = e.errors
                 else:
