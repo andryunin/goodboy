@@ -1,4 +1,11 @@
 from goodboy.declarative import DeclarativeBuilder, SimpleDeclarativeSchemaFabric
+from goodboy.errors import (
+    Error,
+    ErrorFormatter,
+    I18nErrorFormatter,
+    JSONErrorFormatter,
+    TextErrorFormatter,
+)
 from goodboy.schema import (
     Schema,
     SchemaError,
@@ -26,8 +33,12 @@ __all__ = [
     "DateTime",
     "DeclarativeBuilder",
     "Dict",
+    "Error",
+    "ErrorFormatter",
     "Float",
+    "I18nErrorFormatter",
     "Int",
+    "JSONErrorFormatter",
     "Key",
     "List",
     "NoneValue",
@@ -39,6 +50,7 @@ __all__ = [
     "SchemaWithUtils",
     "SimpleDeclarativeSchemaFabric",
     "Str",
+    "TextErrorFormatter",
     "validate",
     "Validator",
 ]
