@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType
-from goodboy.schema import Rule, Schema, SchemaError
+from goodboy.schema import Rule, Schema, SchemaError, SchemaWithUtils
 
 
-class AnyOf(Schema):
+class AnyOf(SchemaWithUtils):
     """
     Accept value matches any of specified schemas, taking into account ``allow_none``
     option.

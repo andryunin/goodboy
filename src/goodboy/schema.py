@@ -16,6 +16,34 @@ Rule = Callable[["Schema", Any, bool, dict], Tuple[Any, List[Error]]]
 
 
 class Schema(ABC):
+    @abstractmethod
+    def __call__(self, value, *, typecast=False, context: dict = {}):
+        ...
+
+
+class SchemaErrorMixin:
+    _messages: MessageCollection
+
+    def _error(self, code: str, args: dict = {}, nested_errors: dict = {}):
+        return Error(code, args, nested_errors, self._messages.get_message(code))
+
+
+class SchemaRulesMixin:
+    _rules: list[Rule]
+
+    def _call_rules(
+        self, value: Any, typecast=False, context: dict = {}
+    ) -> tuple[Any, list[Error]]:
+        result_errors = []
+
+        for rule in self._rules:
+            value, errors = rule(self, value, typecast, context)
+            result_errors += errors
+
+        return value, result_errors
+
+
+class SchemaWithUtils(Schema, SchemaErrorMixin, SchemaRulesMixin):
     def __init__(
         self,
         *,
@@ -61,20 +89,6 @@ class Schema(ABC):
     @abstractmethod
     def _typecast(self, input: Any, context: dict = {}) -> tuple[Any, list[Error]]:
         ...
-
-    def _error(self, code: str, args: dict = {}, nested_errors: dict = {}):
-        return Error(code, args, nested_errors, self._messages.get_message(code))
-
-    def _call_rules(
-        self, value: Any, typecast=False, context: dict = {}
-    ) -> tuple[Any, list[Error]]:
-        result_errors = []
-
-        for rule in self._rules:
-            value, errors = rule(self, value, typecast, context)
-            result_errors += errors
-
-        return value, result_errors
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):

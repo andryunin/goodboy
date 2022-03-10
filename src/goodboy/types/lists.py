@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import Optional
 
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
-from goodboy.schema import Rule, Schema, SchemaError
+from goodboy.schema import Rule, Schema, SchemaError, SchemaWithUtils
 
 
-class List(Schema):
+class List(SchemaWithUtils):
     """
     Accept ``list`` value.
 

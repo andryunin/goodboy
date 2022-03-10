@@ -6,12 +6,12 @@ from typing import Generic, Optional, TypeVar, Union
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
-from goodboy.schema import Rule, Schema
+from goodboy.schema import Rule, SchemaWithUtils
 
 D = TypeVar("D")
 
 
-class DateBase(Generic[D], Schema):
+class DateBase(Generic[D], SchemaWithUtils):
     """
     Abstract base class for Date/DateTime schemas, should not be used directly. Use
     :class:`Date` or :class:`DateTime` instead.

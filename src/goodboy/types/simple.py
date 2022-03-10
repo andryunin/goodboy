@@ -4,10 +4,10 @@ import re
 from typing import Any, Optional, Pattern, Union
 
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
-from goodboy.schema import Rule, Schema
+from goodboy.schema import Rule, SchemaWithUtils
 
 
-class AnyValue(Schema):
+class AnyValue(SchemaWithUtils):
     """
     Accept any values, taking into account ``allow_none`` and ``allowed`` options.
 
@@ -40,7 +40,7 @@ class AnyValue(Schema):
         return input, []
 
 
-class NoneValue(Schema):
+class NoneValue(SchemaWithUtils):
     """
     Accept ``None`` values. Type casting is not performed.
 
@@ -68,7 +68,7 @@ class NoneValue(Schema):
         return input, []
 
 
-class Str(Schema):
+class Str(SchemaWithUtils):
     """
     Accept ``str`` values.
 
@@ -170,7 +170,7 @@ class Str(Schema):
             ]
 
 
-class Bool(Schema):
+class Bool(SchemaWithUtils):
     """
     Accept ``bool`` values.
 

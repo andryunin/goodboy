@@ -5,12 +5,12 @@ from typing import Generic, Optional, TypeVar
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
-from goodboy.schema import Rule, Schema
+from goodboy.schema import Rule, SchemaWithUtils
 
 N = TypeVar("N")
 
 
-class NumericBase(Generic[N], Schema):
+class NumericBase(Generic[N], SchemaWithUtils):
     """
     Abstract base class for Int/Float schemas, should not be used directly. Use
     :class:`Int` or :class:`Float` instead.

@@ -1,7 +1,7 @@
-from goodboy.schema import Schema
+from goodboy.schema import SchemaWithUtils
 
 
-class CallableValue(Schema):
+class CallableValue(SchemaWithUtils):
     """
     Accept callable python objects.
 

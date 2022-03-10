@@ -4,7 +4,7 @@ from typing import Callable, Optional
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
-from goodboy.schema import Rule, Schema, SchemaError
+from goodboy.schema import Rule, Schema, SchemaError, SchemaWithUtils
 from goodboy.types.simple import Str
 
 
@@ -54,7 +54,7 @@ class Key:
 
 
 # TODO: maybe support non string keys?
-class Dict(Schema):
+class Dict(SchemaWithUtils):
     """
     Accept ``dict`` value. Only string keys supported.
 
