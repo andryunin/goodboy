@@ -6,6 +6,12 @@ from goodboy.errors import (
     JSONErrorFormatter,
     TextErrorFormatter,
 )
+from goodboy.messages import (
+    Message,
+    MessageCollection,
+    MessageCollectionType,
+    type_name,
+)
 from goodboy.schema import (
     Schema,
     SchemaError,
@@ -41,6 +47,9 @@ __all__ = [
     "JSONErrorFormatter",
     "Key",
     "List",
+    "Message",
+    "MessageCollection",
+    "MessageCollectionType",
     "NoneValue",
     "Result",
     "Schema",
@@ -51,6 +60,7 @@ __all__ = [
     "SimpleDeclarativeSchemaFabric",
     "Str",
     "TextErrorFormatter",
+    "type_name",
     "validate",
     "Validator",
 ]
