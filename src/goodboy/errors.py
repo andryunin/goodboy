@@ -57,7 +57,7 @@ class Error:
 
         for key, value in format_kwargs.items():
             if isinstance(value, Message):
-                format_kwargs[key] = value.render(format, translations)
+                format_kwargs[key] = value.render(format, {}, translations)
 
         return self._message.render(format, format_kwargs, translations)
 

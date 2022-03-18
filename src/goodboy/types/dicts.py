@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Optional
+from typing import Any, Callable, Mapping, Optional
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
@@ -24,14 +24,14 @@ class Key:
         schema: Optional[Schema] = None,
         *,
         required: Optional[bool] = None,
-        predicate: Optional[Callable[[dict], bool]] = None,
+        predicate: Optional[Callable[[Mapping[str, Any]], bool]] = None,
     ):
         self.required = required
         self.name = name
         self._schema = schema
         self._predicate = predicate
 
-    def predicate_result(self, prev_values: dict):
+    def predicate_result(self, prev_values: Mapping[str, Any]):
         if self._predicate:
             return self._predicate(prev_values)
         else:
@@ -43,7 +43,7 @@ class Key:
         else:
             return value
 
-    def with_predicate(self, predicate: Callable[[dict], bool]) -> Key:
+    def with_predicate(self, predicate: Callable[[Mapping[str, Any]], bool]) -> Key:
         return Key(self.name, self._schema, required=self.required, predicate=predicate)
 
     def __eq__(self, other):

@@ -180,7 +180,7 @@ def get_current_locale() -> Optional[list[str]]:
         return _process_locale
 
 
-def get_current_translations() -> Optional[list[str]]:
+def get_current_translations() -> Translations:
     """
     Returns translations object for current locale (see :func:`get_current_locale`).
     """

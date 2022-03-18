@@ -12,9 +12,6 @@ class SchemaError(Exception):
         self.errors = errors
 
 
-Rule = Callable[["Schema", Any, bool, dict], Tuple[Any, List[Error]]]
-
-
 class Schema(ABC):
     @abstractmethod
     def __call__(self, value, *, typecast=False, context: dict = {}):
@@ -26,6 +23,9 @@ class SchemaErrorMixin:
 
     def _error(self, code: str, args: dict = {}, nested_errors: dict = {}):
         return Error(code, args, nested_errors, self._messages.get_message(code))
+
+
+Rule = Callable[["SchemaRulesMixin", Any, bool, dict], Tuple[Any, List[Error]]]
 
 
 class SchemaRulesMixin:

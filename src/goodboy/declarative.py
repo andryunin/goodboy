@@ -39,8 +39,8 @@ class SimpleDeclarativeSchemaFabric:
 
         return list(map(lambda key: key.with_predicate(predicate), self._keys))
 
-    def create(self, options: dict, builder: DeclarativeBuilder):
-        return self._schema_class(**options)
+    def create(self, options: dict, builder: DeclarativeBuilder) -> Schema:
+        return self._schema_class(**options)  # type: ignore
 
 
 class DictDeclarativeSchemaFabric:
