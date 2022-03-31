@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from typing import Type
+from typing import Any, Mapping, Type
 
 from goodboy.types.dates import Date, DateTime
 from goodboy.types.variants import AnyOf
@@ -21,31 +21,31 @@ from goodboy.types.simple import AnyValue, Bool, NoneValue, Str
 
 
 class DeclarativeSchemaFabric(Protocol):
-    def option_dict_keys(self, schema_name: str, full_schema: Schema):
+    def option_dict_keys(self, schema_name: str, full_schema: Schema) -> list[Key]:
         ...
 
-    def create(self, options: dict, builder: DeclarativeBuilder):
+    def create(self, options: dict[str, Any], builder: DeclarativeBuilder) -> Schema:
         ...
 
 
 class SimpleDeclarativeSchemaFabric:
-    def __init__(self, schema_class: Type[Schema], keys=[]):
+    def __init__(self, schema_class: Type[Schema], keys: list[Key] = []) -> None:
         self._schema_class = schema_class
         self._keys = keys
 
-    def option_dict_keys(self, schema_name: str, full_schema: Schema):
-        def predicate(value):
+    def option_dict_keys(self, schema_name: str, full_schema: Schema) -> list[Key]:
+        def predicate(value: Mapping[str, Any]) -> bool:
             return value.get("type") == schema_name
 
         return list(map(lambda key: key.with_predicate(predicate), self._keys))
 
-    def create(self, options: dict, builder: DeclarativeBuilder) -> Schema:
+    def create(self, options: dict[str, Any], builder: DeclarativeBuilder) -> Schema:
         return self._schema_class(**options)  # type: ignore
 
 
 class DictDeclarativeSchemaFabric:
-    def option_dict_keys(self, schema_name: str, full_schema: Schema):
-        def predicate(value):
+    def option_dict_keys(self, schema_name: str, full_schema: Schema) -> list[Key]:
+        def predicate(value: Mapping[str, Any]) -> bool:
             return value.get("type") == schema_name
 
         keys = [
@@ -73,7 +73,7 @@ class DictDeclarativeSchemaFabric:
 
         return list(map(lambda key: key.with_predicate(predicate), keys))
 
-    def create(self, options: dict, builder: DeclarativeBuilder):
+    def create(self, options: dict[str, Any], builder: DeclarativeBuilder) -> Schema:
         if options.get("keys"):
             keys = []
 
@@ -98,8 +98,8 @@ class DictDeclarativeSchemaFabric:
 
 
 class ListDeclarativeSchemaFabric:
-    def option_dict_keys(self, schema_name: str, full_schema: Schema):
-        def predicate(value):
+    def option_dict_keys(self, schema_name: str, full_schema: Schema) -> list[Key]:
+        def predicate(value: Mapping[str, Any]) -> bool:
             return value.get("type") == schema_name
 
         keys = [
@@ -114,7 +114,7 @@ class ListDeclarativeSchemaFabric:
 
         return list(map(lambda key: key.with_predicate(predicate), keys))
 
-    def create(self, options: dict, builder: DeclarativeBuilder):
+    def create(self, options: dict[str, Any], builder: DeclarativeBuilder) -> Schema:
         if options.get("item"):
             options["item"] = builder.build(options["item"], False)
 
@@ -125,8 +125,8 @@ class ListDeclarativeSchemaFabric:
 
 
 class AnyOfDeclarativeSchemaFabric:
-    def option_dict_keys(self, schema_name: str, full_schema: Schema):
-        def predicate(value):
+    def option_dict_keys(self, schema_name: str, full_schema: Schema) -> list[Key]:
+        def predicate(value: Mapping[str, Any]) -> bool:
             return value.get("type") == schema_name
 
         keys = [
@@ -137,7 +137,7 @@ class AnyOfDeclarativeSchemaFabric:
 
         return list(map(lambda key: key.with_predicate(predicate), keys))
 
-    def create(self, options: dict, builder: DeclarativeBuilder):
+    def create(self, options: dict[str, Any], builder: DeclarativeBuilder) -> Schema:
         options["schemas"] = list(map(builder.build, options["schemas"]))
         return AnyOf(**options)
 
@@ -270,7 +270,7 @@ _DEFAULT_DECLARATIVE_SCHEMA_FABRICS: dict[str, DeclarativeSchemaFabric] = {
 
 
 class DeclarationError(Exception):
-    def __init__(self, errors: list[Error]):
+    def __init__(self, errors: list[Error]) -> None:
         self.errors = errors
 
 
@@ -283,7 +283,9 @@ class DeclarativeBuilder:
     ):
         self._fabrics = fabrics
 
-    def build(self, declaration, validate=True, typecast=True) -> Schema:
+    def build(
+        self, declaration: dict[str, Any], validate: bool = True, typecast: bool = True
+    ) -> Schema:
         if validate:
             try:
                 declaration = self.validate(declaration, typecast=typecast)
@@ -298,11 +300,13 @@ class DeclarativeBuilder:
 
         return schema_fabric.create(declaration, self)
 
-    def validate(self, declaration, typecast=True):
+    def validate(
+        self, declaration: dict[str, Any], typecast: bool = True
+    ) -> dict[str, Any]:
         schema = self.declaration_schema()
         return schema(declaration, typecast=typecast)
 
-    def declaration_schema(self):
+    def declaration_schema(self) -> Dict:
         schema_names = list(self._fabrics.keys())
 
         schema = Dict(
@@ -323,5 +327,7 @@ class DeclarativeBuilder:
 DEFAULT_DECLARATIVE_BUILDER = DeclarativeBuilder()
 
 
-def build(declaration, validate=True, typecast=True):
+def build(
+    declaration: dict[str, Any], validate: bool = True, typecast: bool = True
+) -> Schema:
     return DEFAULT_DECLARATIVE_BUILDER.build(declaration, validate, typecast)

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Any, Optional, Union
 
+from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
 from goodboy.schema import Rule, Schema, SchemaError, SchemaWithUtils
 
@@ -36,13 +37,15 @@ class List(SchemaWithUtils):
         self._max_length = max_length
         self._length = length
 
-    def _validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(
+        self, value: Any, typecast: bool, context: dict[str, Any] = {}
+    ) -> tuple[Optional[list[Any]], list[Error]]:
         if not isinstance(value, list):
             return None, [
                 self._error("unexpected_type", {"expected_type": type_name("list")})
             ]
 
-        errors = []
+        errors: list[Error] = []
 
         if self._min_length is not None and len(value) < self._min_length:
             errors.append(self._error("too_short", {"value": self._min_length}))
@@ -54,7 +57,7 @@ class List(SchemaWithUtils):
             errors.append(self._error("invalid_length", {"value": self._length}))
 
         if self._item:
-            value_errors = {}
+            value_errors: dict[Union[str, int], list[Error]] = {}
             result_value = []
 
             for item_index, item_value in enumerate(value):
@@ -74,5 +77,7 @@ class List(SchemaWithUtils):
 
         return result_value, errors + rule_errors
 
-    def _typecast(self, input, context: dict = {}):
+    def _typecast(
+        self, input: Any, context: dict[str, Any] = {}
+    ) -> tuple[Optional[list[Any]], list[Error]]:
         return input, []

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Optional, Union
+from typing import Any, Optional, Union
 
 from goodboy.i18n import I18nLazyString, Translations, get_current_translations
 from goodboy.i18n import lazy_gettext as _
@@ -55,13 +55,17 @@ class Message:
     TODO: Link i18n documentation.
     """
 
-    def __init__(self, default, **other_formats):
+    def __init__(
+        self,
+        default: str | I18nLazyString,
+        **other_formats: str | I18nLazyString,
+    ) -> None:
         self._formats = {"default": default, **other_formats}
 
     def render(
         self,
         format: Optional[str] = None,
-        kwargs: dict = {},
+        kwargs: dict[str, Any] = {},
         translations: Optional[Translations] = None,
     ) -> str:
         """
@@ -98,13 +102,13 @@ class Message:
 
         return pattern.format(**kwargs)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, self.__class__):
             return self._formats == other._formats
 
         return super().__eq__(other)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         arguments = [repr(self._formats["default"])]
 
         for format, pattern in self._formats.items():
@@ -124,13 +128,19 @@ class MessageCollection:
         messages: dict[str, Union[Message, I18nLazyString, str]],
         parent: Optional["MessageCollection"] = None,
     ):
+        self._messages: dict[str, Message] = {}
+
         for code, message in messages.items():
             if isinstance(message, str):
-                messages[code] = Message(message)
+                self._messages[code] = Message(message)
             elif isinstance(message, dict):
-                messages[code] = Message(**message)
+                self._messages[code] = Message(**message)
+            elif isinstance(message, Message):
+                self._messages[code] = message
+            else:
+                type_ = type(message).__name__
+                raise TypeError(f"unsupported type for message collection: '{type_}'")
 
-        self._messages = messages
         self._parent = parent
 
     def get_message(self, code: str) -> Message:
@@ -139,13 +149,13 @@ class MessageCollection:
         except KeyError:
             return Message(code)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, self.__class__):
             return self._messages == other._messages and self._parent == other._parent
 
         return super().__eq__(other)
 
-    def __getitem__(self, code):
+    def __getitem__(self, code: str) -> Message:
         if code in self._messages:
             return self._messages[code]
 
@@ -156,7 +166,7 @@ class MessageCollection:
 
 
 MessageCollectionType = Union[
-    MessageCollection, Dict[str, Union[Message, I18nLazyString, str]]
+    MessageCollection, dict[str, Union[Message, I18nLazyString, str]]
 ]
 
 DEFAULT_MESSAGES = MessageCollection(
@@ -218,5 +228,5 @@ _TYPE_NAMES_LIST: list[Message] = [
 _TYPE_NAMES = MessageCollection({m.render(): m for m in _TYPE_NAMES_LIST})
 
 
-def type_name(python_type_name: str):
+def type_name(python_type_name: str) -> Message:
     return _TYPE_NAMES[python_type_name]

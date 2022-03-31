@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from datetime import date, datetime
-from typing import Generic, Optional, TypeVar, Union
+from typing import Any, Generic, Optional, TypeVar, Union
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
@@ -27,7 +27,7 @@ class DateBase(Generic[D], SchemaWithUtils):
         earlier_or_equal_to: Optional[Union[D, str]] = None,
         later_than: Optional[Union[D, str]] = None,
         later_or_equal_to: Optional[Union[D, str]] = None,
-        format: str = None,
+        format: Optional[str] = None,
         allowed: Optional[list[Union[D, str]]] = None,
     ):
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
@@ -44,7 +44,9 @@ class DateBase(Generic[D], SchemaWithUtils):
         else:
             self._allowed = None
 
-    def _validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(
+        self, value: Any, typecast: bool, context: dict[str, Any] = {}
+    ) -> tuple[Optional[D], list[Error]]:
         type_errors = self._validate_exact_type(value)
 
         if type_errors:
@@ -86,7 +88,7 @@ class DateBase(Generic[D], SchemaWithUtils):
         return self._typecast_option(input)
 
     @abstractmethod
-    def _validate_exact_type(self, value) -> list[Error]:
+    def _validate_exact_type(self, value: Any) -> list[Error]:
         ...
 
     @abstractmethod
@@ -116,7 +118,9 @@ class Date(DateBase[date]):
     :param allowed: Allow only certain values.
     """  # noqa: E501
 
-    def _typecast(self, input, context: dict = {}):
+    def _typecast(
+        self, input: Any, context: dict[str, Any] = {}
+    ) -> tuple[Optional[date], list[Error]]:
         if isinstance(input, date):
             return input, []
 
@@ -141,7 +145,7 @@ class Date(DateBase[date]):
         except ValueError:
             return None, [self._error("invalid_date_format")]
 
-    def _validate_exact_type(self, value) -> list[Error]:
+    def _validate_exact_type(self, value: Any) -> list[Error]:
         if not isinstance(value, date):
             return [
                 self._error("unexpected_type", {"expected_type": type_name("date")})
@@ -178,7 +182,9 @@ class DateTime(DateBase[datetime]):
     :param allowed: Allow only certain values.
     """  # noqa: E501
 
-    def _typecast(self, input, context: dict = {}):
+    def _typecast(
+        self, input: Any, context: dict[str, Any] = {}
+    ) -> tuple[Optional[datetime], list[Error]]:
         if isinstance(input, datetime):
             return input, []
 
@@ -203,7 +209,7 @@ class DateTime(DateBase[datetime]):
         except ValueError:
             return None, [self._error("invalid_datetime_format")]
 
-    def _validate_exact_type(self, value) -> list[Error]:
+    def _validate_exact_type(self, value: Any) -> list[Error]:
         if not isinstance(value, datetime):
             return [
                 self._error("unexpected_type", {"expected_type": type_name("datetime")})

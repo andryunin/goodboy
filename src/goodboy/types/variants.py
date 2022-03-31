@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from typing import Any
+
+from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType
 from goodboy.schema import Rule, Schema, SchemaError, SchemaWithUtils
 
@@ -25,7 +28,9 @@ class AnyOf(SchemaWithUtils):
         super().__init__(messages=messages, rules=rules)
         self._schemas = schemas
 
-    def __call__(self, value, *, typecast=False, context: dict = {}):
+    def __call__(
+        self, value: Any, *, typecast: bool = False, context: dict[str, Any] = {}
+    ) -> Any:
         value, errors = self._validate(value, typecast, context)
 
         if errors:
@@ -33,7 +38,9 @@ class AnyOf(SchemaWithUtils):
 
         return value
 
-    def _validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(
+        self, value: Any, typecast: bool, context: dict[str, Any] = {}
+    ) -> tuple[Any, list[Error]]:
         schema_errors = {}
         errors = []
 
@@ -51,5 +58,7 @@ class AnyOf(SchemaWithUtils):
 
         return value, errors + rule_errors
 
-    def _typecast(self, input, context: dict = {}):
+    def _typecast(
+        self, input: Any, context: dict[str, Any] = {}
+    ) -> tuple[Any, list[Error]]:
         raise NotImplementedError()

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, List, Tuple
+from typing import Any, Callable, List, Tuple, Union
 
-from goodboy.errors import DEFAULT_MESSAGES, Error
-from goodboy.messages import MessageCollection, MessageCollectionType
+from goodboy.errors import Error
+from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, MessageCollectionType
 
 
 class SchemaError(Exception):
@@ -14,14 +14,21 @@ class SchemaError(Exception):
 
 class Schema(ABC):
     @abstractmethod
-    def __call__(self, value, *, typecast=False, context: dict = {}):
+    def __call__(
+        self, value: Any, *, typecast: bool = False, context: dict[str, Any] = {}
+    ) -> Any:
         ...
 
 
 class SchemaErrorMixin:
     _messages: MessageCollection
 
-    def _error(self, code: str, args: dict = {}, nested_errors: dict = {}):
+    def _error(
+        self,
+        code: str,
+        args: dict[str, Any] = {},
+        nested_errors: dict[Union[str, int], list[Error]] = {},
+    ) -> Error:
         return Error(code, args, nested_errors, self._messages.get_message(code))
 
 
@@ -32,7 +39,7 @@ class SchemaRulesMixin:
     _rules: list[Rule]
 
     def _call_rules(
-        self, value: Any, typecast=False, context: dict = {}
+        self, value: Any, typecast: bool = False, context: dict[str, Any] = {}
     ) -> tuple[Any, list[Error]]:
         result_errors = []
 
@@ -50,7 +57,7 @@ class SchemaWithUtils(Schema, SchemaErrorMixin, SchemaRulesMixin):
         allow_none: bool = False,
         messages: MessageCollectionType = DEFAULT_MESSAGES,
         rules: list[Rule] = [],
-    ):
+    ) -> None:
         self._allow_none = allow_none
 
         if isinstance(messages, MessageCollection):
@@ -60,7 +67,9 @@ class SchemaWithUtils(Schema, SchemaErrorMixin, SchemaRulesMixin):
 
         self._rules = rules
 
-    def __call__(self, value, *, typecast=False, context: dict = {}):
+    def __call__(
+        self, value: Any, *, typecast: bool = False, context: dict[str, Any] = {}
+    ) -> Any:
         if value is None:
             if not self._allow_none:
                 raise SchemaError([self._error("cannot_be_none")])
@@ -82,15 +91,17 @@ class SchemaWithUtils(Schema, SchemaErrorMixin, SchemaRulesMixin):
 
     @abstractmethod
     def _validate(
-        self, value: Any, typecast: bool, context: dict = {}
+        self, value: Any, typecast: bool, context: dict[str, Any] = {}
     ) -> tuple[Any, list[Error]]:
         ...
 
     @abstractmethod
-    def _typecast(self, input: Any, context: dict = {}) -> tuple[Any, list[Error]]:
+    def _typecast(
+        self, input: Any, context: dict[str, Any] = {}
+    ) -> tuple[Any, list[Error]]:
         ...
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
 

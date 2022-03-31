@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Generic, Optional, TypeVar
+from typing import Any, Generic, Optional, TypeVar
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
@@ -35,7 +35,9 @@ class NumericBase(Generic[N], SchemaWithUtils):
         self._greater_or_equal_to = greater_or_equal_to
         self._allowed = allowed
 
-    def _validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(
+        self, value: Any, typecast: bool, context: dict[str, Any] = {}
+    ) -> tuple[Optional[N], list[Error]]:
         value, type_errors = self._validate_exact_type(value)
 
         if type_errors:
@@ -71,7 +73,7 @@ class NumericBase(Generic[N], SchemaWithUtils):
         return value, errors + rule_errors
 
     @abstractmethod
-    def _validate_exact_type(self, value) -> tuple[N, list[Error]]:
+    def _validate_exact_type(self, value: Any) -> tuple[Optional[N], list[Error]]:
         ...
 
 
@@ -94,7 +96,9 @@ class Float(NumericBase[float]):
     :param allowed: Allow only certain values.
     """
 
-    def _typecast(self, input, context: dict = {}):
+    def _typecast(
+        self, input: Any, context: dict[str, Any] = {}
+    ) -> tuple[Optional[float], list[Error]]:
         if isinstance(input, float):
             return input, []
 
@@ -111,7 +115,7 @@ class Float(NumericBase[float]):
         except ValueError:
             return None, [self._error("invalid_numeric_format")]
 
-    def _validate_exact_type(self, value):
+    def _validate_exact_type(self, value: Any) -> tuple[Optional[float], list[Error]]:
         if isinstance(value, float):
             return value, []
         elif isinstance(value, int):
@@ -141,7 +145,9 @@ class Int(NumericBase[int]):
     :param allowed: Allow only certain values.
     """
 
-    def _typecast(self, input, context: dict = {}):
+    def _typecast(
+        self, input: Any, context: dict[str, Any] = {}
+    ) -> tuple[Optional[int], list[Error]]:
         if isinstance(input, int):
             return input, []
 
@@ -155,7 +161,7 @@ class Int(NumericBase[int]):
         except ValueError:
             return None, [self._error("invalid_integer_format")]
 
-    def _validate_exact_type(self, value):
+    def _validate_exact_type(self, value: Any) -> tuple[Optional[int], list[Error]]:
         if not isinstance(value, int):
             return None, [
                 self._error("unexpected_type", {"expected_type": type_name("int")})

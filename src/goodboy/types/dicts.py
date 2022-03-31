@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Mapping, Optional
+from typing import Any, Callable, Mapping, Optional, Union
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
@@ -31,13 +31,13 @@ class Key:
         self._schema = schema
         self._predicate = predicate
 
-    def predicate_result(self, prev_values: Mapping[str, Any]):
+    def predicate_result(self, prev_values: Mapping[str, Any]) -> bool:
         if self._predicate:
             return self._predicate(prev_values)
         else:
             return True
 
-    def validate(self, value, typecast: bool, context: dict):
+    def validate(self, value: Any, typecast: bool, context: dict[str, Any]) -> Any:
         if self._schema:
             return self._schema(value, typecast=typecast, context=context)
         else:
@@ -46,7 +46,7 @@ class Key:
     def with_predicate(self, predicate: Callable[[Mapping[str, Any]], bool]) -> Key:
         return Key(self.name, self._schema, required=self.required, predicate=predicate)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
 
@@ -77,18 +77,20 @@ class Dict(SchemaWithUtils):
         key_schema: Optional[Str] = None,
         value_schema: Optional[Schema] = None,
         keys_required_by_default: bool = True,
-    ):
+    ) -> None:
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
         self._keys = keys
         self._keys_required_by_default = keys_required_by_default
         self._key_schema = key_schema
         self._value_schema = value_schema
 
-    def append_key(self, key: Key):
+    def append_key(self, key: Key) -> None:
         self._keys = self._keys or []
         self._keys.append(key)
 
-    def _validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(
+        self, value: Any, typecast: bool, context: dict[str, Any] = {}
+    ) -> tuple[Optional[dict[str, Any]], list[Error]]:
         if not isinstance(value, dict):
             return None, [
                 self._error("unexpected_type", {"expected_type": type_name("dict")})
@@ -148,12 +150,19 @@ class Dict(SchemaWithUtils):
 
         return result_value, errors + rule_errors
 
-    def _validate_keys(self, value, typecast: bool, context: dict):
+    def _validate_keys(
+        self, value: dict[str, Any], typecast: bool, context: dict[str, Any]
+    ) -> tuple[
+        dict[str, Any],
+        dict[Union[str, int], list[Error]],
+        dict[Union[str, int], list[Error]],
+        list[str],
+    ]:
         assert self._keys is not None
 
-        result_value: dict = {}
-        result_key_errors = {}
-        result_value_errors = {}
+        result_value: dict[str, Any] = {}
+        result_key_errors: dict[Union[str, int], list[Error]] = {}
+        result_value_errors: dict[Union[str, int], list[Error]] = {}
 
         unknown_keys = list(value.keys())
 
@@ -182,12 +191,16 @@ class Dict(SchemaWithUtils):
         return result_value, result_key_errors, result_value_errors, unknown_keys
 
     def _validate_keys_by_schema(
-        self, value, key_names: list[str], typecast: bool, context: dict
-    ) -> tuple[dict, dict[str, list[Error]]]:
+        self,
+        value: dict[str, Any],
+        key_names: list[str],
+        typecast: bool,
+        context: dict[str, Any],
+    ) -> tuple[dict[str, Any], dict[Union[str, int], list[Error]]]:
         assert self._key_schema is not None
 
-        result_value = {}
-        result_errors = {}
+        result_value: dict[str, Any] = {}
+        result_errors: dict[Union[str, int], list[Error]] = {}
 
         for key_name in key_names:
             try:
@@ -201,12 +214,16 @@ class Dict(SchemaWithUtils):
         return result_value, result_errors
 
     def _validate_values_by_schema(
-        self, value, key_names: list[str], typecast: bool, context: dict
-    ):
+        self,
+        value: dict[str, Any],
+        key_names: list[str],
+        typecast: bool,
+        context: dict[str, Any],
+    ) -> tuple[dict[str, Any], dict[Union[str, int], list[Error]]]:
         assert self._value_schema is not None
 
-        result_value = {}
-        result_errors = {}
+        result_value: dict[str, Any] = {}
+        result_errors: dict[Union[str, int], list[Error]] = {}
 
         for key_name in key_names:
             try:
@@ -220,5 +237,7 @@ class Dict(SchemaWithUtils):
 
         return result_value, result_errors
 
-    def _typecast(self, input, context: dict = {}):
+    def _typecast(
+        self, input: Any, context: dict[str, Any] = {}
+    ) -> tuple[Any, list[Error]]:
         return input, []

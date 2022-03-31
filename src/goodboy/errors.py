@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional, Union
 
 from goodboy.i18n import I18nLazyString, Translations
-from goodboy.messages import DEFAULT_MESSAGES, Message, MessageCollection
+from goodboy.messages import DEFAULT_MESSAGES, Message
 
 
 class Error:
@@ -28,10 +28,10 @@ class Error:
     def __init__(
         self,
         code: str,
-        args: dict = {},
-        nested_errors: dict[str, list[Error]] = {},
+        args: dict[str, Any] = {},
+        nested_errors: dict[Union[str, int], list[Error]] = {},
         message: Optional[Union[Message, str, I18nLazyString]] = None,
-    ):
+    ) -> None:
         self.code = code
         self.args = args
         self.nested_errors = nested_errors
@@ -47,7 +47,7 @@ class Error:
 
     def get_message(
         self, format: Optional[str] = None, translations: Optional[Translations] = None
-    ):
+    ) -> str:
         """
         Get message specified for input format and translated with specified
         :class:`~goodboy.i18n.Translations` instance.
@@ -62,17 +62,17 @@ class Error:
         return self._message.render(format, format_kwargs, translations)
 
     @property
-    def message(self):
+    def message(self) -> str:
         """
         Get message for default format and translated to default language.
         """
 
         return self.get_message()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.code
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         arguments = [
             repr(self.code),
             repr(self.args),
@@ -83,7 +83,7 @@ class Error:
 
         return f"Error({arguments_repr})"
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, self.__class__):
             return (
                 self.code == other.code
@@ -97,21 +97,21 @@ class Error:
 
 class ErrorFormatter(ABC):
     @abstractmethod
-    def format(self, errors: list[Error]):
+    def format(self, errors: list[Error]) -> Any:
         ...
 
 
 class I18nErrorFormatter(ErrorFormatter):
     @abstractmethod
-    def __init__(self, translations: Optional[Translations] = None):
+    def __init__(self, translations: Optional[Translations] = None) -> None:
         self._translations = translations
 
 
 class JSONErrorFormatter(I18nErrorFormatter):
-    def __init__(self, translations: Optional[Translations] = None):
+    def __init__(self, translations: Optional[Translations] = None) -> None:
         super().__init__(translations)
 
-    def format(self, errors: list[Error]):
+    def format(self, errors: list[Error]) -> list[dict[str, Any]]:
         result = []
 
         for error in errors:
@@ -119,18 +119,19 @@ class JSONErrorFormatter(I18nErrorFormatter):
 
         return result
 
-    def _format_error(self, error: Error):
-        args: dict[Any, Any] = {}
+    def _format_error(self, error: Error) -> dict[str, Any]:
+        args: dict[str, Any] = {}
 
-        for key, value in error.args.items():
-            args[key] = self._format_argument_value(value)
+        for arg_key, arg_value in error.args.items():
+            args[arg_key] = self._format_argument_value(arg_value)
 
-        formatted_nested_errors: dict[Any, Any] = {}
+        # formatted_nested_errors: Union[dict[str, Any], dict[int, Any]] = {}
+        formatted_nested_errors: dict[Union[str, int], list[dict[str, Any]]] = {}
 
-        for key, nested_errors in error.nested_errors.items():
-            formatted_nested_errors[key] = self.format(nested_errors)
+        for nested_key, nested_errors in error.nested_errors.items():
+            formatted_nested_errors[nested_key] = self.format(nested_errors)
 
-        result = {
+        result: dict[str, Any] = {
             "code": error.code,
             "message": error.get_message("json", self._translations),
         }
@@ -143,7 +144,7 @@ class JSONErrorFormatter(I18nErrorFormatter):
 
         return result
 
-    def _format_argument_value(self, value):
+    def _format_argument_value(self, value: Any) -> Any:
         if isinstance(value, str):
             return value
         elif isinstance(value, int):
@@ -151,7 +152,7 @@ class JSONErrorFormatter(I18nErrorFormatter):
         elif isinstance(value, float):
             return value
         elif isinstance(value, Message):
-            return value.render("json", self._translations)
+            return value.render("json", translations=self._translations)
         elif isinstance(value, list):
             return [self._format_argument_value(v) for v in value]
         else:
@@ -162,11 +163,11 @@ class TextErrorFormatter(I18nErrorFormatter):
     def __init__(self, translations: Optional[Translations] = None):
         super().__init__(translations)
 
-    def format(self, errors: list[Error]):
+    def format(self, errors: list[Error]) -> str:
         lines = self._format_level(errors, 0)
         return "\n".join(lines)
 
-    def _format_level(self, errors: list[Error], level):
+    def _format_level(self, errors: list[Error], level: int) -> list[str]:
         lines = []
 
         for error in errors:
@@ -188,7 +189,7 @@ class TextErrorFormatter(I18nErrorFormatter):
 
         return lines
 
-    def _indent(self, level):
+    def _indent(self, level: int) -> str:
         return "    " * level
 
 

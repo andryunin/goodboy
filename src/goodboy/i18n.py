@@ -23,10 +23,10 @@ class Translations(Protocol):
     :func:`load_default_messages`).
     """
 
-    def gettext(self, message: str):
+    def gettext(self, message: str) -> str:
         ...
 
-    def ngettext(self, singular: str, plural: str, number: int):
+    def ngettext(self, singular: str, plural: str, number: int) -> str:
         ...
 
 
@@ -38,7 +38,7 @@ def default_messages_path() -> Path:
     return Path(__file__).joinpath("..", "locale").resolve()
 
 
-def load_default_messages(languages: Iterable[str] = None) -> Translations:
+def load_default_messages(languages: Optional[Iterable[str]] = None) -> Translations:
     """
     Get translations object (instance of ``gettext.GNUTranslations``) with included
     messages.
@@ -55,7 +55,7 @@ class I18nLoader:
     Cached loader for included messages.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._cache: dict[tuple[str, ...], Translations] = {}
 
     def get_translations(self, languages: Iterable[str]) -> Translations:
@@ -90,12 +90,12 @@ class I18nLazyString:
 
         return translations.gettext(self._message)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         message_repr = repr(self._message)
         return f"_({message_repr})"
 
 
-def lazy_gettext(message) -> I18nLazyString:
+def lazy_gettext(message: str) -> I18nLazyString:
     """
     Lazy version of gettext. Returns :class:`I18nLazyString`.
     """
@@ -106,13 +106,21 @@ def lazy_gettext(message) -> I18nLazyString:
 _process_locale: Optional[list[str]]
 _process_translations: Translations
 
-_thread_locale = threading.local()
+
+class ThreadingLocalLocale(threading.local):
+    def __init__(self) -> None:
+        self.locale: Optional[list[str]] = None
+        self.locale_is_set: bool = False
+        self.translations: Optional[Translations] = None
+
+
+_thread_locale = ThreadingLocalLocale()
 
 
 def set_process_locale(
     languages: Optional[list[str]],
     translations: Optional[Translations] = None,
-):
+) -> None:
     """
     Set locale for process. If translations is ``None``, default messages are
     loaded. If included messages not found for specified languages, NullTranslations
@@ -142,7 +150,7 @@ def set_process_locale(
 def set_thread_locale(
     languages: Optional[list[str]],
     translations: Optional[Translations] = None,
-):
+) -> None:
     """
     Set locale for current thread. If translations is ``None``, default messages
     are lazy loaded on first message translation. If included messages not found for

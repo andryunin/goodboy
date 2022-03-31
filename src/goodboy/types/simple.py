@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any, Optional, Pattern, Union
 
+from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
 from goodboy.schema import Rule, SchemaWithUtils
 
@@ -24,11 +25,13 @@ class AnyValue(SchemaWithUtils):
         messages: MessageCollectionType = DEFAULT_MESSAGES,
         rules: list[Rule] = [],
         allowed: Optional[list[Any]] = None,
-    ):
+    ) -> None:
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
         self._allowed = allowed
 
-    def _validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(
+        self, value: Any, typecast: bool, context: dict[str, Any] = {}
+    ) -> tuple[Any, list[Error]]:
         if self._allowed is not None and value not in self._allowed:
             return None, [self._error("not_allowed")]
 
@@ -36,7 +39,9 @@ class AnyValue(SchemaWithUtils):
 
         return value, rule_errors
 
-    def _typecast(self, input, context: dict = {}):
+    def _typecast(
+        self, input: Any, context: dict[str, Any] = {}
+    ) -> tuple[Any, list[Error]]:
         return input, []
 
 
@@ -53,10 +58,12 @@ class NoneValue(SchemaWithUtils):
         *,
         messages: MessageCollectionType = DEFAULT_MESSAGES,
         rules: list[Rule] = [],
-    ):
+    ) -> None:
         super().__init__(allow_none=True, messages=messages, rules=rules)
 
-    def _validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(
+        self, value: Any, typecast: bool, context: dict[str, Any] = {}
+    ) -> tuple[None, list[Error]]:
         if value is not None:
             return None, [self._error("must_be_none")]
 
@@ -64,7 +71,9 @@ class NoneValue(SchemaWithUtils):
 
         return value, rule_errors
 
-    def _typecast(self, input, context: dict = {}):
+    def _typecast(
+        self, input: Any, context: dict[str, Any] = {}
+    ) -> tuple[None, list[Error]]:
         return input, []
 
 
@@ -103,7 +112,7 @@ class Str(SchemaWithUtils):
         pattern: Union[str, Pattern[str], None] = None,
         is_regex: bool = False,
         allowed: Optional[list[str]] = None,
-    ):
+    ) -> None:
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
         self._allow_blank = allow_blank
         self._min_length = min_length
@@ -120,7 +129,9 @@ class Str(SchemaWithUtils):
         self._is_regex = is_regex
         self._allowed = allowed
 
-    def _validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(
+        self, value: Any, typecast: bool, context: dict[str, Any] = {}
+    ) -> tuple[Optional[str], list[Error]]:
         if not isinstance(value, str):
             return None, [
                 self._error("unexpected_type", {"expected_type": type_name("str")})
@@ -159,7 +170,9 @@ class Str(SchemaWithUtils):
 
         return value, errors + rule_errors
 
-    def _typecast(self, input, context: dict = {}):
+    def _typecast(
+        self, input: Any, context: dict[str, Any] = {}
+    ) -> tuple[Optional[str], list[Error]]:
         # Any python object usually can be casted to string, so casting any value to
         # string is too dangerous
         if isinstance(input, str):
@@ -190,14 +203,16 @@ class Bool(SchemaWithUtils):
         only_false: bool = False,
         only_true: bool = False,
         cast_anything: bool = False,
-    ):
+    ) -> None:
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)
         self._only_false = only_false
         self._only_true = only_true
         # TODO: override cast_anything in validation context
         self._cast_anything = cast_anything
 
-    def _validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(
+        self, value: Any, typecast: bool, context: dict[str, Any] = {}
+    ) -> tuple[Optional[bool], list[Error]]:
         if not isinstance(value, bool):
             return None, [
                 self._error("unexpected_type", {"expected_type": type_name("bool")})
@@ -215,7 +230,9 @@ class Bool(SchemaWithUtils):
 
         return value, errors + rule_errors
 
-    def _typecast(self, input, context: dict = {}):
+    def _typecast(
+        self, input: Any, context: dict[str, Any] = {}
+    ) -> tuple[Optional[bool], list[Error]]:
         if isinstance(input, bool):
             return input, []
 

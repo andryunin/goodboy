@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+from typing import Any, Callable, Optional
+
+from goodboy.errors import Error
 from goodboy.schema import SchemaWithUtils
 
 
@@ -10,7 +15,9 @@ class CallableValue(SchemaWithUtils):
     :param rules: Custom validation rules.
     """
 
-    def _validate(self, value, typecast: bool, context: dict = {}):
+    def _validate(
+        self, value: Any, typecast: bool, context: dict[str, Any] = {}
+    ) -> tuple[Optional[Callable[..., Any]], list[Error]]:
         errors = []
 
         if not callable(value):
@@ -20,5 +27,7 @@ class CallableValue(SchemaWithUtils):
 
         return value, errors + rule_errors
 
-    def _typecast(self, input, context: dict = {}):
+    def _typecast(
+        self, input: Any, context: dict[str, Any] = {}
+    ) -> tuple[Any, list[Error]]:
         return input, []
