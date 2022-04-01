@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from goodboy.i18n import I18nLazyString, Translations, get_current_translations
 from goodboy.i18n import lazy_gettext as _
@@ -166,7 +166,7 @@ class MessageCollection:
 
 
 MessageCollectionType = Union[
-    MessageCollection, dict[str, Union[Message, I18nLazyString, str]]
+    MessageCollection, Dict[str, Union[Message, I18nLazyString, str]]
 ]
 
 DEFAULT_MESSAGES = MessageCollection(
