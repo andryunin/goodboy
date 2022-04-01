@@ -15,6 +15,7 @@ class Key:
     :param name: Key name.
     :param schema: Value schema.
     :param required: Is key required.
+    :param defaukt: Default key value.
     :param predicate: Key is allowed only if predicate returns true.
     """
 
@@ -24,10 +25,15 @@ class Key:
         schema: Optional[Schema] = None,
         *,
         required: Optional[bool] = None,
+        default: Optional[Any] = None,
         predicate: Optional[Callable[[Mapping[str, Any]], bool]] = None,
     ):
+        if default and required:
+            raise ValueError("key with default value cannot be required")
+
         self.required = required
         self.name = name
+        self.default = default
         self._schema = schema
         self._predicate = predicate
 
@@ -179,6 +185,8 @@ class Dict(SchemaWithUtils):
                     result_value_errors[key.name] = e.errors
                 else:
                     result_value[key.name] = key_value
+            elif key.default:
+                result_value[key.name] = key.default
             else:
                 if key.required is not None:
                     key_required = key.required

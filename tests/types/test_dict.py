@@ -90,6 +90,21 @@ def test_rejects_unknown_key():
         schema({"oops": True})
 
 
+def test_returns_default_value_for_absent_key():
+    schema = Dict(keys=[Key("default_key", default="foo")])
+    assert schema({}) == {"default_key": "foo"}
+
+
+def test_ignores_default_value_for_present_key_with_none_value():
+    schema = Dict(keys=[Key("default_key", default="foo")])
+    assert schema({"default_key": None}) == {"default_key": None}
+
+
+def test_key_cannot_has_default_value_and_be_required():
+    with pytest.raises(ValueError):
+        Key("key_name", default=1, required=True)
+
+
 def test_accepts_any_key_when_no_keys_specified():
     schema = Dict()
     good_value = {"hello": "world", "the_answer": 42}
