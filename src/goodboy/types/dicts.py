@@ -5,7 +5,6 @@ from typing import Any, Callable, Mapping, Optional, Union
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
 from goodboy.schema import Rule, Schema, SchemaError, SchemaWithUtils
-from goodboy.types.simple import Str
 
 
 class Key:
@@ -21,7 +20,7 @@ class Key:
     def __init__(
         self,
         name: str,
-        schema: Optional[Schema] = None,
+        schema: Optional[Schema[Any]] = None,
         *,
         required: Optional[bool] = None,
         predicate: Optional[Callable[[Mapping[str, Any]], bool]] = None,
@@ -54,7 +53,7 @@ class Key:
 
 
 # TODO: maybe support non string keys?
-class Dict(SchemaWithUtils):
+class Dict(SchemaWithUtils["dict[str, Any]"]):
     """
     Accept ``dict`` value. Only string keys supported.
 
@@ -74,8 +73,8 @@ class Dict(SchemaWithUtils):
         messages: MessageCollectionType = DEFAULT_MESSAGES,
         rules: list[Rule] = [],
         keys: Optional[list[Key]] = None,
-        key_schema: Optional[Str] = None,
-        value_schema: Optional[Schema] = None,
+        key_schema: Optional[Schema[str]] = None,
+        value_schema: Optional[Schema[Any]] = None,
         keys_required_by_default: bool = True,
     ) -> None:
         super().__init__(allow_none=allow_none, messages=messages, rules=rules)

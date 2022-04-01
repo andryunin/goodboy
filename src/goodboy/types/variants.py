@@ -7,7 +7,7 @@ from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType
 from goodboy.schema import Rule, Schema, SchemaError, SchemaWithUtils
 
 
-class AnyOf(SchemaWithUtils):
+class AnyOf(SchemaWithUtils[Any]):
     """
     Accept value matches any of specified schemas, taking into account ``allow_none``
     option.
@@ -20,7 +20,7 @@ class AnyOf(SchemaWithUtils):
 
     def __init__(
         self,
-        schemas: list[Schema],
+        schemas: list[Schema[Any]],
         *,
         messages: MessageCollectionType = DEFAULT_MESSAGES,
         rules: list[Rule] = [],

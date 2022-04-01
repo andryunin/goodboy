@@ -7,7 +7,7 @@ from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
 from goodboy.schema import Rule, Schema, SchemaError, SchemaWithUtils
 
 
-class List(SchemaWithUtils):
+class List(SchemaWithUtils["list[Any]"]):
     """
     Accept ``list`` value.
 
@@ -26,7 +26,7 @@ class List(SchemaWithUtils):
         allow_none: bool = False,
         messages: MessageCollectionType = DEFAULT_MESSAGES,
         rules: list[Rule] = [],
-        item: Optional[Schema] = None,
+        item: Optional[Schema[Any]] = None,
         min_length: Optional[int] = None,
         max_length: Optional[int] = None,
         length: Optional[int] = None,

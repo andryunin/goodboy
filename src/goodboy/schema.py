@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import Any, Callable, List, Tuple, Union
+from abc import abstractmethod
+from typing import Any, Callable, Generic, List, Optional, Tuple, TypeVar, Union
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, MessageCollectionType
@@ -12,11 +12,14 @@ class SchemaError(Exception):
         self.errors = errors
 
 
-class Schema(ABC):
+T = TypeVar("T")
+
+
+class Schema(Generic[T]):
     @abstractmethod
     def __call__(
         self, value: Any, *, typecast: bool = False, context: dict[str, Any] = {}
-    ) -> Any:
+    ) -> Optional[T]:
         ...
 
 
@@ -50,7 +53,7 @@ class SchemaRulesMixin:
         return value, result_errors
 
 
-class SchemaWithUtils(Schema, SchemaErrorMixin, SchemaRulesMixin):
+class SchemaWithUtils(Schema[T], SchemaErrorMixin, SchemaRulesMixin):
     def __init__(
         self,
         *,
@@ -69,7 +72,7 @@ class SchemaWithUtils(Schema, SchemaErrorMixin, SchemaRulesMixin):
 
     def __call__(
         self, value: Any, *, typecast: bool = False, context: dict[str, Any] = {}
-    ) -> Any:
+    ) -> Optional[T]:
         if value is None:
             if not self._allow_none:
                 raise SchemaError([self._error("cannot_be_none")])
@@ -82,17 +85,17 @@ class SchemaWithUtils(Schema, SchemaErrorMixin, SchemaRulesMixin):
             if errors:
                 raise SchemaError(errors)
 
-        value, errors = self._validate(value, typecast, context)
+        result_value, errors = self._validate(value, typecast, context)
 
         if errors:
             raise SchemaError(errors)
 
-        return value
+        return result_value
 
     @abstractmethod
     def _validate(
         self, value: Any, typecast: bool, context: dict[str, Any] = {}
-    ) -> tuple[Any, list[Error]]:
+    ) -> tuple[Optional[T], list[Error]]:
         ...
 
     @abstractmethod

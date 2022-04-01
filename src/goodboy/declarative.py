@@ -21,30 +21,34 @@ from goodboy.types.simple import AnyValue, Bool, NoneValue, Str
 
 
 class DeclarativeSchemaFabric(Protocol):
-    def option_dict_keys(self, schema_name: str, full_schema: Schema) -> list[Key]:
+    def option_dict_keys(self, schema_name: str, full_schema: Dict) -> list[Key]:
         ...
 
-    def create(self, options: dict[str, Any], builder: DeclarativeBuilder) -> Schema:
+    def create(
+        self, options: dict[str, Any], builder: DeclarativeBuilder
+    ) -> Schema[Any]:
         ...
 
 
 class SimpleDeclarativeSchemaFabric:
-    def __init__(self, schema_class: Type[Schema], keys: list[Key] = []) -> None:
+    def __init__(self, schema_class: Type[Schema[Any]], keys: list[Key] = []) -> None:
         self._schema_class = schema_class
         self._keys = keys
 
-    def option_dict_keys(self, schema_name: str, full_schema: Schema) -> list[Key]:
+    def option_dict_keys(self, schema_name: str, full_schema: Dict) -> list[Key]:
         def predicate(value: Mapping[str, Any]) -> bool:
             return value.get("type") == schema_name
 
         return list(map(lambda key: key.with_predicate(predicate), self._keys))
 
-    def create(self, options: dict[str, Any], builder: DeclarativeBuilder) -> Schema:
+    def create(
+        self, options: dict[str, Any], builder: DeclarativeBuilder
+    ) -> Schema[Any]:
         return self._schema_class(**options)  # type: ignore
 
 
 class DictDeclarativeSchemaFabric:
-    def option_dict_keys(self, schema_name: str, full_schema: Schema) -> list[Key]:
+    def option_dict_keys(self, schema_name: str, full_schema: Dict) -> list[Key]:
         def predicate(value: Mapping[str, Any]) -> bool:
             return value.get("type") == schema_name
 
@@ -73,7 +77,9 @@ class DictDeclarativeSchemaFabric:
 
         return list(map(lambda key: key.with_predicate(predicate), keys))
 
-    def create(self, options: dict[str, Any], builder: DeclarativeBuilder) -> Schema:
+    def create(
+        self, options: dict[str, Any], builder: DeclarativeBuilder
+    ) -> Schema[Any]:
         if options.get("keys"):
             keys = []
 
@@ -98,7 +104,7 @@ class DictDeclarativeSchemaFabric:
 
 
 class ListDeclarativeSchemaFabric:
-    def option_dict_keys(self, schema_name: str, full_schema: Schema) -> list[Key]:
+    def option_dict_keys(self, schema_name: str, full_schema: Dict) -> list[Key]:
         def predicate(value: Mapping[str, Any]) -> bool:
             return value.get("type") == schema_name
 
@@ -114,7 +120,9 @@ class ListDeclarativeSchemaFabric:
 
         return list(map(lambda key: key.with_predicate(predicate), keys))
 
-    def create(self, options: dict[str, Any], builder: DeclarativeBuilder) -> Schema:
+    def create(
+        self, options: dict[str, Any], builder: DeclarativeBuilder
+    ) -> Schema[Any]:
         if options.get("item"):
             options["item"] = builder.build(options["item"], False)
 
@@ -125,7 +133,7 @@ class ListDeclarativeSchemaFabric:
 
 
 class AnyOfDeclarativeSchemaFabric:
-    def option_dict_keys(self, schema_name: str, full_schema: Schema) -> list[Key]:
+    def option_dict_keys(self, schema_name: str, full_schema: Dict) -> list[Key]:
         def predicate(value: Mapping[str, Any]) -> bool:
             return value.get("type") == schema_name
 
@@ -137,7 +145,9 @@ class AnyOfDeclarativeSchemaFabric:
 
         return list(map(lambda key: key.with_predicate(predicate), keys))
 
-    def create(self, options: dict[str, Any], builder: DeclarativeBuilder) -> Schema:
+    def create(
+        self, options: dict[str, Any], builder: DeclarativeBuilder
+    ) -> Schema[Any]:
         options["schemas"] = list(map(builder.build, options["schemas"]))
         return AnyOf(**options)
 
@@ -285,7 +295,7 @@ class DeclarativeBuilder:
 
     def build(
         self, declaration: dict[str, Any], validate: bool = True, typecast: bool = True
-    ) -> Schema:
+    ) -> Schema[Any]:
         if validate:
             try:
                 declaration = self.validate(declaration, typecast=typecast)
@@ -329,5 +339,5 @@ DEFAULT_DECLARATIVE_BUILDER = DeclarativeBuilder()
 
 def build(
     declaration: dict[str, Any], validate: bool = True, typecast: bool = True
-) -> Schema:
+) -> Schema[Any]:
     return DEFAULT_DECLARATIVE_BUILDER.build(declaration, validate, typecast)

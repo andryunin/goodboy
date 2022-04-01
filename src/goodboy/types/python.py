@@ -6,7 +6,7 @@ from goodboy.errors import Error
 from goodboy.schema import SchemaWithUtils
 
 
-class CallableValue(SchemaWithUtils):
+class CallableValue(SchemaWithUtils[Callable[..., Any]]):
     """
     Accept callable python objects.
 

@@ -10,7 +10,7 @@ from goodboy.schema import Rule, SchemaWithUtils
 N = TypeVar("N")
 
 
-class NumericBase(Generic[N], SchemaWithUtils):
+class NumericBase(SchemaWithUtils[N]):
     """
     Abstract base class for Int/Float schemas, should not be used directly. Use
     :class:`Int` or :class:`Float` instead.

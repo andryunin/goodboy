@@ -8,7 +8,7 @@ from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
 from goodboy.schema import Rule, SchemaWithUtils
 
 
-class AnyValue(SchemaWithUtils):
+class AnyValue(SchemaWithUtils[Any]):
     """
     Accept any values, taking into account ``allow_none`` and ``allowed`` options.
 
@@ -45,7 +45,7 @@ class AnyValue(SchemaWithUtils):
         return input, []
 
 
-class NoneValue(SchemaWithUtils):
+class NoneValue(SchemaWithUtils[None]):
     """
     Accept ``None`` values. Type casting is not performed.
 
@@ -77,7 +77,7 @@ class NoneValue(SchemaWithUtils):
         return input, []
 
 
-class Str(SchemaWithUtils):
+class Str(SchemaWithUtils[str]):
     """
     Accept ``str`` values.
 
@@ -183,7 +183,7 @@ class Str(SchemaWithUtils):
             ]
 
 
-class Bool(SchemaWithUtils):
+class Bool(SchemaWithUtils[bool]):
     """
     Accept ``bool`` values.
 
