@@ -304,7 +304,7 @@ class DeclarativeBuilder:
         self, declaration: dict[str, Any], typecast: bool = True
     ) -> dict[str, Any]:
         schema = self.declaration_schema()
-        return schema(declaration, typecast=typecast)
+        return schema(declaration, typecast=typecast)  # type: ignore
 
     def declaration_schema(self) -> Dict:
         schema_names = list(self._fabrics.keys())
