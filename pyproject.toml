@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "goodboy"
-version = "0.2.0"
+version = "0.2.1"
 description = "Data validation tool"
 license = "MIT"
 authors = ["Maxim Andryunin <maxim.andryunin@gmail.com>"]
