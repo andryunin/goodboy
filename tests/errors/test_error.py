@@ -26,3 +26,21 @@ def test_message_as_lazy_gettext_string():
 
     assert error.get_message() == error.message == "oops!"
     assert error.get_message("json") == "oops!"
+
+
+def test_merge_nested_errors_when_key_not_exists():
+    nested_errors = {"key": [Error("key_oops")]}
+
+    error = Error("oops")
+    error.merge_nested_errors(nested_errors)
+
+    assert error.nested_errors == nested_errors
+
+
+def test_merge_nested_errors_when_key_already_exists():
+    nested_errors = {"key": [Error("key_oops_2")]}
+
+    error = Error("oops", nested_errors={"key": [Error("key_oops_1")]})
+    error.merge_nested_errors(nested_errors)
+
+    assert error.nested_errors == {"key": [Error("key_oops_1"), Error("key_oops_2")]}

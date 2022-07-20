@@ -34,7 +34,7 @@ class Error:
     ) -> None:
         self.code = code
         self.args = args
-        self.nested_errors = nested_errors
+        self.nested_errors = nested_errors.copy()
 
         if message:
             if isinstance(message, Message):
@@ -68,6 +68,15 @@ class Error:
         """
 
         return self.get_message()
+
+    def merge_nested_errors(
+        self, nested_errors_to_merge: dict[Union[str, int], list[Error]] = {}
+    ) -> None:
+        for key, errors in nested_errors_to_merge.items():
+            if key in self.nested_errors:
+                self.nested_errors[key] += errors
+            else:
+                self.nested_errors[key] = errors
 
     def __str__(self) -> str:
         return self.code

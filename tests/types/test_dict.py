@@ -275,6 +275,56 @@ def test_ignores_rules_when_value_has_unexpected_type():
         schema(42)
 
 
+def test_merges_key_errors_from_rule_errors():
+    schema = Dict(
+        rules=[rule_with_key_errors],
+        key_schema=Str(length=3),
+    )
+
+    with assert_errors(
+        [
+            Error(
+                "key_errors",
+                nested_errors={
+                    "rule_key": [
+                        Error("invalid_string_length", {"value": 3}),
+                        Error("key_error_from_rule"),
+                    ],
+                    "non_rule_key": [
+                        Error("invalid_string_length", {"value": 3}),
+                    ],
+                },
+            )
+        ]
+    ):
+        schema({"non_rule_key": ..., "rule_key": ...})
+
+
+def test_merges_value_errors_from_rule_errors():
+    schema = Dict(
+        rules=[rule_with_value_errors],
+        value_schema=Str(length=3),
+    )
+
+    with assert_errors(
+        [
+            Error(
+                "value_errors",
+                nested_errors={
+                    "rule_key": [
+                        Error("invalid_string_length", {"value": 3}),
+                        Error("value_error_from_rule"),
+                    ],
+                    "non_rule_key": [
+                        Error("invalid_string_length", {"value": 3}),
+                    ],
+                },
+            )
+        ]
+    ):
+        schema({"non_rule_key": "oops", "rule_key": "oops"})
+
+
 def validate_keys_count_is_odd_and_add_bar_dict_key(
     self: Dict, value, typecast: bool, context: dict
 ):
@@ -282,3 +332,21 @@ def validate_keys_count_is_odd_and_add_bar_dict_key(
         return {**value, "bar": 1}, []
     else:
         return value, [self._error("key_count_is_not_odd")]
+
+
+def rule_with_key_errors(self: Dict, value, typecast: bool, context: dict):
+    return value, [
+        self._error(
+            "key_errors",
+            nested_errors={"rule_key": [self._error("key_error_from_rule")]},
+        )
+    ]
+
+
+def rule_with_value_errors(self: Dict, value, typecast: bool, context: dict):
+    return value, [
+        self._error(
+            "value_errors",
+            nested_errors={"rule_key": [self._error("value_error_from_rule")]},
+        ),
+    ]
