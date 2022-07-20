@@ -62,7 +62,9 @@ class List(SchemaWithUtils):
 
             for item_index, item_value in enumerate(value):
                 try:
-                    item_value = self._item(item_value, typecast=typecast)
+                    item_value = self._item(
+                        item_value, typecast=typecast, context=context
+                    )
                 except SchemaError as e:
                     value_errors[item_index] = e.errors
                 else:
