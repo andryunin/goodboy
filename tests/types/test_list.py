@@ -6,7 +6,7 @@ from goodboy.errors import Error
 from goodboy.messages import type_name
 from goodboy.types.dates import Date
 from goodboy.types.lists import List
-from goodboy.types.simple import AnyValue
+from goodboy.types.simple import AnyValue, Str
 from tests.conftest import assert_errors, assert_list_value_errors
 
 
@@ -154,6 +154,31 @@ def test_ignores_rules_when_value_has_unexpected_type():
         schema(42)
 
 
+def test_merges_value_errors_from_rule_errors():
+    schema = List(
+        rules=[rule_with_value_errors],
+        item=Str(length=3),
+    )
+
+    with assert_errors(
+        [
+            Error(
+                "value_errors",
+                nested_errors={
+                    0: [
+                        Error("invalid_string_length", {"value": 3}),
+                        Error("value_error_from_rule"),
+                    ],
+                    1: [
+                        Error("invalid_string_length", {"value": 3}),
+                    ],
+                },
+            )
+        ]
+    ):
+        schema(["oops", "oops"])
+
+
 def validate_value_length_is_odd_and_add_bar_list_item(
     self: List, value, typecast: bool, context: dict
 ):
@@ -161,3 +186,12 @@ def validate_value_length_is_odd_and_add_bar_list_item(
         return value + ["bar"], []
     else:
         return value, [self._error("length_is_not_odd")]
+
+
+def rule_with_value_errors(self: List, value, typecast: bool, context: dict):
+    return value, [
+        self._error(
+            "value_errors",
+            nested_errors={0: [self._error("value_error_from_rule")]},
+        ),
+    ]

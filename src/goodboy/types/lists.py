@@ -77,7 +77,22 @@ class List(SchemaWithUtils):
 
         result_value, rule_errors = self._call_rules(result_value, typecast, context)
 
-        return result_value, errors + rule_errors
+        self._merge_rule_errors(rule_errors, errors)
+
+        return result_value, errors
+
+    def _merge_rule_errors(self, rule_errors: list[Error], to: list[Error]):
+        for rule_error in rule_errors:
+            if rule_error.code != "value_errors":
+                to.append(rule_error)
+                continue
+
+            for to_error in to:
+                if to_error.code == rule_error.code:
+                    to_error.merge_nested_errors(rule_error.nested_errors)
+                    break
+            else:
+                to.append(rule_error)
 
     def _typecast(
         self, input: Any, context: dict[str, Any] = {}
