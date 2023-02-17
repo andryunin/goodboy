@@ -15,7 +15,7 @@ class Key:
     :param name: Key name.
     :param schema: Value schema.
     :param required: Is key required.
-    :param defaukt: Default key value.
+    :param default: Default key value.
     :param predicate: Key is allowed only if predicate returns true.
     """
 
