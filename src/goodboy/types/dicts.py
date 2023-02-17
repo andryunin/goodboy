@@ -201,7 +201,10 @@ class Dict(SchemaWithUtils):
                 else:
                     result_value[key.name] = key_value
             elif key.default:
-                result_value[key.name] = key.default
+                if callable(key.default):
+                    result_value[key.name] = key.default()
+                else:
+                    result_value[key.name] = key.default
             else:
                 if key.required is not None:
                     key_required = key.required

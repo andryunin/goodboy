@@ -95,6 +95,11 @@ def test_returns_default_value_for_absent_key():
     assert schema({}) == {"default_key": "foo"}
 
 
+def test_calls_callable_default_value_for_absent_key():
+    schema = Dict(keys=[Key("default_key", default=lambda: "foo")])
+    assert schema({}) == {"default_key": "foo"}
+
+
 def test_ignores_default_value_for_present_key_with_none_value():
     schema = Dict(keys=[Key("default_key", default="foo")])
     assert schema({"default_key": None}) == {"default_key": None}
