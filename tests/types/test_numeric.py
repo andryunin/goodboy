@@ -1,11 +1,11 @@
 import pytest
 
 from goodboy.errors import Error
-from goodboy.types.numeric import Float, Int
+from goodboy.types.numeric import DecimalSchema, Float, Int
 from tests.conftest import assert_errors, validate_value_is_42_and_double_it
 
 
-@pytest.mark.parametrize("type_class", [Int, Float])
+@pytest.mark.parametrize("type_class", [Int, Float, DecimalSchema])
 class TestNumeric:
     def test_accepts_none_when_none_allowed(self, type_class):
         schema = type_class(allow_none=True)

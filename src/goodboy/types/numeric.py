@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
+from decimal import Decimal, InvalidOperation
 from typing import Any, Generic, Optional, TypeVar
 
 from goodboy.errors import Error
@@ -123,6 +124,53 @@ class Float(NumericBase[float]):
         else:
             return None, [
                 self._error("unexpected_type", {"expected_type": type_name("float")})
+            ]
+
+
+class DecimalSchema(NumericBase[Decimal]):
+    """
+    Accept ``decimal`` values. Integer and float values are converted to decimals.
+
+    :param allow_none: If true, value is allowed to be ``None``.
+    :param messages: Override error messages.
+    :param rules: Custom validation rules.
+    :param less_than: Accept only values less than option value.
+    :param less_or_equal_to: Accept only values less than or equal to option value.
+    :param greater_than: Accept only values greater than option value.
+    :param greater_or_equal_to: Accept only values greater than or equal to option
+        value.
+    :param allowed: Allow only certain values.
+    """
+
+    def _typecast(
+        self, input: Any, context: dict[str, Any] = {}
+    ) -> tuple[Optional[Decimal], list[Error]]:
+        if isinstance(input, Decimal):
+            return input, []
+
+        if isinstance(input, int):
+            return Decimal(input), []
+
+        if not isinstance(input, str):
+            return None, [
+                self._error("unexpected_type", {"expected_type": type_name("decimal")})
+            ]
+
+        try:
+            return Decimal(input), []
+        except InvalidOperation:
+            return None, [self._error("invalid_numeric_format")]
+
+    def _validate_exact_type(self, value: Any) -> tuple[Optional[Decimal], list[Error]]:
+        if isinstance(value, Decimal):
+            return value, []
+        elif isinstance(value, int):
+            return Decimal(value), []
+        elif isinstance(value, float):
+            return Decimal(value), []
+        else:
+            return None, [
+                self._error("unexpected_type", {"expected_type": type_name("decimal")})
             ]
 
 

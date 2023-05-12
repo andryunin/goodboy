@@ -222,6 +222,7 @@ _TYPE_NAMES_LIST: list[Message] = [
     Message("datetime", json="string"),
     Message("int", json="integer"),
     Message("float", json="number"),
+    Message("decimal", json="number"),
     Message("bool", json="boolean"),
 ]
 

@@ -22,7 +22,7 @@ from goodboy.schema import (
 from goodboy.types.dates import Date, DateTime
 from goodboy.types.dicts import Dict, Key
 from goodboy.types.lists import List
-from goodboy.types.numeric import Float, Int
+from goodboy.types.numeric import DecimalSchema, Float, Int
 from goodboy.types.python import CallableValue
 from goodboy.types.simple import AnyValue, Bool, NoneValue, Str
 from goodboy.types.variants import AnyOf
@@ -37,6 +37,7 @@ __all__ = [
     "CallableValue",
     "Date",
     "DateTime",
+    "DecimalSchema",
     "DeclarativeBuilder",
     "Dict",
     "Error",
