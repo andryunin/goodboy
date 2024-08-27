@@ -1,11 +1,34 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Mapping, Optional, Union
+from enum import StrEnum
+from typing import Any, Callable, Mapping, Optional, TypeAlias, TypedDict, Union
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
 from goodboy.schema import Rule, Schema, SchemaError, SchemaWithUtils
 from goodboy.types.simple import Str
+
+KeyPredicateFunction: TypeAlias = Callable[[Mapping[str, Any]], bool]
+
+
+class KeyPredicateBinaryOp(StrEnum):
+    EQ = "="
+    NE = "!="
+    LT = "<"
+    LTE = "<="
+    GT = ">"
+    GTE = ">="
+    AND = "and"
+    OR = "or"
+
+
+KeyPredicateOperand: TypeAlias = str | int | bool
+
+KeyPredicateExpr: TypeAlias = tuple[
+    KeyPredicateOperand, KeyPredicateBinaryOp, KeyPredicateOperand
+]
+
+KeyPredicate: TypeAlias = KeyPredicateFunction | KeyPredicateExpr
 
 
 class Key:
@@ -26,7 +49,7 @@ class Key:
         *,
         required: Optional[bool] = None,
         default: Optional[Any] = None,
-        predicate: Optional[Callable[[Mapping[str, Any]], bool]] = None,
+        predicate: Optional[KeyPredicate] = None,
     ):
         if default and required:
             raise ValueError("key with default value cannot be required")
@@ -38,10 +61,49 @@ class Key:
         self._predicate = predicate
 
     def predicate_result(self, prev_values: Mapping[str, Any]) -> bool:
-        if self._predicate:
-            return self._predicate(prev_values)
-        else:
+        if self._predicate is None:
             return True
+
+        if callable(self._predicate):
+            return self._predicate(prev_values)
+        elif isinstance(self._predicate, tuple):
+            return self._predicate_expression_result(self._predicate, prev_values)
+        else:
+            raise TypeError("invalid key predicate type")
+
+    def _predicate_expression_result(
+        self, predicate: KeyPredicateExpr, prev_values: Mapping[str, Any]
+    ) -> bool:
+        left, op, right = predicate
+
+        if isinstance(left, str) and left.startswith("$"):
+            left_value = prev_values.get(left[1:])
+        else:
+            left_value = left
+
+        if isinstance(right, str) and right.startswith("$"):
+            right_value = prev_values.get(right[1:])
+        else:
+            right_value = right
+
+        if op == KeyPredicateBinaryOp.EQ:
+            return left_value == right_value
+        elif op == KeyPredicateBinaryOp.NE:
+            return left_value != right_value
+        elif op == KeyPredicateBinaryOp.LT:
+            return left_value < right_value
+        elif op == KeyPredicateBinaryOp.LTE:
+            return left_value <= right_value
+        elif op == KeyPredicateBinaryOp.GT:
+            return left_value > right_value
+        elif op == KeyPredicateBinaryOp.GTE:
+            return left_value >= right_value
+        elif op == KeyPredicateBinaryOp.AND:
+            return left_value and right_value
+        elif op == KeyPredicateBinaryOp.OR:
+            return left_value or right_value
+        else:
+            raise ValueError("unknown predicate expression operator")
 
     def validate(self, value: Any, typecast: bool, context: dict[str, Any]) -> Any:
         if self._schema:

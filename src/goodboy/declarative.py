@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from typing import Any, Mapping, Type
+from typing import Any, Mapping, Type, Union
 
 from goodboy.types.dates import Date, DateTime
 from goodboy.types.variants import AnyOf
@@ -13,7 +13,7 @@ else:
 
 from goodboy.errors import Error
 from goodboy.schema import Schema, SchemaError
-from goodboy.types.dicts import Dict, Key
+from goodboy.types.dicts import Dict, Key, KeyPredicateBinaryOp
 from goodboy.types.lists import List
 from goodboy.types.numeric import Float, Int
 from goodboy.types.python import CallableValue
@@ -21,11 +21,11 @@ from goodboy.types.simple import AnyValue, Bool, NoneValue, Str
 
 
 class DeclarativeSchemaFabric(Protocol):
-    def option_dict_keys(self, schema_name: str, full_schema: Schema) -> list[Key]:
-        ...
+    def option_dict_keys(self, schema_name: str, full_schema: Schema) -> list[Key]: ...
 
-    def create(self, options: dict[str, Any], builder: DeclarativeBuilder) -> Schema:
-        ...
+    def create(
+        self, options: dict[str, Any], builder: DeclarativeBuilder
+    ) -> Schema: ...
 
 
 class SimpleDeclarativeSchemaFabric:
@@ -48,6 +48,38 @@ class DictDeclarativeSchemaFabric:
         def predicate(value: Mapping[str, Any]) -> bool:
             return value.get("type") == schema_name
 
+        def validate_predicate_value(
+            self: List, value, typecast: bool, context: dict[str, Any]
+        ):
+            if value is None:
+                return value, []
+
+            if len(value) != 3:
+                return value, [self._error("invalid_length", {"value": 3})]
+
+            left, op, right = value
+            value_errors: dict[Union[str, int], list[Error]] = {}
+
+            try:
+                Str()(left)
+            except SchemaError as e:
+                value_errors[0] = e.errors
+
+            try:
+                Str(allowed=[op.value for op in KeyPredicateBinaryOp])(op)
+            except SchemaError as e:
+                value_errors[1] = e.errors
+
+            try:
+                Str()(right)
+            except SchemaError as e:
+                value_errors[2] = e.errors
+
+            if value_errors:
+                return value, [self._error("value_errors", nested_errors=value_errors)]
+            else:
+                return tuple(value), []
+
         keys = [
             Key("allow_none", Bool()),
             Key("messages", _MESSAGES_SCHEMA),
@@ -60,7 +92,10 @@ class DictDeclarativeSchemaFabric:
                             Key("name", Str(), required=True),
                             Key("schema", full_schema),
                             Key("required", Bool(allow_none=True)),
-                            Key("predicate", CallableValue(allow_none=True)),
+                            Key(
+                                "predicate",
+                                List(allow_none=True, rules=[validate_predicate_value]),
+                            ),
                         ],
                         keys_required_by_default=False,
                     )

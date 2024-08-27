@@ -156,7 +156,7 @@ def test_declarative_build_dict():
             {
                 "name": "bar",
                 "schema": {"type": "int"},
-                "predicate": dummy_key_predicate,
+                "predicate": ["$foo", "=", "bar"],
             },
         ],
         "key_schema": {"type": "str", "length": 3},
@@ -170,7 +170,7 @@ def test_declarative_build_dict():
         rules=[dummy_rule],
         keys=[
             Key("foo", Str(allow_none=True), required=True),
-            Key("bar", Int(), predicate=dummy_key_predicate),
+            Key("bar", Int(), predicate=("$foo", "=", "bar")),
         ],
         key_schema=Str(length=3),
         value_schema=Str(length=3),
