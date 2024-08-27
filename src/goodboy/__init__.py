@@ -28,7 +28,7 @@ from goodboy.types.simple import AnyValue, Bool, NoneValue, Str
 from goodboy.types.variants import AnyOf
 from goodboy.validator import Result, Validator, validate
 
-__version__ = "0.2.4"
+__version__ = "0.2.5"
 
 __all__ = [
     "AnyOf",
