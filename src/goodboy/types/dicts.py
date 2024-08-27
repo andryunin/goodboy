@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Callable, Mapping, Optional, TypeAlias, TypedDict, Union
+from typing import Any, Callable, Mapping, Optional, TypeAlias, Union
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name

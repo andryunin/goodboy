@@ -11,7 +11,7 @@ from goodboy.types.numeric import Float, Int
 from goodboy.types.simple import AnyValue, Bool, NoneValue, Str
 from goodboy.types.variants import AnyOf
 
-from .conftest import assert_declarative_errors, dummy_key_predicate, dummy_rule
+from .conftest import assert_declarative_errors, dummy_rule
 
 ALLOWED_SCHEMA_NAMES = list(_DEFAULT_DECLARATIVE_SCHEMA_FABRICS.keys())
 
