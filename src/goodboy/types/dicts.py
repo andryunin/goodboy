@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from enum import StrEnum
+from enum import Enum
 from typing import Any, Callable, Mapping, Optional, TypeAlias, TypedDict, Union
 
 from goodboy.errors import Error
@@ -11,7 +11,7 @@ from goodboy.types.simple import Str
 KeyPredicateFunction: TypeAlias = Callable[[Mapping[str, Any]], bool]
 
 
-class KeyPredicateBinaryOp(StrEnum):
+class KeyPredicateBinaryOp(str, Enum):
     EQ = "="
     NE = "!="
     LT = "<"
