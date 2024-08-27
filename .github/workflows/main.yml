@@ -56,8 +56,9 @@ jobs:
           python -m poetry run pip install flake8
 
       - name: Compile locale files
-        run: |
-          python -m poetry run pybabel compile -d src/goodboy/locale -D goodboy
+        uses: whtsky/msgfmt-action@20190305
+        env:
+          WORKDIR: src/goodboy/locale
 
       - name: Lint with flake8
         run: |
