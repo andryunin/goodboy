@@ -12,7 +12,7 @@ KeyPredicateFunction: TypeAlias = Callable[[Mapping[str, Any]], bool]
 
 
 class KeyPredicateBinaryOp(str, Enum):
-    EQ = "="
+    EQ = "=="
     NE = "!="
     LT = "<"
     LTE = "<="

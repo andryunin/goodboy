@@ -259,8 +259,8 @@ def test_accepts_values_when_expr_predicate_succeed(good_value):
     schema = Dict(
         keys=[
             Key("field", Str()),
-            Key("value", Str(), predicate=("$field", "=", "name")),
-            Key("value", Date(), predicate=("$field", "=", "birthday")),
+            Key("value", Str(), predicate=("$field", "==", "name")),
+            Key("value", Date(), predicate=("$field", "==", "birthday")),
         ]
     )
 
@@ -278,8 +278,8 @@ def test_rejects_values_when_expr_predicate_failed(bad_value, type_name):
     schema = Dict(
         keys=[
             Key("field", Str()),
-            Key("value", Str(), predicate=("$field", "=", "name")),
-            Key("value", Date(), predicate=("$field", "=", "birthday")),
+            Key("value", Str(), predicate=("$field", "==", "name")),
+            Key("value", Date(), predicate=("$field", "==", "birthday")),
         ]
     )
 
