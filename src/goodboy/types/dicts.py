@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Callable, Mapping, Optional, Union
+from typing import Any, Callable, Mapping, Optional, Tuple, Union
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
@@ -24,7 +24,7 @@ class KeyPredicateBinaryOp(str, Enum):
 
 KeyPredicateOperand = Union[str, int, bool]
 
-KeyPredicateExpr = tuple[KeyPredicateOperand, KeyPredicateBinaryOp, KeyPredicateOperand]
+KeyPredicateExpr = Tuple[KeyPredicateOperand, KeyPredicateBinaryOp, KeyPredicateOperand]
 
 KeyPredicate = Union[KeyPredicateFunction, KeyPredicateExpr]
 
