@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Callable, Mapping, Optional, TypeAlias, Union
+from typing import Any, Callable, Mapping, Optional, Union
 
 from goodboy.errors import Error
 from goodboy.messages import DEFAULT_MESSAGES, MessageCollectionType, type_name
 from goodboy.schema import Rule, Schema, SchemaError, SchemaWithUtils
 from goodboy.types.simple import Str
 
-KeyPredicateFunction: TypeAlias = Callable[[Mapping[str, Any]], bool]
+KeyPredicateFunction = Callable[[Mapping[str, Any]], bool]
 
 
 class KeyPredicateBinaryOp(str, Enum):
@@ -22,13 +22,11 @@ class KeyPredicateBinaryOp(str, Enum):
     OR = "or"
 
 
-KeyPredicateOperand: TypeAlias = str | int | bool
+KeyPredicateOperand = Union[str, int, bool]
 
-KeyPredicateExpr: TypeAlias = tuple[
-    KeyPredicateOperand, KeyPredicateBinaryOp, KeyPredicateOperand
-]
+KeyPredicateExpr = tuple[KeyPredicateOperand, KeyPredicateBinaryOp, KeyPredicateOperand]
 
-KeyPredicate: TypeAlias = KeyPredicateFunction | KeyPredicateExpr
+KeyPredicate = Union[KeyPredicateFunction, KeyPredicateExpr]
 
 
 class Key:
