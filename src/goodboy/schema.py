@@ -4,7 +4,12 @@ from abc import ABC, abstractmethod
 from typing import Any, Callable, List, Tuple, Union
 
 from goodboy.errors import Error
-from goodboy.messages import DEFAULT_MESSAGES, MessageCollection, MessageCollectionType
+from goodboy.messages import (
+    DEFAULT_MESSAGES,
+    Message,
+    MessageCollection,
+    MessageCollectionType,
+)
 
 
 class SchemaError(Exception):
@@ -16,8 +21,7 @@ class Schema(ABC):
     @abstractmethod
     def __call__(
         self, value: Any, *, typecast: bool = False, context: dict[str, Any] = {}
-    ) -> Any:
-        ...
+    ) -> Any: ...
 
 
 class SchemaErrorMixin:
@@ -28,8 +32,14 @@ class SchemaErrorMixin:
         code: str,
         args: dict[str, Any] = {},
         nested_errors: dict[Union[str, int], list[Error]] = {},
+        message: str | Message | None = None,
     ) -> Error:
-        return Error(code, args, nested_errors, self._messages.get_message(code))
+        if message is not None:
+            message = message
+        else:
+            message = self._messages.get_message(code)
+
+        return Error(code, args, nested_errors, message)
 
 
 Rule = Callable[["SchemaRulesMixin", Any, bool, dict], Tuple[Any, List[Error]]]
@@ -92,14 +102,12 @@ class SchemaWithUtils(Schema, SchemaErrorMixin, SchemaRulesMixin):
     @abstractmethod
     def _validate(
         self, value: Any, typecast: bool, context: dict[str, Any] = {}
-    ) -> tuple[Any, list[Error]]:
-        ...
+    ) -> tuple[Any, list[Error]]: ...
 
     @abstractmethod
     def _typecast(
         self, input: Any, context: dict[str, Any] = {}
-    ) -> tuple[Any, list[Error]]:
-        ...
+    ) -> tuple[Any, list[Error]]: ...
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, self.__class__):
