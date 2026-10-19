@@ -23,11 +23,9 @@ class Translations(Protocol):
     :func:`load_default_messages`).
     """
 
-    def gettext(self, message: str) -> str:
-        ...
+    def gettext(self, message: str) -> str: ...
 
-    def ngettext(self, singular: str, plural: str, number: int) -> str:
-        ...
+    def ngettext(self, singular: str, plural: str, number: int) -> str: ...
 
 
 def default_messages_path() -> Path:
@@ -103,8 +101,8 @@ def lazy_gettext(message: str) -> I18nLazyString:
     return I18nLazyString(message)
 
 
-_process_locale: Optional[list[str]]
-_process_translations: Translations
+_process_locale: Optional[list[str]] = None
+_process_translations: Translations | None = None
 
 
 class ThreadingLocalLocale(threading.local):
@@ -199,6 +197,9 @@ def get_current_translations() -> Translations:
 
         return _thread_locale.translations
     else:
+        if not _process_translations:
+            raise ValueError("process translations is not set")
+
         return _process_translations
 
 
