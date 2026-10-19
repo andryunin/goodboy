@@ -21,7 +21,6 @@ jobs:
       matrix:
         python-version:
           [
-            "3.7",
             "3.8",
             "3.9",
             "3.10",
@@ -63,8 +62,9 @@ jobs:
           poetry run pip install flake8
 
       - name: Compile locale files
-        run: |
-          find src/goodboy/locale -name '*.po' -exec sh -c 'msgfmt "$1" -o "${1%.po}.mo"' _ {} \;
+        uses: whtsky/msgfmt-action@20190305
+        env:
+          WORKDIR: src/goodboy/locale
 
       - name: Lint with flake8
         run: |
